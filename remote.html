@@ -1,0 +1,2977 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>AETHER-VJ // MANDO MÓVIL WI-FI</title>
+  <style>
+    :root {
+      --bg: #08090d;
+      --card: #12151f;
+      --slot: #191d2b;
+      --border: #2a3147;
+      --cyan: #00f0ff;
+      --amber: #ffb800;
+      --green: #00e676;
+      --magenta: #ff0055;
+      --text: #f2f5fa;
+      --muted: #939db8;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      padding: 0 0 80px 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "JetBrains Mono", "Segoe UI", system-ui, monospace;
+      user-select: none;
+    }
+
+    /* PANTALLA DE LOGIN / CONTRASEÑA */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: radial-gradient(circle at 50% 25%, #151b2d 0%, #07080c 85%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .login-overlay.hidden {
+      display: none;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 370px;
+      background: var(--card);
+      border: 1px solid var(--cyan);
+      border-radius: 12px;
+      padding: 24px 20px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 240, 255, 0.15);
+      text-align: center;
+    }
+    .login-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--cyan);
+      background: rgba(0, 240, 255, 0.12);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+    }
+    .login-title {
+      font-size: 18px;
+      font-weight: 900;
+      margin: 0 0 6px;
+      letter-spacing: 0.6px;
+    }
+    .login-sub {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.45;
+      margin: 0 0 18px;
+    }
+    .pin-input {
+      width: 100%;
+      background: #090b11;
+      border: 1px solid var(--border);
+      color: #fff;
+      font-family: inherit;
+      font-size: 18px;
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: 3px;
+      padding: 14px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      outline: none;
+    }
+    .pin-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+    }
+    .btn-login-submit {
+      width: 100%;
+      background: var(--cyan);
+      color: #050608;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .login-error {
+      color: #ff4d79;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 10px;
+      min-height: 16px;
+    }
+    .login-roles-hint {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 10px;
+      color: var(--muted);
+      text-align: left;
+      line-height: 1.6;
+    }
+
+    /* CABECERA Y CONTROLES */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(12, 14, 20, 0.96);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+    }
+    .led {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--amber);
+      box-shadow: 0 0 8px var(--amber);
+    }
+    .led.online {
+      background: var(--green);
+      box-shadow: 0 0 10px var(--green);
+    }
+    .top-right-cluster {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-pill {
+      font-size: 10px;
+      color: var(--cyan);
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .btn-logout {
+      background: var(--slot);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* OCULTAR CONTROLES TÉCNICOS CUANDO ENTRA UN DJ INVITADO */
+    body.dj-guest-mode .admin-only {
+      display: none !important;
+    }
+
+    .quick-hero-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 10px 12px 4px;
+    }
+    .btn-hero {
+      padding: 13px 10px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    .btn-hero.calm {
+      background: rgba(0, 230, 118, 0.16);
+      border-color: var(--green);
+      color: var(--green);
+    }
+    .btn-hero.next {
+      background: rgba(0, 240, 255, 0.16);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+    .btn-hero.panic {
+      background: rgba(255, 0, 85, 0.18);
+      border-color: var(--magenta);
+      color: #ff6d97;
+    }
+    .preset-grid-mobile {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+    .preset-grid-mobile .btn-pad {
+      min-height: 52px;
+      font-size: 9px;
+      line-height: 1.25;
+      overflow: hidden;
+    }
+    .preset-grid-mobile .btn-pad .pnum {
+      display: block;
+      font-size: 13px;
+      font-weight: 900;
+      margin-bottom: 2px;
+    }
+    .preset-grid-mobile .btn-pad.filled {
+      border-color: var(--magenta);
+    }
+    .preset-grid-mobile.save-armed .btn-pad {
+      border-style: dashed;
+      border-color: var(--amber);
+    }
+    .tabs-nav {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      padding: 8px 12px;
+    }
+    .tab-btn {
+      padding: 11px 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      background: rgba(255, 184, 0, 0.16);
+      border-color: var(--amber);
+      color: var(--amber);
+    }
+    .tab-pane { display: none; padding: 6px 12px; }
+    .tab-pane.active { display: block; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--cyan);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      letter-spacing: 0.5px;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .grid-6 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .btn-pad {
+      background: var(--slot);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 11px 8px;
+      border-radius: 5px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-pad.active {
+      background: rgba(0, 240, 255, 0.18);
+      border-color: var(--cyan);
+      color: var(--cyan);
+      box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.2);
+    }
+    .btn-pad.amber-active {
+      background: rgba(255, 184, 0, 0.2);
+      border-color: var(--amber);
+      color: var(--amber);
+    }
+    .btn-pad.green-live {
+      background: rgba(0, 230, 118, 0.22);
+      border-color: var(--green);
+      color: var(--green);
+    }
+    .btn-pad.danger {
+      background: rgba(255, 0, 85, 0.16);
+      border-color: var(--magenta);
+      color: #ff6699;
+    }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .slider-row span {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      min-width: 88px;
+    }
+    .slider-row input[type="range"] {
+      flex: 1;
+      accent-color: var(--cyan);
+      height: 26px;
+    }
+    .logo-preview-box {
+      background: repeating-conic-gradient(#141824 0% 25%, #0c0e16 0% 50%) 50% / 16px 16px;
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      height: 84px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .logo-preview-box img {
+      max-width: 90%;
+      max-height: 72px;
+      object-fit: contain;
+    }
+    .text-logo-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .text-logo-input {
+      flex: 1;
+      background: #0b0d14;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 10px;
+      border-radius: 5px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .scene-pad-mobile {
+      background: var(--slot);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 8px;
+      text-align: left;
+      color: var(--text);
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .scene-pad-mobile.active {
+      border-color: var(--cyan);
+      background: rgba(0, 240, 255, 0.16);
+    }
+    .scene-pad-mobile .code {
+      font-size: 9px;
+      color: var(--cyan);
+      font-weight: 800;
+    }
+    .scene-pad-mobile .name {
+      font-size: 11px;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    /* ==================== V2: TEXTO, VÍDEO, CORNER-PIN, MÁSCARAS, EDGE BLEND ==================== */
+    .help-text {
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-top: 8px;
+    }
+    .help-text strong { color: var(--text); }
+    .msg-line {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--amber);
+      margin-top: 6px;
+      min-height: 14px;
+    }
+    .btn-big {
+      padding: 15px 8px !important;
+      font-size: 12px !important;
+    }
+    .btn-full { width: 100%; }
+    .text-area-input {
+      width: 100%;
+      background: #0b0d14;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.35;
+      resize: none;
+      min-height: 66px;
+      user-select: text;
+      -webkit-user-select: text;
+      outline: none;
+    }
+    .text-area-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    }
+    .char-counter {
+      text-align: right;
+      font-size: 10px;
+      color: var(--muted);
+      margin: 4px 0 8px;
+    }
+    .now-playing {
+      background: #0b0d14;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 11px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .now-playing.live {
+      border-color: var(--green);
+      color: var(--green);
+    }
+    .upload-progress { margin-top: 8px; }
+    .upload-progress .bar {
+      height: 14px;
+      background: #0b0d14;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .upload-progress .fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--cyan), var(--green));
+      transition: width 0.15s linear;
+    }
+    .upload-progress .label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-top: 4px;
+      text-align: center;
+    }
+    .media-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 360px;
+      overflow-y: auto;
+    }
+    .media-item { display: flex; gap: 6px; }
+    .media-item .media-play {
+      flex: 1;
+      min-width: 0;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-align: left;
+    }
+    .media-item .media-play.playing {
+      border-color: var(--green);
+      color: var(--green);
+      background: rgba(0, 230, 118, 0.12);
+    }
+    .media-item .mname {
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .media-item .msize {
+      font-size: 9px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .media-item .media-del { width: 54px; flex: 0 0 54px; }
+    .select-input {
+      width: 100%;
+      background: #0b0d14;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .cp-editor {
+      position: relative;
+      width: 100%;
+      height: 0;
+      padding-top: 56.25%;
+      background: #05060a;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      touch-action: none;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .cp-editor canvas {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .cp-handle {
+      position: absolute;
+      width: 36px;
+      height: 36px;
+      margin: -18px 0 0 -18px;
+      border-radius: 50%;
+      border: 2px solid var(--cyan);
+      background: rgba(0, 240, 255, 0.25);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+      cursor: grab;
+      z-index: 2;
+    }
+    .cp-handle.selected {
+      border-color: var(--amber);
+      background: rgba(255, 184, 0, 0.4);
+      box-shadow: 0 0 14px rgba(255, 184, 0, 0.6);
+    }
+    .cp-readout {
+      font-size: 10px;
+      color: var(--amber);
+      margin: 6px 0;
+      text-align: center;
+      font-weight: 700;
+    }
+    .nudge-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .nudge-pad .btn-pad { padding: 14px 4px; font-size: 16px; }
+    .nudge-pad .btn-pad.step-btn { font-size: 10px; }
+    .mask-block {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px;
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.015);
+    }
+    .mask-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .mask-head > span { font-size: 11px; font-weight: 800; color: #ff6d97; }
+    .mask-head .btn-pad { min-width: 120px; }
+  </style>
+</head>
+<body>
+
+  <!-- MODAL DE CONTRASEÑA / PIN PARA DJS Y TÉCNICOS -->
+  <div id="login-overlay" class="login-overlay">
+    <div class="login-card">
+      <div class="login-badge">🔒 ACCESO PROTEGIDO WI-FI</div>
+      <h1 class="login-title">AETHER-VJ // REMOTE</h1>
+      <p class="login-sub">Introduce la clave proporcionada por el técnico para subir tu Logo PNG o controlar el escenario.</p>
+
+      <form id="login-form">
+        <input type="password" id="pin-input" class="pin-input" placeholder="CONTRASEÑA / PIN" autocomplete="off" required />
+        <button type="submit" class="btn-login-submit">ENTRAR AL SISTEMA</button>
+      </form>
+      <div id="login-error" class="login-error"></div>
+
+      <div class="login-roles-hint">
+        <div>🎧 <strong>Clave DJ Invitado:</strong> Permite subir tu Logo PNG, escribir tu nombre y elegir el efecto 3D/Latido de tu logo.</div>
+        <div style="margin-top:4px">🎛️ <strong>Clave Técnico:</strong> Control total de los 48 loops, paletas, BPM y efectos de sala.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRA SUPERIOR DE ESTADO -->
+  <header class="topbar">
+    <div class="brand">
+      <span id="conn-led" class="led"></span>
+      <span id="role-title">AETHER // MÓVIL</span>
+    </div>
+    <div class="top-right-cluster">
+      <div id="live-scene-pill" class="status-pill">CONECTADO</div>
+      <button type="button" id="btn-logout" class="btn-logout" title="Cerrar sesión o cambiar de clave">🔒 SALIR</button>
+    </div>
+  </header>
+
+  <!-- BOTONES RÁPIDOS SIEMPRE VISIBLES (SOLO TÉCNICO) -->
+  <div class="quick-hero-bar admin-only">
+    <button type="button" id="btn-calm" class="btn-hero calm">🌿 CALMAR VISUAL</button>
+    <button type="button" id="btn-next" class="btn-hero next">⏭ SIGUIENTE LOOP</button>
+    <button type="button" id="btn-panic" class="btn-hero panic" style="grid-column: span 2">🆘 PÁNICO: VOLVER A VISUAL SEGURO</button>
+  </div>
+
+  <!-- NAVEGACIÓN POR PESTAÑAS TÁCTILES (EL DJ SOLO VE LOGO, TEXTO Y VÍDEO; EL TÉCNICO LO VE TODO) -->
+  <nav class="tabs-nav">
+    <button type="button" class="tab-btn active" data-tab="tab-logo">📸 LOGO</button>
+    <button type="button" class="tab-btn" data-tab="tab-text">✍️ TEXTO</button>
+    <button type="button" class="tab-btn" data-tab="tab-media">🎬 VÍDEO Y CÁMARA</button>
+    <button type="button" class="tab-btn admin-only" data-tab="tab-visuals">🌀 LOOPS</button>
+    <button type="button" class="tab-btn admin-only" data-tab="tab-color">🎨 COLOR</button>
+    <button type="button" class="tab-btn admin-only" data-tab="tab-mapping">📐 MAPPING</button>
+  </nav>
+
+  <!-- ==================== PESTAÑA 1: ESTUDIO DE LOGO PNG DJ ==================== -->
+  <section id="tab-logo" class="tab-pane active">
+    <div class="card">
+      <div class="card-title">
+        <span>📸 SUBIR Y MOSTRAR LOGO DEL DJ</span>
+        <span id="logo-status-tag" style="color:var(--amber)">APAGADO</span>
+      </div>
+
+      <div class="logo-preview-box">
+        <img id="logo-preview-img" alt="Vista previa del Logo" style="display:none" />
+        <span id="logo-preview-placeholder" style="font-size:11px;color:var(--muted)">VISTA PREVIA DEL LOGO ACTIVO</span>
+      </div>
+
+      <input type="file" id="mobile-logo-file" accept="image/png,image/jpeg,image/webp,image/svg+xml" style="display:none" />
+
+      <div class="grid-2" style="margin-bottom:8px">
+        <button type="button" id="btn-m-logo-toggle" class="btn-pad" style="padding:14px 8px;font-size:12px">
+          👁 MOSTRAR LOGO
+        </button>
+        <button type="button" id="btn-m-logo-upload" class="btn-pad amber-active" style="padding:14px 8px;font-size:12px">
+          📤 SUBIR LOGO (PNG/JPG/SVG)
+        </button>
+      </div>
+
+      <div class="card-title" style="margin-top:6px;margin-bottom:6px">
+        <span>🪄 QUITAR FONDO AL SUBIR</span>
+      </div>
+      <div class="grid-4" id="m-logo-bg-grid">
+        <button type="button" class="btn-pad active" data-bg="auto">🤖 Auto</button>
+        <button type="button" class="btn-pad" data-bg="white">⚪ Blanco</button>
+        <button type="button" class="btn-pad" data-bg="black">⚫ Negro</button>
+        <button type="button" class="btn-pad" data-bg="none">🚫 No</button>
+      </div>
+      <button type="button" id="btn-m-logo-reclean" class="btn-pad btn-full" style="margin-top:6px;padding:13px 8px">
+        ✨ Re-limpiar fondo del logo activo
+      </button>
+      <div id="m-logo-msg" class="msg-line"></div>
+      <div class="help-text">Acepta PNG con transparencia, JPG, WEBP y SVG. <strong>Auto</strong> detecta si el fondo es blanco o negro y lo vuelve transparente; usa <strong>No</strong> si tu PNG ya viene recortado.</div>
+
+      <div class="card-title" style="margin-top:10px;margin-bottom:6px">
+        <span>4 RANURAS DE DJS DE LA NOCHE</span>
+      </div>
+      <div class="grid-4" id="m-logo-slots">
+        <button type="button" class="btn-pad amber-active" data-slot="0">DJ 1</button>
+        <button type="button" class="btn-pad" data-slot="1">DJ 2</button>
+        <button type="button" class="btn-pad" data-slot="2">DJ 3</button>
+        <button type="button" class="btn-pad" data-slot="3">DJ 4</button>
+      </div>
+
+      <!-- GENERADOR INSTANTÁNEO DE LOGO SI EL DJ NO TRAE PNG -->
+      <div class="card-title" style="margin-top:12px;margin-bottom:4px">
+        <span>✏️ ¿NO TIENES PNG? ESCRIBE TU NOMBRE DE DJ:</span>
+      </div>
+      <div class="text-logo-row">
+        <input type="text" id="dj-name-input" class="text-logo-input" placeholder="EJ: DJ MARCO / AFTERLIFE" maxlength="22" />
+        <button type="button" id="btn-create-text-logo" class="btn-pad active" style="white-space:nowrap">
+          ⚡ CREAR LOGO
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>✨ EFECTO DINÁMICO DEL LOGO EN VIVO</span>
+      </div>
+      <div class="grid-2" id="m-logo-fx-grid">
+        <button type="button" class="btn-pad" data-fx="0">⏹ Fijo Limpio</button>
+        <button type="button" class="btn-pad active" data-fx="1">💓 Latido BPM + Halo</button>
+        <button type="button" class="btn-pad" data-fx="2">🧊 Logo 3D Relieve</button>
+        <button type="button" class="btn-pad" data-fx="3">⚡ Neón + Glitch RGB</button>
+        <button type="button" class="btn-pad" data-fx="4" style="grid-column: span 2">🎭 Silueta / Máscara (Visuales por dentro)</button>
+      </div>
+
+      <div class="card-title" style="margin-top:12px">
+        <span>POSICIÓN Y COLOR DEL LOGO</span>
+      </div>
+      <div class="grid-4" id="m-logo-pos-grid">
+        <button type="button" class="btn-pad active" data-pos="0">🎯 Centro</button>
+        <button type="button" class="btn-pad" data-pos="1">⬆️ Arriba</button>
+        <button type="button" class="btn-pad" data-pos="2">↘️ Esquina</button>
+        <button type="button" id="btn-m-logo-tint" class="btn-pad">🎨 Teñir</button>
+      </div>
+
+      <div class="slider-row">
+        <span>TAMAÑO LOGO</span>
+        <input type="range" id="m-logo-scale" min="0.15" max="1.0" step="0.01" value="0.44" />
+      </div>
+      <div class="slider-row">
+        <span>SOMBRA FONDO</span>
+        <input type="range" id="m-logo-backdrop" min="0.0" max="1.0" step="0.01" value="0.65" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PESTAÑA TEXTO EN PANTALLA (DJ Y TÉCNICO) ==================== -->
+  <section id="tab-text" class="tab-pane">
+    <div class="card">
+      <div class="card-title">
+        <span>✍️ TEXTO EN PANTALLA</span>
+        <span id="m-text-status-tag" style="color:var(--amber)">OCULTO</span>
+      </div>
+      <textarea id="m-text-input" class="text-area-input" maxlength="140" rows="2" placeholder="Escribe tu mensaje (máx. 2 líneas)"></textarea>
+      <div class="char-counter"><span id="m-text-count">0/140</span></div>
+
+      <div class="card-title" style="margin-bottom:6px"><span>⚡ MENSAJES RÁPIDOS</span></div>
+      <div class="grid-2" id="m-text-quick">
+        <button type="button" class="btn-pad" data-text="¡FELIZ&#10;CUMPLE!">🎂 Feliz cumple</button>
+        <button type="button" class="btn-pad" data-text="MAKE SOME&#10;NOISE!">🔥 Make some noise</button>
+        <button type="button" class="btn-pad" data-text="¡FELIZ&#10;AÑO NUEVO!">🕛 Feliz Año</button>
+        <button type="button" class="btn-pad" data-text="¡VIVAN LOS&#10;NOVIOS!">💍 Vivan los novios</button>
+        <button type="button" class="btn-pad" data-text="MANOS&#10;ARRIBA">🙌 Manos arriba</button>
+        <button type="button" class="btn-pad" data-text="GRACIAS&#10;POR VENIR">❤️ Gracias por venir</button>
+      </div>
+
+      <div class="grid-2" style="margin-top:10px">
+        <button type="button" id="btn-m-text-toggle" class="btn-pad btn-big">👁 MOSTRAR TEXTO</button>
+        <button type="button" id="btn-m-text-send" class="btn-pad amber-active btn-big">📤 ENVIAR TEXTO</button>
+      </div>
+      <div id="m-text-msg" class="msg-line"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>🔤 TIPO DE LETRA</span></div>
+      <div class="grid-2" id="m-text-font-grid">
+        <button type="button" class="btn-pad active" data-font="0">Impacto</button>
+        <button type="button" class="btn-pad" data-font="1">Mono Tech</button>
+        <button type="button" class="btn-pad" data-font="2">Elegante</button>
+        <button type="button" class="btn-pad" data-font="3">Redonda</button>
+      </div>
+
+      <div class="card-title" style="margin-top:12px"><span>✨ EFECTO DEL TEXTO</span></div>
+      <div class="grid-2" id="m-text-fx-grid">
+        <button type="button" class="btn-pad" data-tfx="0">⏹ Limpio</button>
+        <button type="button" class="btn-pad active" data-tfx="1">💓 Latido + Halo</button>
+        <button type="button" class="btn-pad" data-tfx="2">⚡ Neón Glitch RGB</button>
+        <button type="button" class="btn-pad" data-tfx="3">📜 Ticker (desplazamiento)</button>
+        <button type="button" class="btn-pad" data-tfx="4">🌊 Onda</button>
+        <button type="button" class="btn-pad" data-tfx="5">🎭 Silueta (visual dentro)</button>
+        <button type="button" class="btn-pad" data-tfx="6" style="grid-column: span 2">🧊 Relieve 3D</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>📍 POSICIÓN Y COLOR</span></div>
+      <div class="grid-3" id="m-text-pos-grid" style="margin-bottom:8px">
+        <button type="button" class="btn-pad active" data-tpos="0">🎯 Centro</button>
+        <button type="button" class="btn-pad" data-tpos="1">⬆️ Arriba</button>
+        <button type="button" class="btn-pad" data-tpos="2">⬇️ Abajo</button>
+      </div>
+      <div class="grid-3" id="m-text-color-grid">
+        <button type="button" class="btn-pad active" data-tcolor="0">⚪ Blanco</button>
+        <button type="button" class="btn-pad" data-tcolor="1">🎨 Paleta</button>
+        <button type="button" class="btn-pad" data-tcolor="2">🌈 Arcoíris</button>
+      </div>
+      <div class="slider-row">
+        <span>TAMAÑO</span>
+        <input type="range" id="m-text-scale" min="0.15" max="1.0" step="0.01" value="0.5" />
+      </div>
+      <div class="slider-row">
+        <span>OPACIDAD</span>
+        <input type="range" id="m-text-opacity" min="0.1" max="1.0" step="0.01" value="1" />
+      </div>
+      <div class="slider-row">
+        <span>SOMBRA FONDO</span>
+        <input type="range" id="m-text-backdrop" min="0" max="1.0" step="0.01" value="0.4" />
+      </div>
+      <div class="slider-row">
+        <span>VEL. TICKER</span>
+        <input type="range" id="m-text-scroll" min="0.05" max="1.0" step="0.01" value="0.5" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PESTAÑA VÍDEO, GIF Y CÁMARA (DJ Y TÉCNICO; CÁMARA SOLO TÉCNICO) ==================== -->
+  <section id="tab-media" class="tab-pane">
+    <div class="card">
+      <div class="card-title">
+        <span>🎬 VÍDEO / GIF / FOTO</span>
+        <span id="m-media-status-tag" style="color:var(--amber)">PARADO</span>
+      </div>
+      <div id="m-media-now" class="now-playing">⏹ Nada en reproducción</div>
+
+      <input type="file" id="m-media-file" accept="video/mp4,video/webm,video/quicktime,video/x-m4v,.mp4,.webm,.mov,.m4v,image/gif,image/png,image/jpeg,image/webp" style="display:none" />
+      <button type="button" id="btn-m-media-upload" class="btn-pad amber-active btn-big btn-full">
+        📤 SUBIR VÍDEO / GIF / FOTO DEL MÓVIL
+      </button>
+      <div id="m-media-progress" class="upload-progress" style="display:none">
+        <div class="bar"><div id="m-media-progress-fill" class="fill"></div></div>
+        <div id="m-media-progress-text" class="label">0%</div>
+      </div>
+      <div id="m-media-msg" class="msg-line"></div>
+
+      <div class="grid-2" style="margin-top:6px">
+        <button type="button" id="btn-m-media-toggle" class="btn-pad btn-big">👁 MOSTRAR VÍDEO</button>
+        <button type="button" id="btn-m-media-stop" class="btn-pad danger btn-big">⏹ Quitar vídeo</button>
+      </div>
+      <div class="help-text">MP4, WEBM, MOV, GIF, PNG, JPG o WEBP de hasta 300 MB. Se queda guardado en la biblioteca para volver a lanzarlo.</div>
+    </div>
+
+    <div class="card admin-only">
+      <div class="card-title"><span>📷 CÁMARA EN DIRECTO</span></div>
+      <select id="m-camera-select" class="select-input">
+        <option value="">Cámara por defecto</option>
+      </select>
+      <div class="grid-2">
+        <button type="button" id="btn-m-camera-on" class="btn-pad active btn-big">📷 Cámara en directo</button>
+        <button type="button" id="btn-m-camera-refresh" class="btn-pad btn-big">🔄 Buscar cámaras</button>
+      </div>
+      <div class="help-text">La cámara se conecta al ordenador del visual (webcam USB o capturadora HDMI). Usa el efecto <strong>Espejo</strong> si es una cámara selfie.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>📚 BIBLIOTECA DE VÍDEOS</span>
+        <button type="button" id="btn-m-media-refresh" class="btn-logout">🔄 ACTUALIZAR</button>
+      </div>
+      <div id="m-media-list" class="media-list">
+        <div class="help-text">Toca 🔄 ACTUALIZAR para ver los vídeos subidos.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>🎚 MEZCLA CON LOS VISUALES</span></div>
+      <div class="grid-2" id="m-media-blend-grid">
+        <button type="button" class="btn-pad active" data-mblend="0">⬛ Encima (tapa)</button>
+        <button type="button" class="btn-pad" data-mblend="1">✨ Pantalla (suma luz)</button>
+        <button type="button" class="btn-pad" data-mblend="2">🎭 Máscara (visual dentro)</button>
+        <button type="button" class="btn-pad" data-mblend="3">🔀 Diferencia</button>
+        <button type="button" class="btn-pad" data-mblend="4" style="grid-column: span 2">🌗 Mitad y mitad</button>
+      </div>
+
+      <div class="card-title" style="margin-top:12px"><span>🎨 EFECTO DEL VÍDEO</span></div>
+      <div class="grid-2" id="m-media-fx-grid">
+        <button type="button" class="btn-pad active" data-mfx="0">⏹ Normal</button>
+        <button type="button" class="btn-pad" data-mfx="1">💠 Bordes Neón</button>
+        <button type="button" class="btn-pad" data-mfx="2">🎨 Duotono Paleta</button>
+        <button type="button" class="btn-pad" data-mfx="3">🔥 Térmica</button>
+        <button type="button" class="btn-pad" data-mfx="4">🟨 Pop-Art</button>
+        <button type="button" class="btn-pad" data-mfx="5">👻 Fantasma</button>
+        <button type="button" class="btn-pad" data-mfx="6" style="grid-column: span 2">▦ Pixel LED</button>
+      </div>
+
+      <div class="card-title" style="margin-top:12px"><span>🖼 ENCUADRE</span></div>
+      <div class="grid-3" id="m-media-fit-grid">
+        <button type="button" class="btn-pad active" data-mfit="0">⛶ Llenar</button>
+        <button type="button" class="btn-pad" data-mfit="1">▣ Encajar</button>
+        <button type="button" id="btn-m-media-mirror" class="btn-pad">🪞 Espejo</button>
+      </div>
+      <div class="slider-row">
+        <span>OPACIDAD</span>
+        <input type="range" id="m-media-opacity" min="0" max="1" step="0.01" value="1" />
+      </div>
+      <div class="slider-row">
+        <span>ZOOM AL BOMBO</span>
+        <input type="range" id="m-media-beatzoom" min="0" max="1" step="0.01" value="0" />
+      </div>
+      <div class="slider-row">
+        <span>VELOCIDAD</span>
+        <input type="range" id="m-media-speed" min="0.25" max="2" step="0.05" value="1" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PESTAÑA 2: 48 LOOPS, FORMAS Y 3D (SOLO TÉCNICO) ==================== -->
+  <section id="tab-visuals" class="tab-pane admin-only">
+    <div class="card">
+      <div class="card-title">
+        <span>⭐ MIS LOOKS GUARDADOS</span>
+        <span id="m-preset-hint" style="color:var(--muted)">TOCA PARA CARGAR</span>
+      </div>
+      <div class="preset-grid-mobile" id="m-preset-grid"></div>
+      <button type="button" id="btn-m-preset-save" class="btn-pad" style="width:100%;margin-top:8px">
+        💾 GUARDAR LOOK ACTUAL EN UNA CASILLA
+      </button>
+      <div class="card-title" style="margin-top:12px;margin-bottom:6px">
+        <span>🔀 TRANSICIÓN AL CARGAR UN LOOK</span>
+        <span id="m-transition-readout" style="color:var(--amber)">4 COMPASES</span>
+      </div>
+      <div class="grid-3" id="m-transition-grid">
+        <button type="button" class="btn-pad" data-bars="0">✂️ Corte</button>
+        <button type="button" class="btn-pad" data-bars="1">1 compás</button>
+        <button type="button" class="btn-pad" data-bars="2">2 compases</button>
+        <button type="button" class="btn-pad active" data-bars="4">4 compases</button>
+        <button type="button" class="btn-pad" data-bars="8">8 compases</button>
+        <button type="button" class="btn-pad" data-bars="16">16 compases</button>
+      </div>
+      <div class="help-text">La mezcla entre Looks dura los compases elegidos y va sincronizada al BPM.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">
+        <span>FAMILIAS DE LOOPS (48 GENERADORES)</span>
+      </div>
+      <div class="grid-6" id="m-bank-tabs" style="margin-bottom:10px">
+        <button type="button" class="btn-pad amber-active" data-bank="FLT">1. PLANOS</button>
+        <button type="button" class="btn-pad" data-bank="MIN">2. ARCOS</button>
+        <button type="button" class="btn-pad" data-bank="MOT">3. ESCENA</button>
+        <button type="button" class="btn-pad" data-bank="GEO">4. FORMAS</button>
+        <button type="button" class="btn-pad" data-bank="KIN">5. BARRIDO</button>
+        <button type="button" class="btn-pad" data-bank="SPC">6. 🧊 3D</button>
+      </div>
+      <div class="grid-2" id="m-scene-grid"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>🧊 CONVERTIR CUALQUIER LOOP EN 3D</span>
+      </div>
+      <div class="grid-2" id="m-3d-grid">
+        <button type="button" class="btn-pad active" data-3d="0">⏹ 2D Normal</button>
+        <button type="button" class="btn-pad" data-3d="1">📐 Plano 3D</button>
+        <button type="button" class="btn-pad" data-3d="2">🧊 Extrusión 3D</button>
+        <button type="button" class="btn-pad" data-3d="3">🏟 Curva 3D</button>
+      </div>
+      <div class="slider-row">
+        <span>RELIEVE 3D</span>
+        <input type="range" id="m-3d-amount" min="0.10" max="1.0" step="0.01" value="0.55" />
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>FIGURA Y ACABADO</span></div>
+      <div class="grid-3" id="m-shape-grid" style="margin-bottom:8px">
+        <button type="button" class="btn-pad active" data-shape="0">◈ Auto</button>
+        <button type="button" class="btn-pad" data-shape="1">□ Cuadrado</button>
+        <button type="button" class="btn-pad" data-shape="2">△ Triángulo</button>
+        <button type="button" class="btn-pad" data-shape="3">⬡ Hexágono</button>
+        <button type="button" class="btn-pad" data-shape="4">◇ Rombo</button>
+        <button type="button" class="btn-pad" data-shape="5">≡ Líneas</button>
+      </div>
+      <div class="grid-2" id="m-style-grid">
+        <button type="button" class="btn-pad" data-style="0">✨ Normal</button>
+        <button type="button" class="btn-pad active" data-style="1">⏹ 100% Plano</button>
+        <button type="button" class="btn-pad" data-style="2">📐 Línea Fina</button>
+        <button type="button" class="btn-pad" data-style="3">🎨 Sólido</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PESTAÑA 3: PALETAS DE COLOR, BPM Y DIRECTO (SOLO TÉCNICO) ==================== -->
+  <section id="tab-color" class="tab-pane admin-only">
+    <div class="card">
+      <div class="card-title"><span>🎨 10 PALETAS DE COLOR</span></div>
+      <div class="grid-2" id="m-palette-grid">
+        <button type="button" class="btn-pad active" data-pal="0">Cyberpunk</button>
+        <button type="button" class="btn-pad" data-pal="1">Techno Blanco/Negro</button>
+        <button type="button" class="btn-pad" data-pal="2">Acid Green</button>
+        <button type="button" class="btn-pad" data-pal="3">Sunset Ibiza</button>
+        <button type="button" class="btn-pad" data-pal="4">Ice Blue</button>
+        <button type="button" class="btn-pad" data-pal="5">Inferno</button>
+        <button type="button" class="btn-pad" data-pal="6">Gold Luxury</button>
+        <button type="button" class="btn-pad" data-pal="7">Ultraviolet</button>
+        <button type="button" class="btn-pad" data-pal="8">Matrix</button>
+        <button type="button" class="btn-pad" data-pal="9">Industrial Red</button>
+      </div>
+      <button type="button" id="btn-m-calm-color" class="btn-pad active" style="width:100%;margin-top:10px">
+        🐢 COLOR SUAVE (ANTI-FERIA): ACTIVO
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>🥁 RITMO BPM Y VELOCIDAD</span>
+        <span id="m-bpm-readout" style="color:var(--amber)">126.0 BPM</span>
+      </div>
+      <button type="button" id="btn-m-tap" class="btn-pad amber-active" style="width:100%;padding:16px;font-size:13px;margin-bottom:8px">
+        🥁 TOCAR AL RITMO DE LA MÚSICA (TAP TEMPO)
+      </button>
+      <div class="slider-row">
+        <span>VELOCIDAD</span>
+        <input type="range" id="m-macro-speed" min="0" max="1" step="0.01" value="0.22" />
+      </div>
+      <div class="slider-row">
+        <span>GROSOR</span>
+        <input type="range" id="m-macro-thickness" min="0" max="1" step="0.01" value="0.38" />
+      </div>
+      <div class="slider-row">
+        <span>ZOOM / CANT.</span>
+        <input type="range" id="m-macro-scale" min="0" max="1" step="0.01" value="0.24" />
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>⚡ BOTONES DE IMPACTO EN DIRECTO</span></div>
+      <div class="grid-2">
+        <button type="button" id="btn-m-flash" class="btn-pad">☀️ DESTELLO (MANTENER)</button>
+        <button type="button" id="btn-m-strobe" class="btn-pad">⚡ ESTROBO (MANTENER)</button>
+        <button type="button" id="btn-m-mono" class="btn-pad">◑ BLANCO / NEGRO</button>
+        <button type="button" id="btn-m-blackout" class="btn-pad danger">🌑 APAGAR PANTALLA</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PESTAÑA 4: MAPPING DE PANTALLA Y SLICES LED (SOLO TÉCNICO) ==================== -->
+  <section id="tab-mapping" class="tab-pane admin-only">
+    <div class="card">
+      <div class="card-title">
+        <span>📐 CALIBRACIÓN Y SLICES DE ESCENARIO</span>
+      </div>
+      <div class="grid-2" style="margin-bottom:10px">
+        <button type="button" id="btn-m-testgrid" class="btn-pad">🎯 CARTA DE AJUSTE</button>
+        <button type="button" id="btn-m-map-reset" class="btn-pad danger">↺ RESETEAR TODO</button>
+      </div>
+
+      <div class="card-title" style="margin-top:8px;margin-bottom:6px;color:var(--cyan)">
+        <span>📏 ESCALADOR PANTALLA LED POR PÍXELES (X × Y)</span>
+      </div>
+      <button type="button" id="btn-m-led-scaler" class="btn-pad btn-big btn-full" style="margin-bottom:8px">
+        🔲 ESCALADOR LED (X × Y PX): APAGADO
+      </button>
+      <div class="grid-2" style="margin-bottom:6px">
+        <div class="slider-row" style="margin:0">
+          <span>ANCHO PX (X)</span>
+          <input type="number" id="m-led-w" class="text-input" min="64" max="7680" step="1" value="1024" style="margin:0;text-align:center" />
+        </div>
+        <div class="slider-row" style="margin:0">
+          <span>ALTO PX (Y)</span>
+          <input type="number" id="m-led-h" class="text-input" min="64" max="4320" step="1" value="512" style="margin:0;text-align:center" />
+        </div>
+        <div class="slider-row" style="margin:0">
+          <span>INICIO X (PX)</span>
+          <input type="number" id="m-led-ox" class="text-input" min="0" max="7680" step="1" value="0" style="margin:0;text-align:center" />
+        </div>
+        <div class="slider-row" style="margin:0">
+          <span>INICIO Y (PX)</span>
+          <input type="number" id="m-led-oy" class="text-input" min="0" max="4320" step="1" value="0" style="margin:0;text-align:center" />
+        </div>
+      </div>
+      <div class="grid-3" id="m-led-presets" style="margin-bottom:6px">
+        <button type="button" class="btn-pad" data-lw="512" data-lh="256">512×256</button>
+        <button type="button" class="btn-pad" data-lw="768" data-lh="384">768×384</button>
+        <button type="button" class="btn-pad" data-lw="1024" data-lh="512">1024×512</button>
+        <button type="button" class="btn-pad" data-lw="1280" data-lh="720">1280×720</button>
+        <button type="button" class="btn-pad" data-lw="1920" data-lh="1080" style="grid-column: span 2">1920×1080 (Full HD)</button>
+      </div>
+      <div class="grid-2" style="margin-bottom:10px">
+        <button type="button" id="btn-m-led-anchor" class="btn-pad active">↖ Esquina (0,0) Enviadora</button>
+        <button type="button" id="btn-m-led-aspect" class="btn-pad active">📐 Sin deformar</button>
+      </div>
+      <div class="help-text" style="margin-bottom:10px">
+        Escribe los píxeles exactos de tu pantalla LED (ej. <strong>768 × 384</strong>). Toda la imagen se comprimirá dentro de ese recuadro (empezando en la esquina superior izquierda <strong>0,0</strong> como piden las enviadoras NovaStar / Colorlight) y el resto quedará en negro puro.
+      </div>
+
+      <div class="card-title" style="margin-bottom:6px"><span>MODO DE SLICES (PANTALLAS DIVIDIDAS)</span></div>
+      <div class="grid-2" id="m-slice-mode-grid">
+        <button type="button" class="btn-pad active" data-slice="0" style="grid-column: span 2">🖥 1 Pantalla Completa (Sin dividir)</button>
+        <button type="button" class="btn-pad" data-slice="1">▮▮▮ Tótems Verticales</button>
+        <button type="button" class="btn-pad" data-slice="2">🎧 Cabina DJ + 2 Tótems</button>
+        <button type="button" class="btn-pad" data-slice="3">☰ Bandas Horizontales</button>
+        <button type="button" class="btn-pad" data-slice="4">⊞ Matriz Paneles LED</button>
+      </div>
+
+      <div class="card-title" style="margin-top:12px;margin-bottom:6px"><span>CANTIDAD DE TÓTEMS / SLICES Y ENCUADRE</span></div>
+      <div class="grid-4" id="m-slice-count-grid" style="margin-bottom:8px">
+        <button type="button" class="btn-pad" data-scount="2">2 SLICES</button>
+        <button type="button" class="btn-pad active" data-scount="3">3 SLICES</button>
+        <button type="button" class="btn-pad" data-scount="4">4 SLICES</button>
+        <button type="button" class="btn-pad" data-scount="6">6 SLICES</button>
+      </div>
+
+      <button type="button" id="btn-m-slice-clone" class="btn-pad active" style="width:100%;margin-bottom:6px">
+        🔄 MODO: CLONAR VISUAL EN CADA SLICE
+      </button>
+
+      <div class="slider-row">
+        <span>SEPARACIÓN</span>
+        <input type="range" id="m-slice-gap" min="0" max="0.18" step="0.005" value="0.04" />
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>📍 POSICIÓN X/Y, TAMAÑO Y TRAPECIO</span>
+      </div>
+      <div class="slider-row">
+        <span>POSICIÓN X</span>
+        <input type="range" id="m-map-x" min="-0.75" max="0.75" step="0.005" value="0" />
+      </div>
+      <div class="slider-row">
+        <span>POSICIÓN Y</span>
+        <input type="range" id="m-map-y" min="-0.75" max="0.75" step="0.005" value="0" />
+      </div>
+      <div class="slider-row">
+        <span>ANCHO (X)</span>
+        <input type="range" id="m-map-w" min="0.15" max="1.40" step="0.01" value="1" />
+      </div>
+      <div class="slider-row">
+        <span>ALTO (Y)</span>
+        <input type="range" id="m-map-h" min="0.15" max="1.40" step="0.01" value="1" />
+      </div>
+      <div class="slider-row">
+        <span>TRAPECIO V</span>
+        <input type="range" id="m-map-kx" min="-0.55" max="0.55" step="0.01" value="0" />
+      </div>
+      <div class="slider-row">
+        <span>TRAPECIO H</span>
+        <input type="range" id="m-map-ky" min="-0.55" max="0.55" step="0.01" value="0" />
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>📐 CORNER-PIN (4 ESQUINAS)</span>
+        <span id="m-cp-status" style="color:var(--amber)">APAGADO</span>
+      </div>
+      <div class="grid-2">
+        <button type="button" id="btn-m-cornerpin" class="btn-pad btn-big">📐 ACTIVAR CORNER-PIN</button>
+        <button type="button" id="btn-m-cp-testgrid" class="btn-pad btn-big">🎯 CARTA DE AJUSTE</button>
+      </div>
+      <div id="m-cp-proj-row" class="grid-2" style="display:none;margin-top:8px">
+        <button type="button" class="btn-pad active" data-proj="0">🖥 Proyector 1 (izq.)</button>
+        <button type="button" class="btn-pad" data-proj="1">🖥 Proyector 2 (der.)</button>
+      </div>
+      <div id="m-cp-editor" class="cp-editor">
+        <canvas id="m-cp-canvas"></canvas>
+      </div>
+      <div id="m-cp-readout" class="cp-readout">ESQUINA 1 ↖ · X 0.000 · Y 0.000</div>
+      <div class="grid-4" id="m-cp-corner-grid">
+        <button type="button" class="btn-pad active" data-corner="0">1 ↖</button>
+        <button type="button" class="btn-pad" data-corner="1">2 ↗</button>
+        <button type="button" class="btn-pad" data-corner="2">3 ↘</button>
+        <button type="button" class="btn-pad" data-corner="3">4 ↙</button>
+      </div>
+      <div class="nudge-pad">
+        <div></div>
+        <button type="button" class="btn-pad" data-nudge="up">▲</button>
+        <div></div>
+        <button type="button" class="btn-pad" data-nudge="left">◀</button>
+        <button type="button" id="btn-m-cp-step" class="btn-pad step-btn">PASO: FINO</button>
+        <button type="button" class="btn-pad" data-nudge="right">▶</button>
+        <div></div>
+        <button type="button" class="btn-pad" data-nudge="down">▼</button>
+        <div></div>
+      </div>
+      <button type="button" id="btn-m-cp-reset" class="btn-pad danger btn-full" style="margin-top:8px">↺ Reset esquinas</button>
+      <div class="help-text">Arrastra los círculos hasta que coincidan con las esquinas reales de la pantalla o del objeto. Activa la <strong>carta de ajuste</strong> mientras ajustas y usa las flechas para afinar (FINO = 0.002 · GRUESO = 0.02). El recuadro discontinuo es la imagen original.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>⬛ MÁSCARAS (TAPAR ZONAS)</span></div>
+      <div id="m-masks-wrap"></div>
+      <div class="help-text">Cada máscara es un rectángulo negro que tapa una zona (una puerta, un altavoz, la cabina...). Se ven en rojo en el editor de esquinas de arriba.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>🖥🖥 EDGE BLENDING (2 PROYECTORES)</span></div>
+      <div class="grid-2" id="m-edge-mode-grid">
+        <button type="button" class="btn-pad active" data-edge="0">⏹ Apagado</button>
+        <button type="button" class="btn-pad" data-edge="1">🖥🖥 2 proyectores en 1 ventana</button>
+        <button type="button" class="btn-pad" data-edge="2">◧ Este es el IZQUIERDO</button>
+        <button type="button" class="btn-pad" data-edge="3">◨ Este es el DERECHO</button>
+      </div>
+      <div class="slider-row">
+        <span>SOLAPE</span>
+        <input type="range" id="m-edge-overlap" min="0.02" max="0.45" step="0.005" value="0.15" />
+      </div>
+      <div class="slider-row">
+        <span>GAMMA</span>
+        <input type="range" id="m-edge-gamma" min="1.0" max="3.0" step="0.05" value="2.2" />
+      </div>
+      <div class="slider-row">
+        <span>CURVA</span>
+        <input type="range" id="m-edge-curve" min="1.0" max="4.0" step="0.05" value="2.0" />
+      </div>
+      <div class="help-text">
+        <strong>Modo 1:</strong> un solo PC con una ventana estirada sobre los 2 proyectores (escritorio extendido).<br />
+        <strong>Modos 2 y 3:</strong> cada proyector tiene su propio ordenador/ventana: abre <strong>projector.html?blend=left</strong> en el izquierdo y <strong>projector.html?blend=right</strong> en el derecho.<br />
+        Sube el <strong>solape</strong> hasta que la zona compartida coincida y ajusta la <strong>gamma</strong> hasta que la franja central no se vea más brillante.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>💡 SALIDA DE PANTALLA Y SEGURIDAD</span>
+      </div>
+      <div class="slider-row">
+        <span>BRILLO</span>
+        <input type="range" id="m-out-bright" min="0.10" max="1.0" step="0.01" value="1" />
+      </div>
+      <div class="slider-row">
+        <span>FRÍO ⟷ CÁLIDO</span>
+        <input type="range" id="m-out-temp" min="-1" max="1" step="0.02" value="0" />
+      </div>
+      <button type="button" id="btn-m-safe-strobe" class="btn-pad active" style="width:100%;margin-top:10px">
+        🛡 LÍMITE ESTROBO 3/s: ACTIVO
+      </button>
+    </div>
+
+    <div class="card admin-only">
+      <div class="card-title">
+        <span>📊 RECURSOS DEL MINI-PC Y ACTUALIZACIÓN ONLINE</span>
+        <button type="button" id="btn-m-refresh-sys" class="btn-logout">🔄 VER</button>
+      </div>
+      <div id="m-sys-stats-readout" class="now-playing" style="line-height:1.6;font-size:12px">
+        Consultando CPU, RAM y Temperatura del Mini-PC...
+      </div>
+      <div class="card-title" style="margin-top:10px;margin-bottom:6px">
+        <span>🌐 ACTUALIZAR PLUGIN VÍA INTERNET</span>
+      </div>
+      <input type="text" id="m-update-repo-url" class="text-input" value="https://github.com/Gabichuelo/resolumeplugin.git" placeholder="https://github.com/Gabichuelo/resolumeplugin.git" />
+      <button type="button" id="btn-m-internet-update" class="btn-pad amber-active btn-big btn-full">
+        🔄 DESCARGAR Y ACTUALIZAR MINI-PC AHORA
+      </button>
+      <div id="m-update-msg" class="msg-line"></div>
+    </div>
+  </section>
+
+  <script>
+    (function () {
+      const SCENES_BY_BANK = {
+        FLT: [
+          { id: 16, code: 'FLT-17', name: 'MARCOS PLANOS' },
+          { id: 17, code: 'FLT-18', name: 'BLOQUES MONDRIAN' },
+          { id: 18, code: 'FLT-19', name: 'LÍNEA ⟷ RELLENO' },
+          { id: 19, code: 'FLT-20', name: 'BANDAS PLANAS' },
+          { id: 20, code: 'FLT-21', name: 'CAPAS PLANAS' },
+          { id: 21, code: 'FLT-22', name: 'CÁPSULAS PLANAS' },
+          { id: 22, code: 'FLT-23', name: 'UNIÓN 2 FORMAS' },
+          { id: 23, code: 'FLT-24', name: 'SÍMBOLOS PLANOS' }
+        ],
+        MIN: [
+          { id: 32, code: 'MIN-33', name: 'ARCOS PARTIDOS' },
+          { id: 33, code: 'MIN-34', name: 'ECLIPSE GEOMÉTRICO' },
+          { id: 34, code: 'MIN-35', name: 'METRÓNOMO ESCENA' },
+          { id: 35, code: 'MIN-36', name: 'ESCALERA BAUHAUS' },
+          { id: 36, code: 'MIN-37', name: 'ONDA DE CÍRCULOS' },
+          { id: 37, code: 'MIN-38', name: 'ARCOS MONUMENTALES' },
+          { id: 38, code: 'MIN-39', name: 'ONDA DE COLUMNAS' },
+          { id: 39, code: 'MIN-40', name: 'ENGRANAJE MINIMAL' }
+        ],
+        MOT: [
+          { id: 40, code: 'MOT-41', name: 'CORTINA DE ESCENA' },
+          { id: 41, code: 'MOT-42', name: 'MARCO 4 ESQUINAS' },
+          { id: 42, code: 'MOT-43', name: 'CASCADA VERTICAL' },
+          { id: 43, code: 'MOT-44', name: 'DIAMANTE EXPANSIVO' },
+          { id: 44, code: 'MOT-45', name: 'ESPEJO HORIZONTAL' },
+          { id: 45, code: 'MOT-46', name: 'CARRUSEL MARCOS' },
+          { id: 46, code: 'MOT-47', name: 'ABANICO DE LÍNEAS' },
+          { id: 47, code: 'MOT-48', name: 'TÓTEM CENTRAL' }
+        ],
+        GEO: [
+          { id: 0, code: 'GEO-01', name: 'MARCOS CUADRADOS' },
+          { id: 1, code: 'GEO-02', name: 'TRIÁNGULOS LIMPIOS' },
+          { id: 2, code: 'GEO-03', name: 'LÍNEAS PARALELAS' },
+          { id: 3, code: 'GEO-04', name: 'MOSAICO POLIGONAL' },
+          { id: 4, code: 'GEO-05', name: 'ESTILO BAUHAUS' },
+          { id: 5, code: 'GEO-06', name: 'CUBOS ISOMÉTRICOS' },
+          { id: 6, code: 'GEO-07', name: 'CRUCES TÉCNICAS' },
+          { id: 7, code: 'GEO-08', name: 'BLOQUES CONTRASTE' }
+        ],
+        KIN: [
+          { id: 8, code: 'KIN-09', name: 'LÍNEAS FINO⟷GRUESO' },
+          { id: 9, code: 'KIN-10', name: 'BARRIDO IZQ➔DER' },
+          { id: 10, code: 'KIN-11', name: 'ONDAS ACORDEÓN' },
+          { id: 11, code: 'KIN-12', name: 'PÉNDULO DE BARRAS' },
+          { id: 12, code: 'KIN-13', name: 'PANELES MÓVILES' },
+          { id: 13, code: 'KIN-14', name: 'FLECHAS IZQ➔DER' },
+          { id: 14, code: 'KIN-15', name: 'ESCÁNER X/Y' },
+          { id: 15, code: 'KIN-16', name: 'PISTAS DIGITALES' }
+        ],
+        SPC: [
+          { id: 24, code: 'SPC-25', name: 'CUBO / HIPERCUBO 3D' },
+          { id: 25, code: 'SPC-26', name: 'OCTAEDRO 3D + ÓRBITAS' },
+          { id: 26, code: 'SPC-27', name: 'ESFERA / GLOBO 3D' },
+          { id: 27, code: 'SPC-28', name: 'GIROSCOPIO 3D' },
+          { id: 28, code: 'SPC-29', name: 'ARQUITECTURA 3D' },
+          { id: 29, code: 'SPC-30', name: 'PÓRTICOS 3D' },
+          { id: 30, code: 'SPC-31', name: 'TERRENO 3D LÁSER' },
+          { id: 31, code: 'SPC-32', name: 'PISTONES 3D' }
+        ]
+      };
+
+      let currentBank = 'FLT';
+      let currentActiveGen = 18;
+      let currentSlot = 0;
+      let logoEnabled = false;
+      let logoTint = false;
+      let sessionPin = sessionStorage.getItem('aether_remote_pin') || '';
+      let sessionRole = sessionStorage.getItem('aether_remote_role') || '';
+
+      const loginOverlay = document.getElementById('login-overlay');
+      const loginForm = document.getElementById('login-form');
+      const pinInput = document.getElementById('pin-input');
+      const loginError = document.getElementById('login-error');
+      const roleTitle = document.getElementById('role-title');
+
+      function applyRoleUI(role) {
+        sessionRole = role;
+        if (role === 'dj') {
+          document.body.classList.add('dj-guest-mode');
+          roleTitle.textContent = '🎧 MODO DJ INVITADO';
+          // Ensure Logo Tab is active
+          activateTab('tab-logo');
+        } else {
+          document.body.classList.remove('dj-guest-mode');
+          roleTitle.textContent = '🎛️ MODO TÉCNICO';
+        }
+        loginOverlay.classList.add('hidden');
+      }
+
+      async function verifyPinWithServer(pinValue) {
+        const cleanPin = String(pinValue || '').trim();
+        if (!cleanPin) return false;
+
+        // If opened via http:// server, authenticate against /api/auth
+        if (window.location.protocol.startsWith('http')) {
+          try {
+            const resp = await fetch('/api/auth', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ pin: cleanPin })
+            });
+            const data = await resp.json();
+            if (resp.ok && data.ok) {
+              sessionPin = cleanPin;
+              sessionStorage.setItem('aether_remote_pin', sessionPin);
+              sessionStorage.setItem('aether_remote_role', data.role);
+              applyRoleUI(data.role);
+              return true;
+            } else {
+              loginError.textContent = data.error || 'Contraseña incorrecta';
+              return false;
+            }
+          } catch (_) {
+            // Fallback offline/local check
+          }
+        }
+
+        // Local file:// fallback check (default admin="1234", dj="dj")
+        if (cleanPin === '1234') {
+          sessionPin = cleanPin;
+          applyRoleUI('admin');
+          return true;
+        } else if (cleanPin.toLowerCase() === 'dj') {
+          sessionPin = cleanPin;
+          applyRoleUI('dj');
+          return true;
+        }
+        loginError.textContent = 'Contraseña incorrecta';
+        return false;
+      }
+
+      if (sessionPin && sessionRole) {
+        verifyPinWithServer(sessionPin);
+      }
+
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        loginError.textContent = '';
+        await verifyPinWithServer(pinInput.value);
+      });
+
+      document.getElementById('btn-logout').addEventListener('click', () => {
+        sessionPin = '';
+        sessionRole = '';
+        sessionStorage.removeItem('aether_remote_pin');
+        sessionStorage.removeItem('aether_remote_role');
+        pinInput.value = '';
+        loginError.textContent = '';
+        loginOverlay.classList.remove('hidden');
+      });
+
+      // Local BroadcastChannel fallback + Wi-Fi HTTP API
+      const bc = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('aether_vj_sync_v1') : null;
+
+      function sendCommand(payload) {
+        const msg = Object.assign({ type: 'REMOTE_COMMAND', pin: sessionPin }, payload);
+        if (window.location.protocol.startsWith('http')) {
+          // Via Wi-Fi server only (sending also through BroadcastChannel would apply toggles twice)
+          fetch('/api/command', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(msg)
+          }).then((r) => {
+            if (r.status === 401) {
+              loginOverlay.classList.remove('hidden');
+              loginError.textContent = 'La clave ha cambiado. Vuelve a introducirla.';
+            } else if (r.status === 429) {
+              loginOverlay.classList.remove('hidden');
+              loginError.textContent = 'Demasiados intentos. Espera 1 minuto.';
+            }
+          }).catch(() => {});
+        } else if (bc) {
+          // Opened by double-click on the same computer: talk directly to the console tab
+          try { bc.postMessage(msg); } catch (_) {}
+        }
+      }
+
+      // Tabs Navigation
+      function activateTab(tabId) {
+        document.querySelectorAll('.tab-btn').forEach((b) => b.classList.toggle('active', b.getAttribute('data-tab') === tabId));
+        document.querySelectorAll('.tab-pane').forEach((p) => p.classList.toggle('active', p.id === tabId));
+        if (tabId === 'tab-media' && typeof onMediaTabOpened === 'function') onMediaTabOpened();
+        if (tabId === 'tab-mapping' && typeof onMappingTabOpened === 'function') onMappingTabOpened();
+      }
+      document.querySelectorAll('.tab-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          activateTab(btn.getAttribute('data-tab'));
+        });
+      });
+
+      // Render 8 Scene Pads for selected Bank
+      function renderScenePads() {
+        const grid = document.getElementById('m-scene-grid');
+        grid.innerHTML = '';
+        const list = SCENES_BY_BANK[currentBank] || SCENES_BY_BANK.FLT;
+        list.forEach((sc) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scene-pad-mobile' + (sc.id === currentActiveGen ? ' active' : '');
+          btn.innerHTML = '<div class="code">' + sc.code + '</div><div class="name">' + sc.name + '</div>';
+          btn.addEventListener('click', () => {
+            currentActiveGen = sc.id;
+            renderScenePads();
+            sendCommand({ action: 'NEXT_SCENE', genId: sc.id });
+          });
+          grid.appendChild(btn);
+        });
+      }
+      renderScenePads();
+
+      document.querySelectorAll('#m-bank-tabs .btn-pad').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          currentBank = btn.getAttribute('data-bank');
+          document.querySelectorAll('#m-bank-tabs .btn-pad').forEach((b) => b.classList.toggle('amber-active', b === btn));
+          renderScenePads();
+          sendCommand({ action: 'SELECT_BANK', bank: currentBank });
+        });
+      });
+
+      // Hero Quick Buttons
+      document.getElementById('btn-calm').addEventListener('click', () => {
+        sendCommand({ action: 'CALM_PRESET' });
+      });
+      document.getElementById('btn-next').addEventListener('click', () => {
+        sendCommand({ action: 'NEXT_SCENE' });
+      });
+
+      // ==================== LOGO STUDIO LOGIC ====================
+      const btnLogoToggle = document.getElementById('btn-m-logo-toggle');
+      const logoStatusTag = document.getElementById('logo-status-tag');
+      const previewImg = document.getElementById('logo-preview-img');
+      const previewPlaceholder = document.getElementById('logo-preview-placeholder');
+
+      function updateLogoToggleUI() {
+        btnLogoToggle.classList.toggle('green-live', logoEnabled);
+        btnLogoToggle.textContent = logoEnabled ? '🟢 LOGO EN PANTALLA' : '👁 MOSTRAR LOGO';
+        logoStatusTag.textContent = logoEnabled ? 'EN PANTALLA' : 'OCULTO';
+        logoStatusTag.style.color = logoEnabled ? 'var(--green)' : 'var(--amber)';
+      }
+
+      btnLogoToggle.addEventListener('click', () => {
+        logoEnabled = !logoEnabled;
+        updateLogoToggleUI();
+        sendCommand({ action: 'SET_LOGO_PROP', prop: 'enabled', value: logoEnabled });
+      });
+
+      const fileInput = document.getElementById('mobile-logo-file');
+      document.getElementById('btn-m-logo-upload').addEventListener('click', () => {
+        fileInput.click();
+      });
+
+      // Smart logo: background removal mode ('auto' | 'white' | 'black' | 'none') applied by the engine
+      let logoBgMode = 'auto';
+      const logoMsg = document.getElementById('m-logo-msg');
+      let logoMsgTimer = null;
+      function showLogoMsg(text) {
+        logoMsg.textContent = text;
+        if (logoMsgTimer) clearTimeout(logoMsgTimer);
+        logoMsgTimer = setTimeout(() => { logoMsg.textContent = ''; }, 4000);
+      }
+      document.querySelectorAll('#m-logo-bg-grid .btn-pad').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          logoBgMode = btn.getAttribute('data-bg') || 'auto';
+          document.querySelectorAll('#m-logo-bg-grid .btn-pad').forEach((b) => b.classList.toggle('active', b === btn));
+        });
+      });
+      document.getElementById('btn-m-logo-reclean').addEventListener('click', () => {
+        const mode = logoBgMode === 'none' ? 'auto' : logoBgMode;
+        sendCommand({ action: 'PROCESS_LOGO', mode: mode });
+        showLogoMsg('✨ Limpiando fondo (' + ({ auto: 'automático', white: 'blanco', black: 'negro' }[mode]) + ')...');
+      });
+
+      function sendLogoCanvas(c) {
+        const dataUrl = c.toDataURL('image/png');
+        previewImg.src = dataUrl;
+        previewImg.style.display = 'block';
+        previewPlaceholder.style.display = 'none';
+        logoEnabled = true;
+        updateLogoToggleUI();
+        sendCommand({ action: 'UPLOAD_LOGO', dataUrl: dataUrl, slot: currentSlot, bgRemove: logoBgMode });
+        showLogoMsg('📤 Logo enviado a la ranura DJ ' + (currentSlot + 1));
+      }
+
+      // SVG → PNG raster (longest side = maxDim) keeping transparency
+      function rasterizeSvgText(svgText, maxDim) {
+        let w = 0;
+        let h = 0;
+        let text = svgText;
+        try {
+          const doc = new DOMParser().parseFromString(svgText, 'image/svg+xml');
+          const root = doc.documentElement;
+          if (root && root.nodeName.toLowerCase() === 'svg') {
+            const vb = (root.getAttribute('viewBox') || '').trim().split(/[\s,]+/).map(parseFloat);
+            const aw = parseFloat(root.getAttribute('width'));
+            const ah = parseFloat(root.getAttribute('height'));
+            if (vb.length === 4 && vb[2] > 0 && vb[3] > 0) {
+              w = vb[2]; h = vb[3];
+            } else if (aw > 0 && ah > 0) {
+              w = aw; h = ah;
+              root.setAttribute('viewBox', '0 0 ' + aw + ' ' + ah);
+            } else {
+              w = 1; h = 1;
+            }
+            const k = maxDim / Math.max(w, h);
+            w = Math.max(16, Math.round(w * k));
+            h = Math.max(16, Math.round(h * k));
+            root.setAttribute('width', String(w));
+            root.setAttribute('height', String(h));
+            if (!root.getAttribute('xmlns')) root.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            text = new XMLSerializer().serializeToString(doc);
+          }
+        } catch (_) {}
+        if (!(w > 0 && h > 0)) { w = maxDim; h = maxDim; }
+        const img = new Image();
+        img.onload = () => {
+          const c = document.createElement('canvas');
+          c.width = w;
+          c.height = h;
+          const ctx = c.getContext('2d');
+          ctx.clearRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          try { sendLogoCanvas(c); } catch (_) { showLogoMsg('❌ Este SVG no se puede convertir. Prueba con PNG.'); }
+        };
+        img.onerror = () => showLogoMsg('❌ No se pudo leer el SVG. Prueba con PNG.');
+        img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(text);
+      }
+
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const isSvg = file.type === 'image/svg+xml' || /\.svg$/i.test(file.name || '');
+        const reader = new FileReader();
+        if (isSvg) {
+          reader.onload = (ev) => rasterizeSvgText(String(ev.target.result || ''), 1024);
+          reader.readAsText(file);
+          e.target.value = '';
+          return;
+        }
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const maxDim = 1024;
+            let w = img.width || 512;
+            let h = img.height || 512;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+              else { w = Math.round((w * maxDim) / h); h = maxDim; }
+            }
+            const c = document.createElement('canvas');
+            c.width = Math.max(16, w);
+            c.height = Math.max(16, h);
+            const ctx = c.getContext('2d');
+            ctx.clearRect(0, 0, c.width, c.height);
+            ctx.drawImage(img, 0, 0, c.width, c.height);
+            // Background removal is now done by the engine according to bgRemove (Auto / Blanco / Negro / No)
+            sendLogoCanvas(c);
+          };
+          img.onerror = () => showLogoMsg('❌ No se pudo leer la imagen.');
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+        e.target.value = '';
+      });
+
+      // Instant Text-to-PNG DJ Logo Generator (when DJ has no PNG file)
+      document.getElementById('btn-create-text-logo').addEventListener('click', () => {
+        const rawText = (document.getElementById('dj-name-input').value || 'AETHER LIVE').trim().toUpperCase();
+        const c = document.createElement('canvas');
+        c.width = 900;
+        c.height = 340;
+        const ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, c.width, c.height);
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 8;
+        ctx.strokeRect(24, 24, c.width - 48, c.height - 48);
+        ctx.lineWidth = 3;
+        ctx.strokeRect(40, 40, c.width - 80, c.height - 80);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const fontSize = rawText.length > 12 ? 64 : 86;
+        ctx.font = '900 ' + fontSize + 'px "JetBrains Mono", "Segoe UI", sans-serif';
+        ctx.fillText(rawText, c.width / 2, c.height / 2);
+
+        const dataUrl = c.toDataURL('image/png');
+        previewImg.src = dataUrl;
+        previewImg.style.display = 'block';
+        previewPlaceholder.style.display = 'none';
+        logoEnabled = true;
+        updateLogoToggleUI();
+        sendCommand({ action: 'UPLOAD_LOGO', dataUrl: dataUrl, slot: currentSlot, bgRemove: 'none' });
+      });
+
+      // 4 DJ Logo Slots
+      document.querySelectorAll('#m-logo-slots .btn-pad').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          currentSlot = parseInt(btn.getAttribute('data-slot'), 10) || 0;
+          document.querySelectorAll('#m-logo-slots .btn-pad').forEach((b) => b.classList.toggle('amber-active', b === btn));
+          sendCommand({ action: 'SELECT_LOGO_SLOT', slot: currentSlot });
+        });
+      });
+
+      // Logo FX Mode
+      document.querySelectorAll('#m-logo-fx-grid .btn-pad').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const fx = parseInt(btn.getAttribute('data-fx'), 10) || 0;
+          document.querySelectorAll('#m-logo-fx-grid .btn-pad').forEach((b) => b.classList.toggle('active', b === btn));
+          logoEnabled = true;
+          updateLogoToggleUI();
+          sendCommand({ action: 'SET_LOGO_PROP', prop: 'fxMode', value: fx });
+          sendCommand({ action: 'SET_LOGO_PROP', prop: 'enabled', value: true });
+        });
+      });
+
+      // Logo Position
+      document.querySelectorAll('#m-logo-pos-grid .btn-pad[data-pos]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const pos = parseInt(btn.getAttribute('data-pos'), 10) || 0;
+          document.querySelectorAll('#m-logo-pos-grid .btn-pad[data-pos]').forEach((b) => b.classList.toggle('active', b === btn));
+          sendCommand({ action: 'SET_LOGO_PROP', prop: 'pos', value: pos });
+        });
+      });
+
+      // Logo Palette Tint
+      const btnLogoTint = document.getElementById('btn-m-logo-tint');
+      btnLogoTint.addEventListener('click', () => {
+        logoTint = !logoTint;
+        btnLogoTint.classList.toggle('active', logoTint);
+        sendCommand({ action: 'SET_LOGO_PROP', prop: 'tint', value: logoTint });
+      });
+
+      document.getElementById('m-logo-scale').addEventListener('input', (e) => {
+        sendCommand({ action: 'SET_LOGO_PROP', prop: 'scale', value: parseFloat(e.target.value) });
+      });
+      document.getElementById('m-logo-backdrop').addEventListener('input', (e) => {
+        sendCommand({ action: 'SET_LOGO_PROP', prop: 'backdrop', value: parseFloat(e.target.value) });
+      });
+
+      // ==================== 3D, SHAPE, STYLE, PALETTE & BPM ====================
+      document.querySelectorAll('#m-3d-grid .btn-pad').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const mode = parseInt(btn.getAttribute('data-3d'), 10) || 0;
+          document.querySelectorAll('#m-3d-grid .btn-pad').forEach((b) => b.classList.toggle('active', b === btn));
+          sendCommand({ action: 'SET_3D_MODE', value: mode });
+        });
+      });
+      document.getElementById('m-3d-amount').addEventListener('input', (e) => {
+        sendCommand({ action: 'SET_3D_AMOUNT', value: parseFloat(e.target.value) });
+      });
+
+      document.querySelectorAll('#m-shape-grid .btn-pad').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const val = parseInt(btn.getAttribute('data-shape'), 10) || 0;
+          document.querySelectorAll('#m-shape-grid .btn-pad').forEach((b) => b.classList.toggle('active', b === btn));
+          sendCommand({ action: 'SET_SHAPE', value: val });
+        });
+      });
+
+      document.querySelectorAll('#m-style-grid .btn-pad').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const val = parseInt(btn.getAttribute('data-style'), 10) || 0;
+          document.querySelectorAll('#m-style-grid .btn-pad').forEach((b) => b.classList.toggle('active', b === btn));
+          sendCommand({ action: 'SET_STYLE', value: val });
+        });
+      });
+
+      document.querySelectorAll('#m-palette-grid .btn-pad').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const val = parseInt(btn.getAttribute('data-pal'), 10) || 0;
+          document.querySelectorAll('#m-palette-grid .btn-pad').forEach((b) => b.classList.toggle('active', b === btn));
+          sendCommand({ action: 'SET_PALETTE', value: val });
+        });
+      });
+
+      document.getElementById('btn-m-tap').addEventListener('click', () => {
+        sendCommand({ action: 'TAP_TEMPO' });
+      });
+
+      ['speed', 'thickness', 'scale'].forEach((k) => {
+        document.getElementById('m-macro-' + k).addEventListener('input', (e) => {
+          sendCommand({ action: 'SET_MACRO', key: k, value: parseFloat(e.target.value) });
+        });
+      });
+
+      // Momentary & Toggle Kill Buttons
+      const bindHold = (id, key) => {
+        const el = document.getElementById(id);
+        const start = (e) => { e.preventDefault(); el.classList.add('active'); sendCommand({ action: 'KILL_ACTION', key, active: true }); };
+        const end = () => { el.classList.remove('active'); sendCommand({ action: 'KILL_ACTION', key, active: false }); };
+        el.addEventListener('touchstart', start, { passive: false });
+        el.addEventListener('touchend', end);
+        el.addEventListener('mousedown', start);
+        el.addEventListener('mouseup', end);
+      };
+      bindHold('btn-m-flash', 'flash');
+      bindHold('btn-m-strobe', 'strobe');
+
+      document.getElementById('btn-m-mono').addEventListener('click', (e) => {
+        e.currentTarget.classList.toggle('active');
+        sendCommand({ action: 'KILL_ACTION', key: 'mono' });
+      });
+      document.getElementById('btn-m-blackout').addEventListener('click', (e) => {
+        e.currentTarget.classList.toggle('active');
+        sendCommand({ action: 'KILL_ACTION', key: 'blackout' });
+      });
+
+      // ==================== MAPPING & SLICES LOGIC ====================
+      let testGridOn = false;
+      let sliceCloneOn = true;
+      const btnTestGrid = document.getElementById('btn-m-testgrid');
+      const btnSliceClone = document.getElementById('btn-m-slice-clone');
+
+      function renderTestGridButtons() {
+        const mainBtn = document.getElementById('btn-m-testgrid');
+        const cpBtn = document.getElementById('btn-m-cp-testgrid');
+        mainBtn.classList.toggle('green-live', testGridOn);
+        mainBtn.textContent = testGridOn ? '🟢 REJILLA ACTIVA' : '🎯 CARTA DE AJUSTE';
+        if (cpBtn) {
+          cpBtn.classList.toggle('green-live', testGridOn);
+          cpBtn.textContent = testGridOn ? '🟢 REJILLA ACTIVA' : '🎯 CARTA DE AJUSTE';
+        }
+      }
+      function toggleTestGrid() {
+        testGridOn = !testGridOn;
+        renderTestGridButtons();
+        sendCommand({ action: 'SET_MAP_PROP', prop: 'showTestGrid', value: testGridOn });
+      }
+      btnTestGrid.addEventListener('click', toggleTestGrid);
+
+      btnSliceClone.addEventListener('click', () => {
+        sliceCloneOn = !sliceCloneOn;
+        btnSliceClone.classList.toggle('active', sliceCloneOn);
+        btnSliceClone.textContent = sliceCloneOn
+          ? '🔄 MODO: CLONAR VISUAL EN CADA SLICE'
+          : '✂️ MODO: CORTAR PANTALLA COMO MÁSCARA';
+        sendCommand({ action: 'SET_MAP_PROP', prop: 'sliceClone', value: sliceCloneOn });
+      });
+
+      document.getElementById('btn-m-map-reset').addEventListener('click', () => {
+        testGridOn = false;
+        sliceCloneOn = true;
+        renderTestGridButtons();
+        btnSliceClone.classList.add('active');
+        document.getElementById('m-map-x').value = 0;
+        document.getElementById('m-map-y').value = 0;
+        document.getElementById('m-map-w').value = 1;
+        document.getElementById('m-map-h').value = 1;
+        document.getElementById('m-map-kx').value = 0;
+        document.getElementById('m-map-ky').value = 0;
+        document.getElementById('m-slice-gap').value = 0.04;
+        document.querySelectorAll('#m-slice-mode-grid .btn-pad').forEach((b, i) => b.classList.toggle('active', i === 0));
+        sendCommand({ action: 'RESET_MAPPING' });
+      });
+
+      document.querySelectorAll('#m-slice-mode-grid .btn-pad').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const val = parseInt(btn.getAttribute('data-slice'), 10) || 0;
+          document.querySelectorAll('#m-slice-mode-grid .btn-pad').forEach((b) => b.classList.toggle('active', b === btn));
+          sendCommand({ action: 'SET_MAP_PROP', prop: 'sliceMode', value: val });
+        });
+      });
+
+      document.querySelectorAll('#m-slice-count-grid .btn-pad').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const val = parseInt(btn.getAttribute('data-scount'), 10) || 3;
+          document.querySelectorAll('#m-slice-count-grid .btn-pad').forEach((b) => b.classList.toggle('active', b === btn));
+          sendCommand({ action: 'SET_MAP_PROP', prop: 'sliceCount', value: val });
+        });
+      });
+
+      const bindMapRange = (id, prop) => {
+        document.getElementById(id).addEventListener('input', (e) => {
+          sendCommand({ action: 'SET_MAP_PROP', prop, value: parseFloat(e.target.value) });
+        });
+      };
+      bindMapRange('m-slice-gap', 'sliceGap');
+      bindMapRange('m-map-x', 'offsetX');
+      bindMapRange('m-map-y', 'offsetY');
+      bindMapRange('m-map-w', 'scaleX');
+      bindMapRange('m-map-h', 'scaleY');
+      bindMapRange('m-map-kx', 'keystoneX');
+      bindMapRange('m-map-ky', 'keystoneY');
+
+      // Escalador LED por Píxeles (X × Y)
+      let ledScalerOn = false;
+      let ledWLocal = 1024;
+      let ledHLocal = 512;
+      let ledAnchorLocal = 'top-left';
+      let ledAspectLocal = true;
+      const btnLedScaler = document.getElementById('btn-m-led-scaler');
+      const btnLedAnchor = document.getElementById('btn-m-led-anchor');
+      const btnLedAspect = document.getElementById('btn-m-led-aspect');
+      const inpLedW = document.getElementById('m-led-w');
+      const inpLedH = document.getElementById('m-led-h');
+      const inpLedOx = document.getElementById('m-led-ox');
+      const inpLedOy = document.getElementById('m-led-oy');
+
+      function renderLedScalerUI() {
+        if (!btnLedScaler) return;
+        btnLedScaler.classList.toggle('green-live', ledScalerOn);
+        btnLedScaler.textContent = ledScalerOn
+          ? '🟢 ESCALADOR LED ACTIVO: ' + ledWLocal + ' × ' + ledHLocal + ' PX'
+          : '🔲 ESCALADOR LED (X × Y PX): APAGADO';
+        if (btnLedAnchor) {
+          btnLedAnchor.classList.toggle('active', ledAnchorLocal === 'top-left');
+          btnLedAnchor.textContent = ledAnchorLocal === 'top-left' ? '↖ Esquina (0,0) Enviadora' : '🎯 Centrado en HDMI';
+        }
+        if (btnLedAspect) {
+          btnLedAspect.classList.toggle('active', ledAspectLocal);
+          btnLedAspect.textContent = ledAspectLocal ? '📐 Sin deformar' : '↔ Estirar a LED';
+        }
+        document.querySelectorAll('#m-led-presets .btn-pad').forEach((b) => {
+          const bw = parseInt(b.getAttribute('data-lw'), 10);
+          const bh = parseInt(b.getAttribute('data-lh'), 10);
+          b.classList.toggle('active', ledScalerOn && bw === ledWLocal && bh === ledHLocal);
+        });
+      }
+
+      btnLedScaler?.addEventListener('click', () => {
+        ledScalerOn = !ledScalerOn;
+        renderLedScalerUI();
+        sendCommand({ action: 'SET_MAP_PROP', prop: 'ledScalerEnabled', value: ledScalerOn });
+      });
+
+      const bindMobileLedNum = (el, prop, minV, maxV, onUpdate) => {
+        if (!el) return;
+        const handler = () => {
+          const v = parseInt(el.value, 10);
+          if (Number.isFinite(v)) {
+            const c = Math.max(minV, Math.min(maxV, v));
+            if (onUpdate) onUpdate(c);
+            renderLedScalerUI();
+            sendCommand({ action: 'SET_MAP_PROP', prop, value: c });
+          }
+        };
+        el.addEventListener('input', handler);
+        el.addEventListener('change', handler);
+      };
+      bindMobileLedNum(inpLedW, 'ledWidthPx', 64, 7680, (c) => { ledWLocal = c; });
+      bindMobileLedNum(inpLedH, 'ledHeightPx', 64, 4320, (c) => { ledHLocal = c; });
+      bindMobileLedNum(inpLedOx, 'ledOffsetXPx', 0, 7680);
+      bindMobileLedNum(inpLedOy, 'ledOffsetYPx', 0, 4320);
+
+      document.querySelectorAll('#m-led-presets .btn-pad').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          ledWLocal = parseInt(btn.getAttribute('data-lw'), 10) || 1024;
+          ledHLocal = parseInt(btn.getAttribute('data-lh'), 10) || 512;
+          ledScalerOn = true;
+          if (inpLedW) inpLedW.value = ledWLocal;
+          if (inpLedH) inpLedH.value = ledHLocal;
+          renderLedScalerUI();
+          sendCommand({ action: 'SET_MAP_PROP', prop: 'ledWidthPx', value: ledWLocal });
+          sendCommand({ action: 'SET_MAP_PROP', prop: 'ledHeightPx', value: ledHLocal });
+          sendCommand({ action: 'SET_MAP_PROP', prop: 'ledScalerEnabled', value: true });
+        });
+      });
+
+      btnLedAnchor?.addEventListener('click', () => {
+        ledAnchorLocal = ledAnchorLocal === 'center' ? 'top-left' : 'center';
+        renderLedScalerUI();
+        sendCommand({ action: 'SET_MAP_PROP', prop: 'ledAnchor', value: ledAnchorLocal });
+      });
+
+      btnLedAspect?.addEventListener('click', () => {
+        ledAspectLocal = !ledAspectLocal;
+        renderLedScalerUI();
+        sendCommand({ action: 'SET_MAP_PROP', prop: 'ledKeepAspect', value: ledAspectLocal });
+      });
+
+      // Recursos del Mini-PC y Actualización por Internet desde el móvil
+      const sysStatsReadout = document.getElementById('m-sys-stats-readout');
+      const inpUpdateRepo = document.getElementById('m-update-repo-url');
+      const msgUpdate = document.getElementById('m-update-msg');
+      async function fetchMobileSysStats() {
+        if (!window.location.protocol.startsWith('http') || !sysStatsReadout) return;
+        try {
+          const res = await fetch('/api/system-stats', {
+            headers: { 'X-Aether-Pin': sessionPin || '1234' }
+          });
+          if (!res.ok) return;
+          const data = await res.json();
+          if (data && data.system) {
+            const s = data.system;
+            const statusIcon = s.cpuPercent < 65 ? '🟢 Fluido' : (s.cpuPercent < 85 ? '🟡 Normal' : '🔴 Carga Alta');
+            const tempTxt = s.cpuTempC !== null ? s.cpuTempC + ' °C' : 'N/A';
+            sysStatsReadout.innerHTML =
+              statusIcon + ' • <strong>CPU:</strong> ' + s.cpuPercent + '% (' + s.cpuCores + ' núcleos) • ' +
+              '<strong>RAM:</strong> ' + s.ramUsedMb + '/' + s.ramTotalMb + ' MB (' + s.ramPercent + '%) • ' +
+              '<strong>Temp:</strong> ' + tempTxt;
+            if (inpUpdateRepo && s.updateRepoUrl && !inpUpdateRepo.value && document.activeElement !== inpUpdateRepo) {
+              inpUpdateRepo.value = s.updateRepoUrl;
+            }
+          }
+        } catch (_) {}
+      }
+      document.getElementById('btn-m-refresh-sys')?.addEventListener('click', fetchMobileSysStats);
+      setInterval(fetchMobileSysStats, 5000);
+      setTimeout(fetchMobileSysStats, 1200);
+
+      document.getElementById('btn-m-internet-update')?.addEventListener('click', async () => {
+        if (!msgUpdate) return;
+        msgUpdate.style.color = 'var(--cyan)';
+        msgUpdate.textContent = '⏳ Descargando actualización y recompilando en el Mini-PC...';
+        try {
+          const res = await fetch('/api/system-update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              pin: sessionPin || '1234',
+              repoUrl: inpUpdateRepo ? inpUpdateRepo.value.trim() : ''
+            })
+          });
+          const data = await res.json();
+          if (data.ok) {
+            msgUpdate.style.color = 'var(--green)';
+            msgUpdate.textContent = '✅ ' + (data.message || 'Mini-PC actualizado correctamente');
+          } else {
+            msgUpdate.style.color = 'var(--red)';
+            msgUpdate.textContent = '❌ ' + (data.error || 'Error al actualizar');
+          }
+        } catch (err) {
+          msgUpdate.style.color = 'var(--red)';
+          msgUpdate.textContent = '❌ Error de conexión: ' + err.message;
+        }
+      });
+
+      // ==================== PANIC, OUTPUT & SAFETY ====================
+      document.getElementById('btn-panic').addEventListener('click', () => {
+        sendCommand({ action: 'PANIC' });
+      });
+
+      document.getElementById('m-out-bright').addEventListener('input', (e) => {
+        sendCommand({ action: 'SET_OUTPUT_PROP', prop: 'brightness', value: parseFloat(e.target.value) });
+      });
+      document.getElementById('m-out-temp').addEventListener('input', (e) => {
+        sendCommand({ action: 'SET_OUTPUT_PROP', prop: 'colorTemp', value: parseFloat(e.target.value) });
+      });
+
+      let safeStrobeOn = true;
+      const btnSafeStrobe = document.getElementById('btn-m-safe-strobe');
+      function renderSafeStrobe() {
+        btnSafeStrobe.classList.toggle('active', safeStrobeOn);
+        btnSafeStrobe.classList.toggle('danger', !safeStrobeOn);
+        btnSafeStrobe.textContent = safeStrobeOn ? '🛡 LÍMITE ESTROBO 3/s: ACTIVO' : '⚠️ LÍMITE ESTROBO: DESACTIVADO';
+      }
+      btnSafeStrobe.addEventListener('click', () => {
+        if (safeStrobeOn) {
+          const ok = window.confirm('¿Quitar el límite de 3 destellos por segundo? Los estrobos rápidos pueden afectar a personas con epilepsia fotosensible.');
+          if (!ok) return;
+        }
+        safeStrobeOn = !safeStrobeOn;
+        renderSafeStrobe();
+        sendCommand({ action: 'SET_SAFE_STROBE', value: safeStrobeOn });
+      });
+
+      let calmColorOn = true;
+      const btnCalmColor = document.getElementById('btn-m-calm-color');
+      function renderCalmColor() {
+        if (!btnCalmColor) return;
+        btnCalmColor.classList.toggle('active', calmColorOn);
+        btnCalmColor.classList.toggle('danger', !calmColorOn);
+        btnCalmColor.textContent = calmColorOn ? '🐢 COLOR SUAVE (ANTI-FERIA): ACTIVO' : '🌈 COLOR RÁPIDO (SIN LÍMITE)';
+      }
+      if (btnCalmColor) {
+        btnCalmColor.addEventListener('click', () => {
+          calmColorOn = !calmColorOn;
+          renderCalmColor();
+          sendCommand({ action: 'SET_CALM_COLOR', value: calmColorOn });
+        });
+      }
+
+      // ==================== LOOK PRESETS ====================
+      let presetNames = [null, null, null, null, null, null, null, null];
+      let presetSaveArmed = false;
+      const presetGrid = document.getElementById('m-preset-grid');
+      const presetHint = document.getElementById('m-preset-hint');
+      const btnPresetSave = document.getElementById('btn-m-preset-save');
+
+      function escapeText(text) {
+        return String(text).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      }
+
+      function renderPresetGrid() {
+        presetGrid.innerHTML = '';
+        presetGrid.classList.toggle('save-armed', presetSaveArmed);
+        presetHint.textContent = presetSaveArmed ? 'ELIGE CASILLA PARA GUARDAR' : 'TOCA PARA CARGAR';
+        btnPresetSave.classList.toggle('amber-active', presetSaveArmed);
+        presetNames.forEach((p, i) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'btn-pad' + (p ? ' filled' : '');
+          btn.innerHTML = '<span class="pnum">' + (i + 1) + '</span>' + (p ? escapeText(p.name) : 'VACÍO');
+          btn.addEventListener('click', () => {
+            if (presetSaveArmed || !p) {
+              sendCommand({ action: 'SAVE_PRESET', slot: i });
+              presetSaveArmed = false;
+            } else {
+              sendCommand({ action: 'RECALL_PRESET', slot: i });
+            }
+            renderPresetGrid();
+          });
+          presetGrid.appendChild(btn);
+        });
+      }
+      btnPresetSave.addEventListener('click', () => {
+        presetSaveArmed = !presetSaveArmed;
+        renderPresetGrid();
+      });
+      renderPresetGrid();
+
+      // ==================== V2 HELPERS ====================
+      const isHttpMode = window.location.protocol.startsWith('http');
+      const TOUCH_GUARD_MS = 900;
+
+      // Leading + trailing throttle (the last value is always delivered)
+      function throttle(fn, ms) {
+        let last = 0;
+        let timer = null;
+        let pending = null;
+        return function () {
+          pending = Array.prototype.slice.call(arguments);
+          const wait = ms - (Date.now() - last);
+          if (wait <= 0) {
+            last = Date.now();
+            fn.apply(null, pending);
+          } else if (!timer) {
+            timer = setTimeout(() => {
+              timer = null;
+              last = Date.now();
+              fn.apply(null, pending);
+            }, wait);
+          }
+        };
+      }
+      function markTouched(el) { if (el) el.dataset.touchedAt = String(Date.now()); }
+      function isIdle(el) {
+        if (!el) return true;
+        return Date.now() - parseInt(el.dataset.touchedAt || '0', 10) > TOUCH_GUARD_MS;
+      }
+      function setRangeIfIdle(id, v) {
+        const el = document.getElementById(id);
+        if (!el || typeof v !== 'number' || !isFinite(v) || !isIdle(el)) return;
+        if (Math.abs(parseFloat(el.value) - v) > 1e-6) el.value = String(v);
+      }
+      // Button grid: one active button, calls onPick(value) on tap
+      function bindChoiceGrid(gridId, attr, onPick) {
+        const grid = document.getElementById(gridId);
+        grid.querySelectorAll('.btn-pad[' + attr + ']').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            grid.querySelectorAll('.btn-pad[' + attr + ']').forEach((b) => b.classList.toggle('active', b === btn));
+            markTouched(grid);
+            onPick(btn.getAttribute(attr), btn);
+          });
+        });
+      }
+      function reflectChoiceGrid(gridId, attr, value) {
+        const grid = document.getElementById(gridId);
+        if (!grid || value === undefined || value === null || !isIdle(grid)) return;
+        grid.querySelectorAll('.btn-pad[' + attr + ']').forEach((b) => b.classList.toggle('active', b.getAttribute(attr) === String(value)));
+      }
+      function bindThrottledRange(id, onValue, ms) {
+        const el = document.getElementById(id);
+        const send = throttle(onValue, ms || 80);
+        el.addEventListener('input', () => {
+          markTouched(el);
+          send(parseFloat(el.value));
+        });
+      }
+      function clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
+      function round4(v) { return Math.round(v * 10000) / 10000; }
+      function formatBytes(n) {
+        const b = Number(n) || 0;
+        if (b >= 1073741824) return (b / 1073741824).toFixed(1) + ' GB';
+        if (b >= 1048576) return (b / 1048576).toFixed(1) + ' MB';
+        if (b >= 1024) return Math.round(b / 1024) + ' KB';
+        return b + ' B';
+      }
+      function makeMsg(id) {
+        const el = document.getElementById(id);
+        let t = null;
+        return function (text, keepMs) {
+          el.textContent = text;
+          if (t) clearTimeout(t);
+          t = null;
+          if (keepMs !== 0) t = setTimeout(() => { el.textContent = ''; }, keepMs || 4500);
+        };
+      }
+
+      // ==================== TEXTO EN PANTALLA ====================
+      const textInput = document.getElementById('m-text-input');
+      const textCount = document.getElementById('m-text-count');
+      const btnTextToggle = document.getElementById('btn-m-text-toggle');
+      const textStatusTag = document.getElementById('m-text-status-tag');
+      const showTextMsg = makeMsg('m-text-msg');
+      let textEnabled = false;
+      let textServerContent = '';
+
+      function sanitizeTextValue(v) {
+        const lines = String(v || '').replace(/\r/g, '').split('\n');
+        const out = lines.length > 2 ? lines[0] + '\n' + lines.slice(1).join(' ') : lines.join('\n');
+        return out.slice(0, 140);
+      }
+      function updateTextCount() {
+        textCount.textContent = textInput.value.length + '/140';
+      }
+      function renderTextToggle() {
+        btnTextToggle.classList.toggle('green-live', textEnabled);
+        btnTextToggle.textContent = textEnabled ? '🟢 TEXTO EN PANTALLA' : '👁 MOSTRAR TEXTO';
+        textStatusTag.textContent = textEnabled ? 'EN PANTALLA' : 'OCULTO';
+        textStatusTag.style.color = textEnabled ? 'var(--green)' : 'var(--amber)';
+      }
+      textInput.addEventListener('input', () => {
+        const clean = sanitizeTextValue(textInput.value);
+        if (clean !== textInput.value) textInput.value = clean;
+        updateTextCount();
+      });
+      document.querySelectorAll('#m-text-quick .btn-pad').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          textInput.value = sanitizeTextValue(btn.getAttribute('data-text') || '');
+          updateTextCount();
+          showTextMsg('Pulsa 📤 ENVIAR TEXTO para lanzarlo.');
+        });
+      });
+      btnTextToggle.addEventListener('click', () => {
+        textEnabled = !textEnabled;
+        markTouched(btnTextToggle);
+        renderTextToggle();
+        sendCommand({ action: 'SET_TEXT_PROP', prop: 'enabled', value: textEnabled });
+      });
+      document.getElementById('btn-m-text-send').addEventListener('click', () => {
+        const content = sanitizeTextValue(textInput.value).trim();
+        if (!content) {
+          showTextMsg('✏️ Escribe un mensaje primero.');
+          return;
+        }
+        textInput.value = content;
+        updateTextCount();
+        textServerContent = content;
+        sendCommand({ action: 'SET_TEXT_PROP', prop: 'content', value: content });
+        if (!textEnabled) {
+          textEnabled = true;
+          markTouched(btnTextToggle);
+          renderTextToggle();
+          sendCommand({ action: 'SET_TEXT_PROP', prop: 'enabled', value: true });
+        }
+        showTextMsg('✅ Texto enviado a la pantalla.');
+      });
+      bindChoiceGrid('m-text-font-grid', 'data-font', (v) => sendCommand({ action: 'SET_TEXT_PROP', prop: 'font', value: parseInt(v, 10) || 0 }));
+      bindChoiceGrid('m-text-fx-grid', 'data-tfx', (v) => sendCommand({ action: 'SET_TEXT_PROP', prop: 'fxMode', value: parseInt(v, 10) || 0 }));
+      bindChoiceGrid('m-text-pos-grid', 'data-tpos', (v) => sendCommand({ action: 'SET_TEXT_PROP', prop: 'pos', value: parseInt(v, 10) || 0 }));
+      bindChoiceGrid('m-text-color-grid', 'data-tcolor', (v) => sendCommand({ action: 'SET_TEXT_PROP', prop: 'colorMode', value: parseInt(v, 10) || 0 }));
+      bindThrottledRange('m-text-scale', (v) => sendCommand({ action: 'SET_TEXT_PROP', prop: 'scale', value: v }));
+      bindThrottledRange('m-text-opacity', (v) => sendCommand({ action: 'SET_TEXT_PROP', prop: 'opacity', value: v }));
+      bindThrottledRange('m-text-backdrop', (v) => sendCommand({ action: 'SET_TEXT_PROP', prop: 'backdrop', value: v }));
+      bindThrottledRange('m-text-scroll', (v) => sendCommand({ action: 'SET_TEXT_PROP', prop: 'scrollSpeed', value: v }));
+      renderTextToggle();
+      updateTextCount();
+
+      function applyTextStatus(t) {
+        if (!t || typeof t !== 'object') return;
+        if (typeof t.enabled === 'boolean' && isIdle(btnTextToggle) && t.enabled !== textEnabled) {
+          textEnabled = t.enabled;
+          renderTextToggle();
+        }
+        if (typeof t.content === 'string' && document.activeElement !== textInput && textInput.value === textServerContent && t.content !== textServerContent) {
+          textInput.value = t.content;
+          textServerContent = t.content;
+          updateTextCount();
+        }
+        reflectChoiceGrid('m-text-font-grid', 'data-font', t.font);
+        reflectChoiceGrid('m-text-fx-grid', 'data-tfx', t.fxMode);
+        reflectChoiceGrid('m-text-pos-grid', 'data-tpos', t.pos);
+        reflectChoiceGrid('m-text-color-grid', 'data-tcolor', t.colorMode);
+        setRangeIfIdle('m-text-scale', t.scale);
+        setRangeIfIdle('m-text-opacity', t.opacity);
+        setRangeIfIdle('m-text-backdrop', t.backdrop);
+        setRangeIfIdle('m-text-scroll', t.scrollSpeed);
+      }
+
+      // ==================== VÍDEO, GIF Y CÁMARA ====================
+      const MAX_MEDIA_BYTES = 300 * 1024 * 1024;
+      const mediaFileInput = document.getElementById('m-media-file');
+      const btnMediaUpload = document.getElementById('btn-m-media-upload');
+      const mediaProgress = document.getElementById('m-media-progress');
+      const mediaProgressFill = document.getElementById('m-media-progress-fill');
+      const mediaProgressText = document.getElementById('m-media-progress-text');
+      const mediaListEl = document.getElementById('m-media-list');
+      const mediaNowEl = document.getElementById('m-media-now');
+      const mediaStatusTag = document.getElementById('m-media-status-tag');
+      const btnMediaToggle = document.getElementById('btn-m-media-toggle');
+      const btnMediaMirror = document.getElementById('btn-m-media-mirror');
+      const cameraSelect = document.getElementById('m-camera-select');
+      const showMediaMsg = makeMsg('m-media-msg');
+      let mediaEnabled = false;
+      let mediaMirror = false;
+      let mediaUploading = false;
+      let mediaCurrentUrl = '';
+      let mediaItemsCache = [];
+      let camerasSig = '';
+
+      function guessMediaKind(name, type) {
+        const n = String(name || '').toLowerCase();
+        if (/\.gif$/.test(n) || type === 'image/gif') return 'gif';
+        if (/\.(png|jpe?g|webp)$/.test(n) || String(type || '').startsWith('image/')) return 'image';
+        return 'video';
+      }
+      function kindIcon(kind) {
+        return kind === 'gif' ? '🎞' : (kind === 'image' ? '🖼' : '🎬');
+      }
+      function renderMediaToggle() {
+        btnMediaToggle.classList.toggle('green-live', mediaEnabled);
+        btnMediaToggle.textContent = mediaEnabled ? '🟢 VÍDEO EN PANTALLA' : '👁 MOSTRAR VÍDEO';
+      }
+      function renderMirror() {
+        btnMediaMirror.classList.toggle('active', mediaMirror);
+        btnMediaMirror.textContent = mediaMirror ? '🪞 Espejo: SÍ' : '🪞 Espejo';
+      }
+      function loadMediaItem(item) {
+        const kind = item.kind || guessMediaKind(item.name || item.file);
+        sendCommand({ action: 'LOAD_MEDIA', url: item.url, kind: kind, name: item.name || item.file || '' });
+        mediaEnabled = true;
+        markTouched(btnMediaToggle);
+        renderMediaToggle();
+        mediaCurrentUrl = item.url;
+        renderMediaList(mediaItemsCache);
+        showMediaMsg('▶️ Lanzando: ' + (item.name || item.file));
+      }
+
+      btnMediaUpload.addEventListener('click', () => {
+        if (!isHttpMode) {
+          showMediaMsg('⚠️ Para subir vídeos abre el mando desde la red Wi-Fi (http://...).');
+          return;
+        }
+        if (mediaUploading) return;
+        mediaFileInput.click();
+      });
+      mediaFileInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        e.target.value = '';
+        if (!file) return;
+        if (file.size > MAX_MEDIA_BYTES) {
+          showMediaMsg('❌ El archivo pesa ' + formatBytes(file.size) + '. Máximo 300 MB.', 7000);
+          return;
+        }
+        uploadMediaFile(file);
+      });
+
+      function setUploadProgress(pct, label) {
+        mediaProgress.style.display = 'block';
+        mediaProgressFill.style.width = clamp(pct, 0, 100).toFixed(1) + '%';
+        mediaProgressText.textContent = label;
+      }
+      function uploadMediaFile(file) {
+        mediaUploading = true;
+        btnMediaUpload.classList.remove('amber-active');
+        btnMediaUpload.textContent = '⏳ SUBIENDO...';
+        setUploadProgress(0, '0% · 0 B / ' + formatBytes(file.size));
+        const finish = () => {
+          mediaUploading = false;
+          btnMediaUpload.classList.add('amber-active');
+          btnMediaUpload.textContent = '📤 SUBIR VÍDEO / GIF / FOTO DEL MÓVIL';
+          setTimeout(() => { if (!mediaUploading) mediaProgress.style.display = 'none'; }, 2500);
+        };
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/media-upload?name=' + encodeURIComponent(file.name));
+        xhr.setRequestHeader('X-Aether-Pin', sessionPin);
+        xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+        xhr.upload.onprogress = (ev) => {
+          if (ev.lengthComputable && ev.total > 0) {
+            const pct = (ev.loaded / ev.total) * 100;
+            setUploadProgress(pct, Math.floor(pct) + '% · ' + formatBytes(ev.loaded) + ' / ' + formatBytes(ev.total));
+          }
+        };
+        xhr.onload = () => {
+          let data = null;
+          try { data = JSON.parse(xhr.responseText); } catch (_) {}
+          if (xhr.status >= 200 && xhr.status < 300 && data && data.ok && data.url) {
+            setUploadProgress(100, '100% · ¡Subido!');
+            loadMediaItem({ url: data.url, kind: data.kind || guessMediaKind(file.name, file.type), name: data.name || file.name });
+            refreshMediaList();
+          } else if (xhr.status === 401) {
+            showMediaMsg('❌ Clave no válida. Vuelve a entrar.', 7000);
+            loginOverlay.classList.remove('hidden');
+            loginError.textContent = 'La clave ha cambiado. Vuelve a introducirla.';
+          } else if (xhr.status === 413) {
+            showMediaMsg('❌ Archivo demasiado grande o la biblioteca está llena.', 7000);
+          } else {
+            showMediaMsg('❌ ' + ((data && data.error) || ('Error al subir (' + xhr.status + ')')), 7000);
+          }
+          finish();
+        };
+        xhr.onerror = () => {
+          showMediaMsg('❌ Se cortó la conexión durante la subida.', 7000);
+          finish();
+        };
+        xhr.send(file);
+      }
+
+      function renderMediaList(items) {
+        mediaListEl.innerHTML = '';
+        if (!items || !items.length) {
+          mediaListEl.innerHTML = '<div class="help-text">Todavía no hay vídeos. Sube el primero con 📤.</div>';
+          return;
+        }
+        items.forEach((item) => {
+          const row = document.createElement('div');
+          row.className = 'media-item';
+          const play = document.createElement('button');
+          play.type = 'button';
+          play.className = 'btn-pad media-play' + (item.url && item.url === mediaCurrentUrl ? ' playing' : '');
+          play.innerHTML = '<span>' + kindIcon(item.kind) + '</span><span class="mname">' + escapeText(item.name || item.file || '') +
+            '</span><span class="msize">' + formatBytes(item.size) + '</span>';
+          play.addEventListener('click', () => loadMediaItem(item));
+          row.appendChild(play);
+          const del = document.createElement('button');
+          del.type = 'button';
+          del.className = 'btn-pad danger media-del admin-only';
+          del.textContent = '🗑';
+          del.title = 'Borrar de la biblioteca';
+          del.addEventListener('click', () => deleteMediaItem(item));
+          row.appendChild(del);
+          mediaListEl.appendChild(row);
+        });
+      }
+      function refreshMediaList() {
+        if (!isHttpMode) {
+          mediaListEl.innerHTML = '<div class="help-text">La biblioteca solo está disponible conectado por Wi-Fi (http://...).</div>';
+          return;
+        }
+        fetch('/api/media-list', { headers: { 'X-Aether-Pin': sessionPin } })
+          .then((r) => r.json().then((d) => ({ ok: r.ok, data: d })))
+          .then((res) => {
+            if (res.ok && res.data && res.data.ok) {
+              mediaItemsCache = Array.isArray(res.data.items) ? res.data.items : [];
+              renderMediaList(mediaItemsCache);
+            } else {
+              mediaListEl.innerHTML = '<div class="help-text">No se pudo cargar la biblioteca' + (res.data && res.data.error ? ': ' + escapeText(res.data.error) : '.') + '</div>';
+            }
+          })
+          .catch(() => {
+            mediaListEl.innerHTML = '<div class="help-text">Sin conexión con el ordenador del visual.</div>';
+          });
+      }
+      function deleteMediaItem(item) {
+        if (!window.confirm('¿Borrar "' + (item.name || item.file) + '" de la biblioteca?')) return;
+        fetch('/api/media-delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin: sessionPin, file: item.file })
+        })
+          .then((r) => r.json().catch(() => ({})).then((d) => ({ ok: r.ok, data: d })))
+          .then((res) => {
+            if (res.ok && res.data && res.data.ok !== false) showMediaMsg('🗑 Borrado: ' + (item.name || item.file));
+            else showMediaMsg('❌ ' + ((res.data && res.data.error) || 'No se pudo borrar.'));
+            refreshMediaList();
+          })
+          .catch(() => showMediaMsg('❌ No se pudo borrar.'));
+      }
+      function onMediaTabOpened() {
+        refreshMediaList();
+      }
+      document.getElementById('btn-m-media-refresh').addEventListener('click', refreshMediaList);
+
+      btnMediaToggle.addEventListener('click', () => {
+        mediaEnabled = !mediaEnabled;
+        markTouched(btnMediaToggle);
+        renderMediaToggle();
+        sendCommand({ action: 'SET_MEDIA_PROP', prop: 'enabled', value: mediaEnabled });
+      });
+      document.getElementById('btn-m-media-stop').addEventListener('click', () => {
+        mediaEnabled = false;
+        markTouched(btnMediaToggle);
+        renderMediaToggle();
+        mediaCurrentUrl = '';
+        renderMediaList(mediaItemsCache);
+        sendCommand({ action: 'MEDIA_STOP' });
+        showMediaMsg('⏹ Vídeo quitado.');
+      });
+      document.getElementById('btn-m-camera-on').addEventListener('click', () => {
+        markTouched(cameraSelect);
+        sendCommand({ action: 'CAMERA_ON', deviceId: cameraSelect.value || '' });
+        mediaEnabled = true;
+        markTouched(btnMediaToggle);
+        renderMediaToggle();
+        showMediaMsg('📷 Encendiendo cámara...');
+      });
+      document.getElementById('btn-m-camera-refresh').addEventListener('click', () => {
+        sendCommand({ action: 'REFRESH_CAMERAS' });
+        showMediaMsg('🔄 Buscando cámaras en el ordenador...');
+      });
+      cameraSelect.addEventListener('change', () => markTouched(cameraSelect));
+      btnMediaMirror.addEventListener('click', () => {
+        mediaMirror = !mediaMirror;
+        markTouched(btnMediaMirror);
+        renderMirror();
+        sendCommand({ action: 'SET_MEDIA_PROP', prop: 'mirror', value: mediaMirror });
+      });
+      bindChoiceGrid('m-media-blend-grid', 'data-mblend', (v) => sendCommand({ action: 'SET_MEDIA_PROP', prop: 'blend', value: parseInt(v, 10) || 0 }));
+      bindChoiceGrid('m-media-fx-grid', 'data-mfx', (v) => sendCommand({ action: 'SET_MEDIA_PROP', prop: 'fx', value: parseInt(v, 10) || 0 }));
+      bindChoiceGrid('m-media-fit-grid', 'data-mfit', (v) => sendCommand({ action: 'SET_MEDIA_PROP', prop: 'fit', value: parseInt(v, 10) || 0 }));
+      bindThrottledRange('m-media-opacity', (v) => sendCommand({ action: 'SET_MEDIA_PROP', prop: 'opacity', value: v }));
+      bindThrottledRange('m-media-beatzoom', (v) => sendCommand({ action: 'SET_MEDIA_PROP', prop: 'beatZoom', value: v }));
+      bindThrottledRange('m-media-speed', (v) => sendCommand({ action: 'SET_MEDIA_PROP', prop: 'speed', value: v }));
+      renderMediaToggle();
+      renderMirror();
+
+      function renderCameras(list) {
+        const sig = JSON.stringify(list);
+        if (sig === camerasSig) return;
+        camerasSig = sig;
+        const prev = cameraSelect.value;
+        cameraSelect.innerHTML = '';
+        const def = document.createElement('option');
+        def.value = '';
+        def.textContent = list.length ? 'Cámara por defecto' : 'Cámara por defecto (pulsa 🔄 Buscar cámaras)';
+        cameraSelect.appendChild(def);
+        list.forEach((cam, i) => {
+          if (!cam) return;
+          const opt = document.createElement('option');
+          opt.value = cam.deviceId || '';
+          opt.textContent = cam.label || ('Cámara ' + (i + 1));
+          cameraSelect.appendChild(opt);
+        });
+        cameraSelect.value = prev;
+        if (cameraSelect.value !== prev) cameraSelect.value = '';
+      }
+      function applyMediaStatus(m, playing) {
+        if (m && typeof m === 'object') {
+          if (typeof m.enabled === 'boolean' && isIdle(btnMediaToggle) && m.enabled !== mediaEnabled) {
+            mediaEnabled = m.enabled;
+            renderMediaToggle();
+          }
+          if (typeof m.mirror === 'boolean' && isIdle(btnMediaMirror) && m.mirror !== mediaMirror) {
+            mediaMirror = m.mirror;
+            renderMirror();
+          }
+          reflectChoiceGrid('m-media-blend-grid', 'data-mblend', m.blend);
+          reflectChoiceGrid('m-media-fx-grid', 'data-mfx', m.fx);
+          reflectChoiceGrid('m-media-fit-grid', 'data-mfit', m.fit);
+          setRangeIfIdle('m-media-opacity', m.opacity);
+          setRangeIfIdle('m-media-beatzoom', m.beatZoom);
+          setRangeIfIdle('m-media-speed', m.speed);
+          if (typeof m.cameraId === 'string' && isIdle(cameraSelect) && cameraSelect.value !== m.cameraId) {
+            cameraSelect.value = m.cameraId;
+            if (cameraSelect.value !== m.cameraId) cameraSelect.value = '';
+          }
+          const newUrl = m.source === 'file' ? (m.url || '') : '';
+          if (newUrl !== mediaCurrentUrl) {
+            mediaCurrentUrl = newUrl;
+            renderMediaList(mediaItemsCache);
+          }
+        }
+        const src = m && m.source ? m.source : 'none';
+        const isPlaying = typeof playing === 'boolean' ? playing : (src !== 'none' && Boolean(m && m.enabled));
+        let label = '⏹ Nada en reproducción';
+        if (src === 'camera') label = '📷 Cámara en directo';
+        else if (src === 'file') label = kindIcon(m.kind) + ' ' + (m.name || 'Vídeo');
+        if (src !== 'none' && !isPlaying) label += ' (pausado/oculto)';
+        mediaNowEl.textContent = label;
+        mediaNowEl.classList.toggle('live', src !== 'none' && isPlaying);
+        mediaStatusTag.textContent = isPlaying ? '▶ EN PANTALLA' : (src !== 'none' ? 'CARGADO' : 'PARADO');
+        mediaStatusTag.style.color = isPlaying ? 'var(--green)' : 'var(--amber)';
+      }
+
+      // ==================== TRANSICIÓN ENTRE LOOKS ====================
+      const transitionReadout = document.getElementById('m-transition-readout');
+      function renderTransitionReadout(bars) {
+        transitionReadout.textContent = bars === 0 ? 'CORTE' : (bars + (bars === 1 ? ' COMPÁS' : ' COMPASES'));
+      }
+      bindChoiceGrid('m-transition-grid', 'data-bars', (v) => {
+        const bars = parseInt(v, 10) || 0;
+        renderTransitionReadout(bars);
+        sendCommand({ action: 'SET_TRANSITION', bars: bars });
+      });
+
+      // ==================== CORNER-PIN, MÁSCARAS Y EDGE BLEND ====================
+      const CP_MIN = -0.25;
+      const CP_MAX = 1.25;
+      const CP_SPAN = CP_MAX - CP_MIN;
+      const CORNER_NAMES = ['1 ↖ SUP-IZQ', '2 ↗ SUP-DER', '3 ↘ INF-DER', '4 ↙ INF-IZQ'];
+      const defaultCorners = () => [[0, 0], [1, 0], [1, 1], [0, 1]];
+      const cornersLocal = [defaultCorners(), defaultCorners()];
+      const masksLocal = [0, 1, 2, 3].map(() => ({ enabled: false, x: 0.4, y: 0.6, w: 0.2, h: 0.3, feather: 0.01 }));
+      const edgeLocal = { mode: 0, overlap: 0.15, gamma: 2.2, curve: 2.0 };
+      let cornerPinOn = false;
+      let cpProj = 0;
+      let cpSelected = 0;
+      let cpFine = true;
+      let cpDragging = -1;
+      let cpLastEdit = 0;
+      let maskLastEdit = 0;
+
+      const cpEditor = document.getElementById('m-cp-editor');
+      const cpCanvas = document.getElementById('m-cp-canvas');
+      const cpReadout = document.getElementById('m-cp-readout');
+      const cpStatus = document.getElementById('m-cp-status');
+      const btnCornerPin = document.getElementById('btn-m-cornerpin');
+      const btnCpStep = document.getElementById('btn-m-cp-step');
+      const cpProjRow = document.getElementById('m-cp-proj-row');
+      const cpHandles = [];
+
+      function cpToPct(u) { return ((u - CP_MIN) / CP_SPAN) * 100; }
+
+      function renderCornerPinToggle() {
+        btnCornerPin.classList.toggle('green-live', cornerPinOn);
+        btnCornerPin.textContent = cornerPinOn ? '🟢 CORNER-PIN ACTIVO' : '📐 ACTIVAR CORNER-PIN';
+        cpStatus.textContent = cornerPinOn ? 'ACTIVO' : 'APAGADO';
+        cpStatus.style.color = cornerPinOn ? 'var(--green)' : 'var(--amber)';
+      }
+      function renderProjRow() {
+        const show = edgeLocal.mode !== 0;
+        cpProjRow.style.display = show ? 'grid' : 'none';
+        if (!show && cpProj !== 0) cpProj = 0;
+        cpProjRow.querySelectorAll('.btn-pad[data-proj]').forEach((b) => b.classList.toggle('active', b.getAttribute('data-proj') === String(cpProj)));
+      }
+      function renderCpReadout() {
+        const c = cornersLocal[cpProj][cpSelected];
+        cpReadout.textContent = (edgeLocal.mode !== 0 ? (cpProj === 0 ? 'PROY. 1 · ' : 'PROY. 2 · ') : '') +
+          'ESQUINA ' + CORNER_NAMES[cpSelected] + ' · X ' + c[0].toFixed(3) + ' · Y ' + c[1].toFixed(3);
+      }
+      function positionHandles() {
+        const quad = cornersLocal[cpProj];
+        cpHandles.forEach((h, i) => {
+          h.style.left = cpToPct(quad[i][0]) + '%';
+          h.style.top = cpToPct(quad[i][1]) + '%';
+          h.classList.toggle('selected', i === cpSelected);
+        });
+      }
+      function drawQuad(ctx, quad, X, Y, strong) {
+        const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+        const pt = (s, t) => lerp(lerp(quad[0], quad[1], s), lerp(quad[3], quad[2], s), t);
+        ctx.beginPath();
+        ctx.moveTo(X(quad[0][0]), Y(quad[0][1]));
+        for (let i = 1; i < 4; i++) ctx.lineTo(X(quad[i][0]), Y(quad[i][1]));
+        ctx.closePath();
+        ctx.fillStyle = strong ? 'rgba(0, 240, 255, 0.12)' : 'rgba(147, 157, 184, 0.06)';
+        ctx.fill();
+        ctx.strokeStyle = strong ? (cornerPinOn ? '#00f0ff' : 'rgba(0, 240, 255, 0.55)') : 'rgba(147, 157, 184, 0.45)';
+        ctx.lineWidth = strong ? 2 : 1;
+        ctx.setLineDash(strong && cornerPinOn ? [] : [5, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        if (!strong) return;
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.25)';
+        ctx.lineWidth = 1;
+        for (let k = 1; k < 4; k++) {
+          const t = k / 4;
+          let a = pt(t, 0); let b = pt(t, 1);
+          ctx.beginPath(); ctx.moveTo(X(a[0]), Y(a[1])); ctx.lineTo(X(b[0]), Y(b[1])); ctx.stroke();
+          a = pt(0, t); b = pt(1, t);
+          ctx.beginPath(); ctx.moveTo(X(a[0]), Y(a[1])); ctx.lineTo(X(b[0]), Y(b[1])); ctx.stroke();
+        }
+      }
+      function drawCpEditor() {
+        const W = cpEditor.clientWidth;
+        const H = cpEditor.clientHeight;
+        if (!W || !H) return;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        if (cpCanvas.width !== Math.round(W * dpr) || cpCanvas.height !== Math.round(H * dpr)) {
+          cpCanvas.width = Math.round(W * dpr);
+          cpCanvas.height = Math.round(H * dpr);
+        }
+        const ctx = cpCanvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, W, H);
+        const X = (u) => ((u - CP_MIN) / CP_SPAN) * W;
+        const Y = (v) => ((v - CP_MIN) / CP_SPAN) * H;
+        // Original screen area
+        ctx.fillStyle = '#0d111c';
+        ctx.fillRect(X(0), Y(0), X(1) - X(0), Y(1) - Y(0));
+        ctx.strokeStyle = '#3a4566';
+        ctx.setLineDash([4, 4]);
+        ctx.lineWidth = 1;
+        ctx.strokeRect(X(0) + 0.5, Y(0) + 0.5, X(1) - X(0) - 1, Y(1) - Y(0) - 1);
+        ctx.setLineDash([]);
+        // Masks
+        ctx.font = '700 10px "JetBrains Mono", monospace';
+        masksLocal.forEach((m, i) => {
+          const x0 = X(m.x); const y0 = Y(m.y);
+          const w = X(m.x + m.w) - x0; const h = Y(m.y + m.h) - y0;
+          ctx.fillStyle = m.enabled ? 'rgba(255, 0, 85, 0.38)' : 'rgba(255, 0, 85, 0.08)';
+          ctx.fillRect(x0, y0, w, h);
+          ctx.strokeStyle = m.enabled ? '#ff0055' : 'rgba(255, 0, 85, 0.35)';
+          ctx.setLineDash(m.enabled ? [] : [3, 3]);
+          ctx.strokeRect(x0, y0, w, h);
+          ctx.setLineDash([]);
+          ctx.fillStyle = m.enabled ? '#ffd0dd' : 'rgba(255, 208, 221, 0.4)';
+          ctx.fillText('M' + (i + 1), x0 + 3, y0 + 11);
+        });
+        // Quads (other projector faint, active strong)
+        if (edgeLocal.mode !== 0) drawQuad(ctx, cornersLocal[cpProj === 0 ? 1 : 0], X, Y, false);
+        drawQuad(ctx, cornersLocal[cpProj], X, Y, true);
+      }
+      function refreshCpEditor() {
+        positionHandles();
+        renderCpReadout();
+        drawCpEditor();
+      }
+      function onMappingTabOpened() {
+        requestAnimationFrame(refreshCpEditor);
+      }
+      function selectCorner(i) {
+        cpSelected = i;
+        document.querySelectorAll('#m-cp-corner-grid .btn-pad').forEach((b) => b.classList.toggle('active', b.getAttribute('data-corner') === String(i)));
+        positionHandles();
+        renderCpReadout();
+      }
+      function sendCorner(i) {
+        const c = cornersLocal[cpProj][i];
+        sendCommand({ action: 'SET_CORNER', proj: cpProj, index: i, x: round4(c[0]), y: round4(c[1]) });
+      }
+      const sendCornerThrottled = throttle(sendCorner, 60);
+      function setCornerLocal(i, x, y) {
+        cornersLocal[cpProj][i] = [clamp(x, CP_MIN, CP_MAX), clamp(y, CP_MIN, CP_MAX)];
+        cpLastEdit = Date.now();
+        refreshCpEditor();
+      }
+
+      [0, 1, 2, 3].forEach((i) => {
+        const h = document.createElement('div');
+        h.className = 'cp-handle';
+        h.textContent = String(i + 1);
+        h.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          selectCorner(i);
+          cpDragging = i;
+          try { h.setPointerCapture(e.pointerId); } catch (_) {}
+        });
+        h.addEventListener('pointermove', (e) => {
+          if (cpDragging !== i) return;
+          e.preventDefault();
+          const r = cpEditor.getBoundingClientRect();
+          if (!r.width || !r.height) return;
+          const x = CP_MIN + ((e.clientX - r.left) / r.width) * CP_SPAN;
+          const y = CP_MIN + ((e.clientY - r.top) / r.height) * CP_SPAN;
+          setCornerLocal(i, x, y);
+          sendCornerThrottled(i);
+        });
+        const endDrag = () => {
+          if (cpDragging !== i) return;
+          cpDragging = -1;
+          cpLastEdit = Date.now();
+          setTimeout(() => sendCorner(i), 70); // final value after any pending throttled send
+        };
+        h.addEventListener('pointerup', endDrag);
+        h.addEventListener('pointercancel', endDrag);
+        cpEditor.appendChild(h);
+        cpHandles.push(h);
+      });
+
+      document.querySelectorAll('#m-cp-corner-grid .btn-pad').forEach((btn) => {
+        btn.addEventListener('click', () => selectCorner(parseInt(btn.getAttribute('data-corner'), 10) || 0));
+      });
+      document.querySelectorAll('.nudge-pad .btn-pad[data-nudge]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const step = cpFine ? 0.002 : 0.02;
+          const dir = btn.getAttribute('data-nudge');
+          const c = cornersLocal[cpProj][cpSelected];
+          const dx = dir === 'left' ? -step : (dir === 'right' ? step : 0);
+          const dy = dir === 'up' ? -step : (dir === 'down' ? step : 0);
+          setCornerLocal(cpSelected, c[0] + dx, c[1] + dy);
+          sendCornerThrottled(cpSelected);
+        });
+      });
+      btnCpStep.addEventListener('click', () => {
+        cpFine = !cpFine;
+        btnCpStep.textContent = cpFine ? 'PASO: FINO' : 'PASO: GRUESO';
+        btnCpStep.classList.toggle('amber-active', !cpFine);
+      });
+      btnCornerPin.addEventListener('click', () => {
+        cornerPinOn = !cornerPinOn;
+        markTouched(btnCornerPin);
+        renderCornerPinToggle();
+        drawCpEditor();
+        sendCommand({ action: 'SET_MAP_PROP', prop: 'cornerPin', value: cornerPinOn });
+      });
+      document.getElementById('btn-m-cp-testgrid').addEventListener('click', toggleTestGrid);
+      cpProjRow.querySelectorAll('.btn-pad[data-proj]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          cpProj = parseInt(btn.getAttribute('data-proj'), 10) === 1 ? 1 : 0;
+          renderProjRow();
+          refreshCpEditor();
+        });
+      });
+      document.getElementById('btn-m-cp-reset').addEventListener('click', () => {
+        cornersLocal[cpProj] = defaultCorners();
+        cpLastEdit = Date.now();
+        refreshCpEditor();
+        sendCommand({ action: 'RESET_CORNERS', proj: cpProj });
+      });
+
+      // Masks UI (4 masks built dynamically)
+      const MASK_PROPS = [
+        { k: 'x', label: 'POSICIÓN X', min: 0, max: 1, step: 0.005 },
+        { k: 'y', label: 'POSICIÓN Y', min: 0, max: 1, step: 0.005 },
+        { k: 'w', label: 'ANCHO', min: 0.01, max: 1, step: 0.005 },
+        { k: 'h', label: 'ALTO', min: 0.01, max: 1, step: 0.005 },
+        { k: 'feather', label: 'SUAVIZADO', min: 0, max: 0.2, step: 0.005 }
+      ];
+      const masksWrap = document.getElementById('m-masks-wrap');
+      function renderMaskToggle(i) {
+        const b = document.getElementById('btn-m-mask-' + i + '-toggle');
+        const on = masksLocal[i].enabled;
+        b.classList.toggle('green-live', on);
+        b.textContent = on ? '🟢 ACTIVA' : '⬛ ACTIVAR';
+      }
+      masksLocal.forEach((m, i) => {
+        const block = document.createElement('div');
+        block.className = 'mask-block';
+        let html = '<div class="mask-head"><span>⬛ MÁSCARA ' + (i + 1) + '</span>' +
+          '<button type="button" id="btn-m-mask-' + i + '-toggle" class="btn-pad">⬛ ACTIVAR</button></div>';
+        MASK_PROPS.forEach((p) => {
+          html += '<div class="slider-row"><span>' + p.label + '</span><input type="range" id="m-mask-' + i + '-' + p.k +
+            '" min="' + p.min + '" max="' + p.max + '" step="' + p.step + '" value="' + m[p.k] + '" /></div>';
+        });
+        block.innerHTML = html;
+        masksWrap.appendChild(block);
+        const tBtn = document.getElementById('btn-m-mask-' + i + '-toggle');
+        tBtn.addEventListener('click', () => {
+          masksLocal[i].enabled = !masksLocal[i].enabled;
+          maskLastEdit = Date.now();
+          markTouched(tBtn);
+          renderMaskToggle(i);
+          drawCpEditor();
+          sendCommand({ action: 'SET_MASK', index: i, prop: 'enabled', value: masksLocal[i].enabled });
+        });
+        MASK_PROPS.forEach((p) => {
+          const send = throttle((v) => sendCommand({ action: 'SET_MASK', index: i, prop: p.k, value: v }), 80);
+          const el = document.getElementById('m-mask-' + i + '-' + p.k);
+          el.addEventListener('input', () => {
+            const v = parseFloat(el.value);
+            masksLocal[i][p.k] = v;
+            maskLastEdit = Date.now();
+            markTouched(el);
+            drawCpEditor();
+            send(v);
+          });
+        });
+        renderMaskToggle(i);
+      });
+
+      // Edge blending
+      bindChoiceGrid('m-edge-mode-grid', 'data-edge', (v) => {
+        edgeLocal.mode = parseInt(v, 10) || 0;
+        renderProjRow();
+        refreshCpEditor();
+        sendCommand({ action: 'SET_EDGE_PROP', prop: 'mode', value: edgeLocal.mode });
+      });
+      bindThrottledRange('m-edge-overlap', (v) => { edgeLocal.overlap = v; sendCommand({ action: 'SET_EDGE_PROP', prop: 'overlap', value: v }); });
+      bindThrottledRange('m-edge-gamma', (v) => { edgeLocal.gamma = v; sendCommand({ action: 'SET_EDGE_PROP', prop: 'gamma', value: v }); });
+      bindThrottledRange('m-edge-curve', (v) => { edgeLocal.curve = v; sendCommand({ action: 'SET_EDGE_PROP', prop: 'curve', value: v }); });
+
+      renderCornerPinToggle();
+      renderProjRow();
+      refreshCpEditor();
+      window.addEventListener('resize', () => drawCpEditor());
+      if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(() => drawCpEditor()).observe(cpEditor);
+      }
+
+      function validQuad(q) {
+        return Array.isArray(q) && q.length === 4 && q.every((p) => Array.isArray(p) && p.length >= 2 && isFinite(p[0]) && isFinite(p[1]));
+      }
+      function applyMappingStatus(mp) {
+        if (!mp || typeof mp !== 'object') return;
+        let redraw = false;
+        if (typeof mp.cornerPin === 'boolean' && isIdle(btnCornerPin) && mp.cornerPin !== cornerPinOn) {
+          cornerPinOn = mp.cornerPin;
+          renderCornerPinToggle();
+          redraw = true;
+        }
+        if (typeof mp.showTestGrid === 'boolean' && mp.showTestGrid !== testGridOn) {
+          testGridOn = mp.showTestGrid;
+          renderTestGridButtons();
+        }
+        if (typeof mp.ledScalerEnabled === 'boolean') {
+          ledScalerOn = mp.ledScalerEnabled;
+          if (typeof mp.ledWidthPx === 'number') {
+            ledWLocal = mp.ledWidthPx;
+            if (inpLedW && document.activeElement !== inpLedW) inpLedW.value = ledWLocal;
+          }
+          if (typeof mp.ledHeightPx === 'number') {
+            ledHLocal = mp.ledHeightPx;
+            if (inpLedH && document.activeElement !== inpLedH) inpLedH.value = ledHLocal;
+          }
+          if (typeof mp.ledOffsetXPx === 'number' && inpLedOx && document.activeElement !== inpLedOx) {
+            inpLedOx.value = mp.ledOffsetXPx;
+          }
+          if (typeof mp.ledOffsetYPx === 'number' && inpLedOy && document.activeElement !== inpLedOy) {
+            inpLedOy.value = mp.ledOffsetYPx;
+          }
+          if (typeof mp.ledAnchor === 'string') ledAnchorLocal = mp.ledAnchor;
+          if (typeof mp.ledKeepAspect === 'boolean') ledAspectLocal = mp.ledKeepAspect;
+          renderLedScalerUI();
+        }
+        if (cpDragging < 0 && Date.now() - cpLastEdit > TOUCH_GUARD_MS) {
+          [mp.corners, mp.corners2].forEach((q, p) => {
+            if (!validQuad(q)) return;
+            const next = q.map((pt) => [Number(pt[0]), Number(pt[1])]);
+            if (JSON.stringify(next) !== JSON.stringify(cornersLocal[p])) {
+              cornersLocal[p] = next;
+              redraw = true;
+            }
+          });
+        }
+        if (Array.isArray(mp.masks) && Date.now() - maskLastEdit > TOUCH_GUARD_MS) {
+          mp.masks.slice(0, 4).forEach((m, i) => {
+            if (!m || typeof m !== 'object') return;
+            const cur = masksLocal[i];
+            if (typeof m.enabled === 'boolean' && m.enabled !== cur.enabled) {
+              cur.enabled = m.enabled;
+              renderMaskToggle(i);
+              redraw = true;
+            }
+            MASK_PROPS.forEach((p) => {
+              const v = Number(m[p.k]);
+              if (isFinite(v) && v !== cur[p.k]) {
+                cur[p.k] = v;
+                setRangeIfIdle('m-mask-' + i + '-' + p.k, v);
+                redraw = true;
+              }
+            });
+          });
+        }
+        if (redraw) refreshCpEditor();
+      }
+      function applyEdgeStatus(eb) {
+        if (!eb || typeof eb !== 'object') return;
+        const mode = parseInt(eb.mode, 10);
+        if (isFinite(mode) && mode !== edgeLocal.mode && isIdle(document.getElementById('m-edge-mode-grid'))) {
+          edgeLocal.mode = mode;
+          reflectChoiceGrid('m-edge-mode-grid', 'data-edge', mode);
+          renderProjRow();
+          refreshCpEditor();
+        }
+        ['overlap', 'gamma', 'curve'].forEach((k) => {
+          if (typeof eb[k] === 'number') {
+            edgeLocal[k] = eb[k];
+            setRangeIfIdle('m-edge-' + k, eb[k]);
+          }
+        });
+      }
+
+      function applyV2Status(st) {
+        if (st.text) applyTextStatus(st.text);
+        if (st.media || typeof st.mediaPlaying === 'boolean') applyMediaStatus(st.media, st.mediaPlaying);
+        if (Array.isArray(st.cameras)) renderCameras(st.cameras);
+        if (st.transition && typeof st.transition.bars === 'number') {
+          const tGrid = document.getElementById('m-transition-grid');
+          if (isIdle(tGrid)) {
+            reflectChoiceGrid('m-transition-grid', 'data-bars', st.transition.bars);
+            renderTransitionReadout(st.transition.bars);
+          }
+        }
+        if (st.mapping) applyMappingStatus(st.mapping);
+        if (st.edgeBlend) applyEdgeStatus(st.edgeBlend);
+      }
+
+      // Live Status Sync from Master Server
+      const connLed = document.getElementById('conn-led');
+      const livePill = document.getElementById('live-scene-pill');
+      if (window.location.protocol.startsWith('http') && typeof EventSource !== 'undefined') {
+        const es = new EventSource('/api/events');
+        es.onopen = () => {
+          connLed.classList.add('online');
+          livePill.textContent = 'EN LÍNEA';
+        };
+        es.onmessage = (ev) => {
+          try {
+            const msg = JSON.parse(ev.data);
+            if (msg && msg.type === 'MASTER_STATUS' && msg.status) {
+              const st = msg.status;
+              connLed.classList.add('online');
+              currentActiveGen = st.activeGen;
+              livePill.textContent = 'LOOP #' + (st.activeGen + 1) + ' • ' + st.fps + ' FPS';
+              document.getElementById('m-bpm-readout').textContent = st.bpm + ' BPM';
+              if (st.logo) {
+                logoEnabled = Boolean(st.logo.enabled);
+                updateLogoToggleUI();
+              }
+              if (Array.isArray(st.presets)) {
+                const sig = JSON.stringify(st.presets);
+                if (sig !== JSON.stringify(presetNames)) {
+                  presetNames = st.presets;
+                  renderPresetGrid();
+                }
+              }
+              if (typeof st.safeStrobe === 'boolean' && st.safeStrobe !== safeStrobeOn) {
+                safeStrobeOn = st.safeStrobe;
+                renderSafeStrobe();
+              }
+              if (typeof st.calmColor === 'boolean' && st.calmColor !== calmColorOn) {
+                calmColorOn = st.calmColor;
+                renderCalmColor();
+              }
+              applyV2Status(st);
+            }
+          } catch (_) {}
+        };
+        es.onerror = () => {
+          connLed.classList.remove('online');
+          livePill.textContent = 'RECONECTANDO...';
+        };
+      } else {
+        connLed.classList.add('online');
+        livePill.textContent = 'MODO LOCAL';
+      }
+    })();
+  </script>
+</body>
+</html>

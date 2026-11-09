@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AETHER-VJ // SALIDA LIMPIA (RESOLUME / NDI / SPOUT / ALPHA READY)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: transparent;
+      cursor: none;
+    }
+    body.bg-solid {
+      background-color: #000000;
+    }
+    canvas#projector-gl-canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      background: transparent;
+    }
+  </style>
+</head>
+<body class="bg-solid">
+  <canvas id="projector-gl-canvas"></canvas>
+  <script src="js/aether-projector.bundle.js"></script>
+</body>
+</html>

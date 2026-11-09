@@ -1,0 +1,12 @@
+# Configuración privada local del Mini-PC (PINs, Logos guardados, Calibración)
+aether-config.json
+aether-config.json.tmp
+
+# Vídeos subidos localmente en cada Mini-PC
+media/*
+!media/.gitkeep
+
+# Archivos temporales de sistema
+.DS_Store
+Thumbs.db
+node_modules/

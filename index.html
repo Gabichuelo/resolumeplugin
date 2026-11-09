@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AETHER-VJ // Motor Visual Generativo para Eventos y Resolume</title>
+  <link rel="stylesheet" href="css/console.css" />
+</head>
+<body class="simple-ui-mode">
+  <!-- Lienzo WebGL2 a Pantalla Completa -->
+  <canvas id="aether-gl-canvas" title="Doble clic o pulsa [H] para ocultar/mostrar los controles"></canvas>
+
+  <!-- Pastilla flotante mínima cuando se ocultan los controles (Modo Pantalla Limpia [H]) -->
+  <div id="minimal-hud-pill" class="minimal-restore-pill">
+    <span class="pill-dot"></span>
+    <span>PANTALLA LIMPIA ACTIVA [H]</span>
+    <button type="button" id="btn-restore-ui" class="btn-pill-restore">MOSTRAR CONTROLES</button>
+  </div>
+
+  <!-- Modal de Guía Rápida en 4 Pasos (Oculto por defecto) -->
+  <div id="help-modal-backdrop" class="help-modal-backdrop hidden">
+    <div class="help-modal-card">
+      <div class="help-modal-header">
+        <h2>❓ CÓMO USAR AETHER-VJ EN 4 PASOS SENCILLOS</h2>
+        <button type="button" id="btn-close-help" class="btn-close-help">✕ CERRAR</button>
+      </div>
+      <div class="help-modal-body">
+        <div class="help-step-box">
+          <div class="help-step-num">1</div>
+          <div>
+            <h3>ELIGE QUÉ SE VE (ABAJO A LA DERECHA)</h3>
+            <p>Tienes <strong>4 familias de visuales</strong>: <strong>⏹ PLANOS (Sin efectos)</strong>, <strong>□ FORMAS 2D</strong>, <strong>≡ GROSOR Y BARRIDOS</strong> y <strong>❖ PROFUNDO 3D</strong>. Haz clic en cualquiera de las 8 tarjetas grandes (o pulsa las teclas <code>1</code> a <code>8</code>) para cambiar de visual suavemente.</p>
+          </div>
+        </div>
+        <div class="help-step-box">
+          <div class="help-step-num">2</div>
+          <div>
+            <h3>PERSONALIZA LA FORMA Y EL ACABADO (PANEL IZQUIERDO)</h3>
+            <p>Puedes forzar a que cualquier visual dibuje solo <strong>Cuadrados □</strong>, <strong>Triángulos △</strong> o <strong>Hexágonos ⬡</strong>, activar el acabado <strong>⏹ 100% Plano (Sin Brillo)</strong>, hacer que las líneas <strong>respiren de finas a gruesas</strong> o añadir un <strong>barrido de Izquierda a Derecha</strong>.</p>
+          </div>
+        </div>
+        <div class="help-step-box">
+          <div class="help-step-num">3</div>
+          <div>
+            <h3>MOLDEA CON LOS 8 FADERS (ABAJO A LA IZQUIERDA)</h3>
+            <p>Usa los 8 deslizadores para ajustar la <strong>Velocidad</strong>, la <strong>Cantidad de figuras</strong> (bájalo para ver 1 o 2 figuras gigantes y elegantes sobre fondo negro) y el <strong>Grosor de línea</strong>. Haz <strong>doble clic</strong> sobre cualquier fader para devolverlo a su punto ideal.</p>
+          </div>
+        </div>
+        <div class="help-step-box">
+          <div class="help-step-num">4</div>
+          <div>
+            <h3>BOTÓN "🌿 CALMAR VISUAL" Y SALIDA A RESOLUME (ARRIBA)</h3>
+            <p>Si en algún momento ves demasiadas cosas moviéndose, pulsa <strong>🌿 CALMAR VISUAL</strong> arriba del todo: pondrá al instante un movimiento lento, recto, sin parpadeos y con pocas figuras grandes sobre fondo negro. Para enviar la imagen a un proyector o a Resolume, pulsa <strong>ABRIR VENTANA PROYECTOR</strong> o la tecla <code>H</code>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Mando Móvil, Recursos del Mini-PC y Actualización por Internet -->
+  <div id="remote-modal-backdrop" class="help-modal-backdrop hidden">
+    <div class="help-modal-card" style="max-width:680px">
+      <div class="help-modal-header">
+        <h2>📱 MÓVIL REMOTO · RECURSOS MINI-PC · ACTUALIZAR</h2>
+        <button type="button" id="btn-close-remote-modal" class="btn-close-help">✕ CERRAR</button>
+      </div>
+      <div class="help-modal-body">
+        <div class="help-step-box">
+          <div class="help-step-num">📱</div>
+          <div style="flex:1">
+            <h3>DIRECCIÓN PARA ENTRAR DESDE EL MÓVIL O PC EN LA MISMA RED</h3>
+            <p>Escribe cualquiera de estas direcciones en el navegador de tu móvil (Safari / Chrome):</p>
+            <div id="remote-urls-list" style="margin-top:8px;padding:10px;background:#070a10;border:1px solid #00e5ff55;border-radius:6px;font-family:monospace;font-size:15px;color:#00e5ff;line-height:1.7">
+              Cargando direcciones IP de red...
+            </div>
+            <div id="remote-pins-readout" style="margin-top:6px;font-size:12px;color:#98a4b8">
+              🔑 PIN Técnico (Control Total): <strong>1234</strong> &nbsp;|&nbsp; 🎧 PIN DJ Invitado (Logo/Texto/Vídeo): <strong>dj</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="help-step-box">
+          <div class="help-step-num">📊</div>
+          <div style="flex:1">
+            <h3>CONSUMO DE RECURSOS DEL MINI-PC EN TIEMPO REAL</h3>
+            <div id="sys-stats-box" style="margin-top:6px;padding:10px;background:#070a10;border:1px solid #1e293b;border-radius:6px;font-family:monospace;font-size:13px;color:#e2e8f0;line-height:1.6">
+              Consultando estado de CPU, Memoria RAM y Temperatura...
+            </div>
+          </div>
+        </div>
+
+        <div class="help-step-box">
+          <div class="help-step-num">🌐</div>
+          <div style="flex:1">
+            <h3>ACTUALIZAR PLUGIN VÍA INTERNET (1 CLIC)</h3>
+            <p>Si el Mini-PC tiene cable de red o Wi-Fi con Internet, descarga la última versión desde tu repositorio Git/GitHub sin perder tus ajustes ni logos:</p>
+            <div style="display:flex;gap:6px;margin-top:8px">
+              <input type="text" id="update-repo-url-input" class="v2-text-input" style="flex:1" value="https://github.com/Gabichuelo/resolumeplugin.git" placeholder="https://github.com/Gabichuelo/resolumeplugin.git" />
+              <button type="button" id="btn-run-internet-update" class="btn-console-action primary" style="white-space:nowrap">
+                🔄 ACTUALIZAR AHORA
+              </button>
+            </div>
+            <div id="update-status-msg" style="margin-top:6px;font-size:12px;color:#98a4b8"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Consola Principal -->
+  <div id="console-ui-overlay" class="console-shell">
+
+    <!-- BARRA SUPERIOR: ESTADO, BOTÓN ANTI-MAREO, MODO FÁCIL/PRO Y PROYECTOR -->
+    <header class="console-topbar">
+      <div class="brand-cluster">
+        <div class="brand-badge">AETHER-VJ</div>
+        <div class="brand-meta">
+          <div class="brand-title">MOTOR VISUAL DE EVENTOS</div>
+          <div class="brand-sub">GEOMETRÍA PLANA, FORMAS 2D Y LÍNEAS DINÁMICAS</div>
+        </div>
+      </div>
+
+      <div class="telemetry-cluster">
+        <div class="telemetry-cell">
+          <span class="telemetry-label">RENDIMIENTO</span>
+          <span id="hud-fps" class="telemetry-val ok">60 FPS</span>
+        </div>
+        <div class="telemetry-cell pro-only-flex">
+          <span class="telemetry-label">TIEMPO GPU</span>
+          <span id="hud-framems" class="telemetry-val">16.6 ms</span>
+        </div>
+        <div class="telemetry-cell">
+          <span class="telemetry-label">MINI-PC</span>
+          <span id="hud-sys-load" class="telemetry-val ok" title="Haz clic en 📱 MÓVIL REMOTO para ver el detalle de CPU, RAM y Temperatura">CPU --%</span>
+        </div>
+        <div class="telemetry-cell">
+          <span class="telemetry-label">SESIÓN</span>
+          <span id="hud-session-clock" class="telemetry-val accent">00:00:00</span>
+        </div>
+        <div class="telemetry-cell wide">
+          <span class="telemetry-label">VISUAL EN PANTALLA</span>
+          <span id="hud-active-scene" class="telemetry-val cyan">FLT-19: LÍNEA ⟷ RELLENO</span>
+        </div>
+      </div>
+
+      <div class="output-actions-cluster">
+        <button type="button" id="btn-panic" class="btn-console-action panic-btn" title="Vuelve AL INSTANTE a un visual seguro y limpio: quita apagón, estrobo, invertido, efectos y 3D (Tecla ESC)">
+          🆘 PÁNICO [ESC]
+        </button>
+        <button type="button" id="btn-calm-preset" class="btn-console-action calm-btn" title="Pone inmediatamente un visual lento, elegante, recto, sin parpadeos y con pocas figuras grandes sobre negro">
+          🌿 CALMAR VISUAL
+        </button>
+        <button type="button" id="btn-toggle-simple-ui" class="btn-console-action mode-btn" title="Alternar entre Modo Fácil (controles esenciales claros) y Modo Avanzado (mezclador A/B manual y LFOs)">
+          ✨ MODO: FÁCIL
+        </button>
+        <button type="button" id="btn-open-remote-modal" class="btn-console-action primary" title="Ver dirección IP para el móvil, consumo de CPU/RAM/Temperatura del Mini-PC y actualizar por Internet">
+          📱 MÓVIL REMOTO
+        </button>
+        <button type="button" id="btn-open-help" class="btn-console-action help-btn" title="Ver guía rápida en 4 pasos">
+          ❓ AYUDA
+        </button>
+        <div class="projector-status-box pro-only-flex">
+          <span id="projector-status-led" class="status-led"></span>
+          <span id="projector-status-text">PROYECTOR: EN ESPERA</span>
+        </div>
+        <button type="button" id="btn-open-projector" class="btn-console-action primary" title="Abre una segunda ventana 100% limpia sin botones para enviar a proyector, segunda pantalla o Resolume">
+          🖥 ABRIR PROYECTOR
+        </button>
+        <button type="button" id="btn-hide-ui" class="btn-console-action" title="Oculta todos los paneles para ver solo el visual a pantalla completa (Tecla H)">
+          OCULTAR PANELES [H]
+        </button>
+      </div>
+    </header>
+
+    <!-- ÁREA CENTRAL: PANEL IZQUIERDO + VISOR CENTRAL + PANEL DERECHO -->
+    <div class="console-middle-area">
+
+      <!-- PANEL IZQUIERDO: PASO 1 (FORMA Y ACABADO) + PILOTO AUTOMÁTICO -->
+      <aside class="console-rack left-rack">
+
+        <!-- MÓDULO 0: PERSONALIZACIÓN RÁPIDA DE FORMA, ESTILO PLANO, GROSOR Y BARRIDO -->
+        <section class="rack-module">
+          <div class="module-header">
+            <span class="module-led cyan"></span>
+            <span class="module-title">PASO 1: FORMA, ESTILO Y MOVIMIENTO</span>
+          </div>
+          <div class="sub-label" style="margin-top:0">1. ¿QUÉ FIGURA GEOMÉTRICA QUIERES?</div>
+          <div id="shape-mode-grid" class="shape-selector-grid"></div>
+
+          <div class="sub-label">2. ¿QUÉ ACABADO VISUAL? [TECLA: P]</div>
+          <div id="style-mode-grid" class="weight-selector-grid"></div>
+
+          <div class="sub-label">3. ¿CÓMO CAMBIA EL GROSOR DE LÍNEA? [TECLA: W]</div>
+          <div id="weight-mode-grid" class="weight-selector-grid"></div>
+
+          <div class="sub-label">4. ¿AÑADIR BARRIDO LATERAL? [TECLA: Q]</div>
+          <div id="sweep-mode-grid" class="sweep-selector-grid"></div>
+
+          <div class="sub-label">5. ¿CONVERTIR EN 3D EN VIVO? (CUALQUIER LOOP) [TECLA: E]</div>
+          <div id="effect3d-mode-grid" class="weight-selector-grid"></div>
+          <div class="fx-row" style="margin-top:4px">
+            <span class="fft-band-name" style="width:92px">RELIEVE / GIRO 3D</span>
+            <input type="range" id="effect3d-amount-slider" class="fx-wet-slider" min="0.10" max="1.00" step="0.01" value="0.55" title="Ajusta cuánto se inclina o extruye el efecto 3D" />
+            <span id="effect3d-amount-val" class="module-tag">55%</span>
+          </div>
+        </section>
+
+        <!-- MÓDULO 2: PILOTO AUTOMÁTICO INTELIGENTE -->
+        <section class="rack-module">
+          <div class="module-header">
+            <span class="module-led amber"></span>
+            <span class="module-title">PILOTO AUTOMÁTICO (CAMBIA SOLO)</span>
+            <span id="ap-scenes-played" class="module-tag">ESCENAS: 1</span>
+          </div>
+
+          <div class="autopilot-master-row">
+            <button type="button" id="btn-autopilot-toggle" class="btn-ap-master active" title="Activa o pausa el cambio automático de visuales">
+              PILOTO AUTO: ACTIVO
+            </button>
+            <button type="button" id="btn-lfo-master-toggle" class="btn-ap-sub active" title="Hace que el grosor y el color respiren solos suavemente">
+              MOV. SUAVE
+            </button>
+            <button type="button" id="btn-auto-palette-toggle" class="btn-ap-sub active" title="Cambia la paleta de colores automáticamente al cambiar de escena">
+              AUTO COLOR
+            </button>
+          </div>
+
+          <div class="mixer-quick-btns" style="margin-bottom:4px">
+            <button type="button" id="btn-next-scene" class="btn-console-pad accent" title="Pasa suavemente al siguiente visual ahora mismo (Tecla N)">
+              ⏭ SIGUIENTE VISUAL AHORA [N]
+            </button>
+            <button type="button" id="btn-mutate-macros" class="btn-console-pad" title="Genera una nueva combinación armónica de los 8 faders (Tecla R)">
+              🎲 VARIAR AJUSTES [R]
+            </button>
+          </div>
+
+          <div class="sub-label">¿QUÉ FAMILIAS MEZCLA EL PILOTO AUTOMÁTICO? (48 LOOPS)</div>
+          <div class="ap-pool-row six-cols">
+            <button type="button" class="btn-ap-pool active" data-pool="FLT" title="Solo usa los 8 visuales de Geometría 100% Plana (Sin brillo ni efectos)">
+              1. PLANOS
+            </button>
+            <button type="button" class="btn-ap-pool" data-pool="MIN" title="Arcos partidos, eclipses, metrónomo, escalera Bauhaus y ondas de columnas">
+              2. ARCOS/MIN
+            </button>
+            <button type="button" class="btn-ap-pool" data-pool="MOT" title="Cortina central, marco 4 esquinas, cascada, espejo y tótem LED">
+              3. ESCENARIO
+            </button>
+            <button type="button" class="btn-ap-pool" data-pool="GEO" title="Cuadrados, triángulos, líneas paralelas, Bauhaus y cubos">
+              4. FORMAS 2D
+            </button>
+            <button type="button" class="btn-ap-pool" data-pool="KIN" title="Líneas que cambian de grosor y barridos Izq➔Der">
+              5. BARRIDOS
+            </button>
+            <button type="button" class="btn-ap-pool" data-pool="SPC" title="Cubo e hipercubo 3D, pirámide/octaedro 3D, esfera 3D, giroscopio 3D y pórticos 3D">
+              6. 🧊 3D
+            </button>
+          </div>
+          <div class="ap-pool-row" style="grid-template-columns: 1fr 1fr; margin-top: 3px;">
+            <button type="button" class="btn-ap-pool" data-pool="FLAT_GEO_KIN" title="Mezcla los 40 Loops Planos, Minimal, Escenario, Formas y Barridos (Sin 3D)">
+              ★ MEZCLAR 40 PLANOS/2D
+            </button>
+            <button type="button" class="btn-ap-pool" data-pool="ALL" title="Mezcla absolutamente todos los 48 Loops incluyendo los 8 Objetos 3D">
+              🌐 MEZCLAR TODOS (48)
+            </button>
+          </div>
+
+          <div class="sub-label">RITMO E INTENSIDAD DEL EVENTO</div>
+          <div class="ap-mode-grid">
+            <button type="button" class="btn-ap-mode active" data-mode="HYPNOTIC_SLOW">🌿 SUAVE / ELEGANTE</button>
+            <button type="button" class="btn-ap-mode" data-mode="CLUB_DYNAMIC">🎵 CLUB EQUILIBRADO</button>
+            <button type="button" class="btn-ap-mode" data-mode="FESTIVAL_PEAK">⚡ ENERGÍA / DROP</button>
+            <button type="button" class="btn-ap-mode" data-mode="FULL_RANDOM_CHAOS">🔥 CAOS CREATIVO</button>
+          </div>
+
+          <div class="ap-timer-row">
+            <div class="unit-toggle-group">
+              <button type="button" class="btn-trigger-unit active" data-unit="BARS">COMPASES</button>
+              <button type="button" class="btn-trigger-unit" data-unit="SECONDS">SEGUNDOS</button>
+            </div>
+            <select id="ap-trigger-value" class="console-select"></select>
+          </div>
+
+          <div class="ap-progress-wrap">
+            <div class="ap-progress-bar">
+              <div id="ap-scene-progress-fill" class="ap-progress-fill"></div>
+            </div>
+            <div id="ap-scene-progress-label" class="ap-progress-text">PRÓXIMO CAMBIO: 0 / 32 COMPASES</div>
+          </div>
+        </section>
+
+        <!-- MÓDULO 2.5: MIS LOOKS (PRESETS COMPLETOS GUARDABLES) -->
+        <section class="rack-module">
+          <div class="module-header">
+            <span class="module-led magenta"></span>
+            <span class="module-title">⭐ MIS LOOKS GUARDADOS</span>
+            <span id="preset-mode-tag" class="module-tag">TOCA PARA CARGAR</span>
+          </div>
+          <div id="preset-pad-grid" class="preset-pad-grid"></div>
+          <div class="mixer-quick-btns" style="margin-top:5px">
+            <button type="button" id="btn-preset-save-arm" class="btn-console-pad" title="Activa y después toca una casilla para guardar ahí el look actual (visual, paleta, faders, 3D, efectos y piloto automático)">
+              💾 GUARDAR LOOK
+            </button>
+            <button type="button" id="btn-preset-clear-arm" class="btn-console-pad" title="Activa y después toca una casilla para borrarla">
+              🗑 BORRAR LOOK
+            </button>
+          </div>
+          <div class="sub-label" style="display:flex;align-items:center;justify-content:space-between">
+            <span>TRANSICIÓN AL CARGAR UN LOOK (SINCRONIZADA AL BPM)</span>
+          </div>
+          <div id="transition-bars-grid" class="v2-six-grid"></div>
+        </section>
+
+        <!-- MÓDULO 1 (SOLO EN MODO AVANZADO): MEZCLADOR MANUAL DOBLE DECK A/B -->
+        <section class="rack-module pro-only-block">
+          <div class="module-header">
+            <span class="module-led cyan"></span>
+            <span class="module-title">MEZCLADOR MANUAL A/B [AVANZADO]</span>
+            <span id="crossfader-val" class="module-tag">A:100% / B:0%</span>
+          </div>
+
+          <div class="bank-switch-row six-cols">
+            <button type="button" class="btn-bank-tab active" data-bank="FLT">1:PLANOS</button>
+            <button type="button" class="btn-bank-tab" data-bank="MIN">2:ARCOS</button>
+            <button type="button" class="btn-bank-tab" data-bank="MOT">3:ESCENA</button>
+            <button type="button" class="btn-bank-tab" data-bank="GEO">4:FORMAS</button>
+            <button type="button" class="btn-bank-tab" data-bank="KIN">5:BARRIDO</button>
+            <button type="button" class="btn-bank-tab" data-bank="SPC">6:3D</button>
+          </div>
+
+          <div class="decks-columns">
+            <div class="deck-col">
+              <div class="deck-col-title deck-a-tag">CANAL A</div>
+              <div id="deck-a-generators" class="deck-gen-list"></div>
+            </div>
+            <div class="deck-col">
+              <div class="deck-col-title deck-b-tag">CANAL B</div>
+              <div id="deck-b-generators" class="deck-gen-list"></div>
+            </div>
+          </div>
+
+          <div class="crossfader-box">
+            <span class="xfade-end">A</span>
+            <input type="range" id="master-crossfader" class="crossfader-slider" min="0" max="1" step="0.002" value="0" />
+            <span class="xfade-end">B</span>
+          </div>
+        </section>
+
+      </aside>
+
+      <!-- VISOR CENTRAL DESPEJADO -->
+      <main class="viewport-center-guide">
+        <div class="viewport-corner tl"></div>
+        <div class="viewport-corner tr"></div>
+        <div class="viewport-corner bl"></div>
+        <div class="viewport-corner br"></div>
+        <div class="viewport-watermark">
+          <span>TECLAS RÁPIDAS: [1-8] CAMBIAR VISUAL &bull; [TAB] CAMBIAR FAMILIA &bull; [N] SIGUIENTE &bull; [H] PANTALLA LIMPIA</span>
+        </div>
+      </main>
+
+      <!-- PANEL DERECHO: PALETAS DE COLOR + RITMO BPM / AUDIO + EFECTOS OPCIONALES -->
+      <aside class="console-rack right-rack">
+
+        <!-- MÓDULO 3: 10 PALETAS DE COLOR -->
+        <section class="rack-module">
+          <div class="module-header">
+            <span class="module-led magenta"></span>
+            <span class="module-title">PASO 2: ELIGE LA PALETA DE COLOR</span>
+          </div>
+          <div id="palette-grid" class="palette-swatch-grid"></div>
+        </section>
+
+        <!-- MÓDULO 3.5: LOGO PNG DINÁMICO DE DJ / MARCA (CON EFECTOS GPU) -->
+        <section class="rack-module">
+          <div class="module-header">
+            <span class="module-led amber"></span>
+            <span class="module-title">📸 LOGO DJ / MARCA EN PANTALLA [TECLA: L]</span>
+            <button type="button" id="btn-logo-tint" class="btn-fx-bypass" title="Alterna entre los colores originales del PNG o teñir el logo con la paleta activa">
+              COLOR: PNG ORIGINAL
+            </button>
+          </div>
+
+          <input type="file" id="logo-file-input" accept="image/png,image/webp,image/svg+xml,image/jpeg,.svg,.png,.jpg,.jpeg,.webp" style="display:none" />
+
+          <div class="mixer-quick-btns" style="margin-bottom:5px">
+            <button type="button" id="btn-logo-toggle" class="btn-console-pad" title="Muestra u oculta el Logo con fundido suave en pantalla y en el proyector (Tecla L)">
+              👁 MOSTRAR LOGO [L]
+            </button>
+            <button type="button" id="btn-logo-upload" class="btn-console-pad accent" title="Sube un logo PNG, JPG, WEBP o SVG desde tu ordenador (los SVG se convierten a PNG de alta calidad)">
+              📤 SUBIR PNG / SVG / LOGO
+            </button>
+          </div>
+
+          <div class="sub-label" style="margin-top:2px">QUITAR FONDO AL SUBIR (RECORTE AUTOMÁTICO)</div>
+          <div id="logo-bg-grid" class="v2-four-grid" style="margin-bottom:4px">
+            <button type="button" class="btn-sweep-mode btn-logo-bg active" data-bg="auto" title="Detecta solo el color del fondo (blanco, negro o cualquier color liso) y lo vuelve transparente">AUTO</button>
+            <button type="button" class="btn-sweep-mode btn-logo-bg" data-bg="white" title="Quita el fondo blanco (logos en JPG con fondo blanco)">BLANCO</button>
+            <button type="button" class="btn-sweep-mode btn-logo-bg" data-bg="black" title="Quita el fondo negro">NEGRO</button>
+            <button type="button" class="btn-sweep-mode btn-logo-bg" data-bg="none" title="Sube la imagen tal cual, sin tocar el fondo">NO</button>
+          </div>
+          <button type="button" id="btn-logo-reclean" class="btn-console-pad" style="width:100%;margin-bottom:5px" title="Vuelve a limpiar el fondo del logo activo con el modo elegido arriba (AUTO si está en NO)">
+            ✨ RE-LIMPIAR FONDO DEL LOGO ACTIVO
+          </button>
+
+          <div class="sub-label" style="margin-top:2px">MEMORIAS DE LOGOS DE DJS (4 RANURAS)</div>
+          <div class="ap-pool-row" style="grid-template-columns: repeat(4, 1fr); margin-bottom:4px">
+            <button type="button" class="btn-logo-slot active" data-slot="0">DJ 1 (DEMO)</button>
+            <button type="button" class="btn-logo-slot" data-slot="1">DJ 2 (VACÍO)</button>
+            <button type="button" class="btn-logo-slot" data-slot="2">DJ 3 (VACÍO)</button>
+            <button type="button" class="btn-logo-slot" data-slot="3">DJ 4 (VACÍO)</button>
+          </div>
+
+          <div class="sub-label">EFECTO DINÁMICO DEL LOGO</div>
+          <div id="logo-fx-grid" class="weight-selector-grid"></div>
+
+          <div class="sub-label">POSICIÓN EN ESCENARIO</div>
+          <div id="logo-pos-grid" class="sweep-selector-grid" style="grid-template-columns: repeat(3, 1fr)"></div>
+
+          <div class="fx-row" style="margin-top:5px">
+            <span class="fft-band-name" style="width:92px">TAMAÑO LOGO</span>
+            <input type="range" id="logo-scale-slider" class="fx-wet-slider" min="0.15" max="1.00" step="0.01" value="0.44" />
+            <span id="logo-scale-val" class="module-tag">44%</span>
+          </div>
+
+          <div class="fx-row" style="margin-top:3px">
+            <span class="fft-band-name" style="width:92px">FONDO LECTURA</span>
+            <input type="range" id="logo-backdrop-slider" class="fx-wet-slider" min="0.00" max="1.00" step="0.01" value="0.65" title="Oscurece suavemente los visuales justo detrás del logo para que se lea siempre nítido" />
+            <span id="logo-backdrop-val" class="module-tag">65%</span>
+          </div>
+        </section>
+
+        <!-- MÓDULO 3.6: TEXTO EN PANTALLA (MENSAJES, NOMBRES, AVISOS) -->
+        <section class="rack-module">
+          <div class="module-header">
+            <span class="module-led green"></span>
+            <span class="module-title">✍️ TEXTO EN PANTALLA</span>
+            <span id="text-char-count" class="module-tag">0/140</span>
+          </div>
+
+          <textarea id="text-content-input" class="v2-text-input" maxlength="140" rows="2" spellcheck="false" placeholder="Escribe un mensaje (Intro = enviar, Mayús+Intro = 2ª línea)"></textarea>
+          <div class="v2-three-btns" style="margin:4px 0 5px">
+            <button type="button" id="btn-text-send" class="btn-console-pad accent" title="Envía el texto a la pantalla y al proyector (también con la tecla Intro)">📤 ENVIAR</button>
+            <button type="button" id="btn-text-toggle" class="btn-console-pad" title="Muestra u oculta el texto con fundido">👁 MOSTRAR</button>
+            <button type="button" id="btn-text-clear" class="btn-console-pad" title="Borra el texto y lo quita de la pantalla">🗑 BORRAR</button>
+          </div>
+
+          <div class="sub-label">TIPO DE LETRA</div>
+          <div id="text-font-grid" class="v2-four-grid"></div>
+
+          <div class="sub-label">EFECTO DEL TEXTO</div>
+          <div id="text-fx-grid" class="weight-selector-grid"></div>
+
+          <div class="sub-label">POSICIÓN</div>
+          <div id="text-pos-grid" class="sweep-selector-grid"></div>
+
+          <div class="sub-label">COLOR</div>
+          <div id="text-color-grid" class="sweep-selector-grid"></div>
+
+          <div class="fx-row" style="margin-top:5px">
+            <span class="fft-band-name" style="width:82px">TAMAÑO</span>
+            <input type="range" id="text-scale-slider" class="fx-wet-slider" min="0.15" max="1.00" step="0.01" value="0.5" />
+            <span id="text-scale-val" class="module-tag">50%</span>
+          </div>
+          <div class="fx-row" style="margin-top:2px">
+            <span class="fft-band-name" style="width:82px">OPACIDAD</span>
+            <input type="range" id="text-opacity-slider" class="fx-wet-slider" min="0.10" max="1.00" step="0.01" value="1" />
+            <span id="text-opacity-val" class="module-tag">100%</span>
+          </div>
+          <div class="fx-row" style="margin-top:2px">
+            <span class="fft-band-name" style="width:82px">SOMBRA FONDO</span>
+            <input type="range" id="text-backdrop-slider" class="fx-wet-slider" min="0" max="1" step="0.01" value="0.4" title="Oscurece los visuales detrás del texto para que se lea mejor" />
+            <span id="text-backdrop-val" class="module-tag">40%</span>
+          </div>
+          <div class="fx-row" style="margin-top:2px">
+            <span class="fft-band-name" style="width:82px">VEL. TICKER</span>
+            <input type="range" id="text-scroll-slider" class="fx-wet-slider" min="0.05" max="1.00" step="0.01" value="0.5" title="Velocidad de desplazamiento (solo con el efecto Ticker)" />
+            <span id="text-scroll-val" class="module-tag">50%</span>
+          </div>
+        </section>
+
+        <!-- MÓDULO 3.7: VÍDEO · GIF · CÁMARA EN DIRECTO -->
+        <section class="rack-module">
+          <div class="module-header">
+            <span class="module-led magenta"></span>
+            <span class="module-title">🎬 VÍDEO · GIF · CÁMARA</span>
+            <button type="button" id="btn-media-toggle" class="btn-fx-bypass" title="Muestra u oculta el vídeo / cámara sin quitarlo">OCULTO</button>
+          </div>
+
+          <input type="file" id="media-file-input" accept="video/*,image/gif,image/*" style="display:none" />
+
+          <div id="media-status" class="v2-status-line">SIN VÍDEO NI CÁMARA</div>
+
+          <div class="v2-three-btns" style="margin:4px 0">
+            <button type="button" id="btn-media-open" class="btn-console-pad accent" title="Elige un vídeo (MP4, WEBM, MOV), un GIF o una imagen de tu ordenador">📂 ABRIR</button>
+            <button type="button" id="btn-media-camera" class="btn-console-pad" title="Usa una cámara en directo (webcam, capturadora HDMI...)">📷 CÁMARA</button>
+            <button type="button" id="btn-media-stop" class="btn-console-pad" title="Quita el vídeo o la cámara de la pantalla">⏹ QUITAR</button>
+          </div>
+
+          <div class="ap-timer-row" style="margin-top:0;margin-bottom:4px">
+            <select id="media-camera-select" class="console-select" title="Cámara que se usará al pulsar 📷 CÁMARA">
+              <option value="">CÁMARA POR DEFECTO</option>
+            </select>
+            <button type="button" id="btn-media-cam-refresh" class="btn-mini" title="Buscar cámaras conectadas">🔄</button>
+          </div>
+
+          <div id="media-library-box" class="hidden-block">
+            <div class="sub-label" style="display:flex;align-items:center;justify-content:space-between">
+              <span>BIBLIOTECA DEL SERVIDOR</span>
+              <button type="button" id="btn-media-lib-refresh" class="btn-mini" title="Actualizar la lista de vídeos subidos">🔄</button>
+            </div>
+            <div id="media-library-list" class="v2-media-list"></div>
+          </div>
+
+          <div class="sub-label">CÓMO SE MEZCLA CON LOS VISUALES</div>
+          <div id="media-blend-grid" class="weight-selector-grid"></div>
+
+          <div class="sub-label">EFECTO SOBRE EL VÍDEO / CÁMARA</div>
+          <div id="media-fx-grid" class="weight-selector-grid"></div>
+
+          <div class="sub-label">ENCUADRE</div>
+          <div class="v2-three-btns">
+            <button type="button" class="btn-sweep-mode btn-media-fit active" data-fit="0" title="Rellena toda la pantalla recortando los bordes">⬛ LLENAR</button>
+            <button type="button" class="btn-sweep-mode btn-media-fit" data-fit="1" title="Muestra la imagen completa sin recortar">🔲 ENCAJAR</button>
+            <button type="button" id="btn-media-mirror" class="btn-sweep-mode" title="Espejo horizontal (útil para cámaras tipo selfie)">↔ ESPEJO</button>
+          </div>
+
+          <div class="fx-row" style="margin-top:5px">
+            <span class="fft-band-name" style="width:82px">OPACIDAD</span>
+            <input type="range" id="media-opacity-slider" class="fx-wet-slider" min="0" max="1" step="0.01" value="1" />
+            <span id="media-opacity-val" class="module-tag">100%</span>
+          </div>
+          <div class="fx-row" style="margin-top:2px">
+            <span class="fft-band-name" style="width:82px">ZOOM BOMBO</span>
+            <input type="range" id="media-beatzoom-slider" class="fx-wet-slider" min="0" max="1" step="0.01" value="0" title="Golpe de zoom con cada bombo" />
+            <span id="media-beatzoom-val" class="module-tag">0%</span>
+          </div>
+          <div class="fx-row" style="margin-top:2px">
+            <span class="fft-band-name" style="width:82px">VELOCIDAD</span>
+            <input type="range" id="media-speed-slider" class="fx-wet-slider" min="0.25" max="2.00" step="0.05" value="1" title="Velocidad de reproducción del vídeo (doble clic = normal)" />
+            <span id="media-speed-val" class="module-tag">1.00x</span>
+          </div>
+        </section>
+
+        <!-- MÓDULO 5: RELOJ BPM Y REACTIVIDAD POR AUDIO -->
+        <section class="rack-module">
+          <div class="module-header">
+            <span class="module-led cyan"></span>
+            <span class="module-title">VELOCIDAD BPM Y AUDIO EN VIVO</span>
+            <span id="bpm-bar-counter" class="module-tag">COMPÁS 1.1</span>
+          </div>
+
+          <div class="bpm-control-panel">
+            <div class="bpm-display-box">
+              <span id="bpm-value-readout" class="bpm-digits">126.0</span>
+              <span class="bpm-unit">BPM</span>
+              <div class="beat-led-strip">
+                <span class="beat-led-dot active"></span>
+                <span class="beat-led-dot"></span>
+                <span class="beat-led-dot"></span>
+                <span class="beat-led-dot"></span>
+              </div>
+            </div>
+
+            <div class="bpm-actions-col">
+              <button type="button" id="btn-tap-tempo" class="btn-tap-tempo" title="Haz clic varias veces al ritmo de la música o pulsa BARRA ESPACIADORA">
+                MARCAR RITMO (TAP)
+              </button>
+              <div class="bpm-nudge-row">
+                <button type="button" id="btn-bpm-minus" class="btn-mini">-0.5</button>
+                <input type="range" id="bpm-slider" class="bpm-range" min="60" max="180" step="0.5" value="126" />
+                <button type="button" id="btn-bpm-plus" class="btn-mini">+0.5</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="bpm-mult-row">
+            <span class="mult-label">VELOCIDAD RELOJ:</span>
+            <button type="button" class="btn-bpm-mult" data-mult="0.5">Lento (/2)</button>
+            <button type="button" class="btn-bpm-mult active" data-mult="1">Normal (x1)</button>
+            <button type="button" class="btn-bpm-mult" data-mult="2">Doble (x2)</button>
+            <button type="button" class="btn-bpm-mult" data-mult="4">Rápido (x4)</button>
+          </div>
+
+          <div class="mixer-quick-btns" style="margin-bottom:6px">
+            <button type="button" id="btn-midi-clock" class="btn-console-pad" title="Sigue el BPM y el compás que envía la mesa de DJ (Pioneer DJM, Xone, Rane...), Ableton o Traktor por MIDI Clock USB. Requiere abrir la consola desde http://localhost:8080">
+              🎹 MIDI CLOCK: APAGADO
+            </button>
+          </div>
+
+          <div class="audio-fft-box">
+            <div class="audio-source-row">
+              <button type="button" id="btn-audio-mic" class="btn-audio-src" title="Escuchar música real por el micrófono o tarjeta de sonido">
+                🎤 USAR MICRÓFONO
+              </button>
+              <button type="button" id="btn-audio-sim" class="btn-audio-src" title="Simula un bombo suave para que el grosor lata al ritmo del BPM">
+                🥁 SIMULADOR BOMBO
+              </button>
+              <label class="gain-wrap pro-only-flex" title="Sensibilidad de entrada de audio">
+                <span>SENS</span>
+                <input type="range" id="audio-gain-slider" min="0.2" max="3.0" step="0.05" value="1.25" />
+              </label>
+            </div>
+
+            <div class="fft-meters-stack">
+              <div class="fft-meter-row">
+                <span class="fft-band-name">BAJOS (BOMBO)</span>
+                <div class="fft-bar-bg"><div id="fft-meter-bass" class="fft-bar-fill bass"></div></div>
+              </div>
+              <div class="fft-meter-row">
+                <span class="fft-band-name">MEDIOS</span>
+                <div class="fft-bar-bg"><div id="fft-meter-mid" class="fft-bar-fill mid"></div></div>
+              </div>
+              <div class="fft-meter-row">
+                <span class="fft-band-name">AGUDOS</span>
+                <div class="fft-bar-bg"><div id="fft-meter-high" class="fft-bar-fill high"></div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- MÓDULO 4: EFECTOS EXTRA Y BOTONES DE DIRECTO -->
+        <section class="rack-module">
+          <div class="module-header">
+            <span class="module-led green"></span>
+            <span class="module-title">EFECTOS OPCIONALES</span>
+            <button type="button" id="btn-fx-clean-bypass" class="btn-fx-bypass active" title="Mantiene todos los efectos apagados para que la geometría se vea 100% limpia y plana">
+              SIN EFECTOS: SÍ
+            </button>
+          </div>
+
+          <div class="fx-slot-list">
+            <div class="fx-row">
+              <button type="button" id="fx-kaleido-toggle" class="btn-fx-toggle">ESPEJO SIMÉTRICO</button>
+              <div class="fx-axis-group">
+                <button type="button" class="btn-kaleido-axis active" data-axes="2">2X</button>
+                <button type="button" class="btn-kaleido-axis" data-axes="4">4X</button>
+                <button type="button" class="btn-kaleido-axis" data-axes="8">8X</button>
+              </div>
+              <input type="range" id="fx-kaleido-wet" class="fx-wet-slider" min="0" max="1" step="0.01" value="0.50" title="Intensidad del espejo" />
+            </div>
+
+            <div class="fx-row">
+              <button type="button" id="fx-rgb-toggle" class="btn-fx-toggle">SEPARAR RGB</button>
+              <input type="range" id="fx-rgb-wet" class="fx-wet-slider" min="0" max="1" step="0.01" value="0.16" title="Intensidad RGB" />
+            </div>
+
+            <div class="fx-row">
+              <button type="button" id="fx-feedback-toggle" class="btn-fx-toggle">ESTELA SUAVE</button>
+              <input type="range" id="fx-feedback-wet" class="fx-wet-slider" min="0" max="1" step="0.01" value="0.25" title="Intensidad de estela" />
+            </div>
+
+            <div class="fx-row">
+              <button type="button" id="fx-glitch-toggle" class="btn-fx-toggle">CORTE GLITCH</button>
+              <input type="range" id="fx-glitch-wet" class="fx-wet-slider" min="0" max="1" step="0.01" value="0.40" title="Intensidad de glitch" />
+            </div>
+
+            <div class="fx-row">
+              <button type="button" id="fx-pixelate-toggle" class="btn-fx-toggle">MALLA PANTALLA LED</button>
+              <input type="range" id="fx-pixelate-wet" class="fx-wet-slider" min="0" max="1" step="0.01" value="0.35" title="Tamaño de píxel LED" />
+            </div>
+          </div>
+
+          <div class="sub-label">BOTONES DE IMPACTO PUNTUAL</div>
+          <button type="button" id="btn-safe-strobe" class="btn-console-pad active" style="width:100%;margin-bottom:5px" title="Limita cualquier parpadeo o estrobo a un máximo de 3 destellos por segundo (recomendación habitual para no afectar a personas fotosensibles)">
+            🛡 LÍMITE ESTROBO 3/s: ACTIVO
+          </button>
+          <button type="button" id="btn-calm-color" class="btn-console-pad active" style="width:100%;margin-bottom:5px" title="Anti-feria: los colores cambian muy despacio (fundidos de paleta de 12 s mínimo y deriva de tono lenta), sin saltos bruscos de color">
+            🐢 COLOR SUAVE (ANTI-FERIA): ACTIVO
+          </button>
+          <div class="kill-pads-grid">
+            <button type="button" id="btn-kill-flash" class="btn-kill-pad flash" title="Destello blanco mientras lo mantienes pulsado (Tecla F)">
+              DESTELLO [F]
+            </button>
+            <button type="button" id="btn-kill-strobe" class="btn-kill-pad strobe" title="Estrobo rápido mientras lo mantienes pulsado (Tecla S)">
+              ESTROBO [S]
+            </button>
+            <button type="button" id="btn-kill-mono" class="btn-kill-pad" title="Modo Blanco y Negro puro (Tecla M)">
+              BLANCO/NEGRO [M]
+            </button>
+            <button type="button" id="btn-kill-invert" class="btn-kill-pad" title="Invertir colores (Tecla I)">
+              INVERTIR [I]
+            </button>
+            <button type="button" id="btn-kill-blackout" class="btn-kill-pad danger" title="Fundido a negro total (Tecla B)">
+              APAGAR [B]
+            </button>
+          </div>
+        </section>
+
+        <!-- MÓDULO 6: SALIDA TRANSPARENTE ALPHA / CHROMA PARA RESOLUME -->
+        <section class="rack-module">
+          <div class="module-header">
+            <span class="module-led amber"></span>
+            <span class="module-title">FONDO Y TRANSPARENCIA (RESOLUME / OBS)</span>
+          </div>
+
+          <div class="resolume-config-row">
+            <span class="cfg-label">FONDO:</span>
+            <button type="button" class="btn-bg-mode active" data-bg="SOLID" title="Fondo negro puro #000000 (Ideal para pantallas directas o Luma Key / Add en Resolume)">
+              NEGRO SÓLIDO
+            </button>
+            <button type="button" class="btn-bg-mode" data-bg="ALPHA" title="Canal Alpha 32-bit real transparente (RGBA) para OBS Browser Source, Spout, NDI o Resolume">
+              TRANSPARENTE (ALPHA)
+            </button>
+            <button type="button" class="btn-bg-mode" data-bg="CHROMA" title="Fondo verde #00FF00 para hacer Chroma Key si conectas por cable HDMI / Capturadora">
+              CHROMA VERDE
+            </button>
+          </div>
+
+          <div class="resolume-config-row pro-only-flex">
+            <span class="cfg-label">CALIDAD GPU:</span>
+            <button type="button" id="btn-res-auto" class="btn-res-auto active" title="Baja la resolución sola si la GPU no llega y la sube cuando sobra potencia">AUTO</button>
+            <button type="button" class="btn-res-scale active" data-scale="1">100% MÁXIMA</button>
+            <button type="button" class="btn-res-scale" data-scale="0.75">75% RÁPIDA</button>
+            <button type="button" class="btn-res-scale" data-scale="0.5">50% LIGERA</button>
+          </div>
+        </section>
+
+        <!-- MÓDULO 7: MAPPING DE PANTALLA (X/Y, TAMAÑO, KEYSTONE) Y SLICES DE ESCENARIO -->
+        <section class="rack-module">
+          <div class="module-header">
+            <span class="module-led cyan"></span>
+            <span class="module-title">📐 MAPPING DE PANTALLA Y SLICES LED [TECLA: G]</span>
+            <button type="button" id="btn-map-reset" class="btn-fx-bypass" title="Devuelve Posición X/Y, Ancho/Alto, Trapecio y Slices al 100% original">
+              ↺ RESET
+            </button>
+          </div>
+
+          <div class="mixer-quick-btns" style="margin-bottom:5px">
+            <button type="button" id="btn-map-testgrid" class="btn-console-pad" title="Muestra una rejilla de ajuste y bordes en cada Slice para cuadrar el proyector o pantalla LED (Tecla G)">
+              🎯 CARTA DE AJUSTE [G]
+            </button>
+            <button type="button" id="btn-slice-clone" class="btn-console-pad accent" title="Alterna entre encuadrar el visual completo dentro de cada Slice (Clonar) o recortar la pantalla como una máscara">
+              MODO: CLONAR EN SLICE
+            </button>
+          </div>
+
+          <div class="sub-label" style="margin-top:4px;color:#00e5ff">📏 ESCALADOR DE PANTALLA LED POR PÍXELES (MODO ENVIADORA X × Y)</div>
+          <button type="button" id="btn-led-scaler-toggle" class="btn-console-pad" style="width:100%;margin-bottom:5px" title="Escala toda la imagen exactamente a los píxeles X × Y de tu pantalla LED (dejando el resto en negro puro), igual que un procesador/escalador de vídeo">
+            🔲 ESCALADOR LED (PÍXELES X × Y): APAGADO
+          </button>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:4px">
+            <div class="fx-row" style="margin:0">
+              <span class="fft-band-name" style="width:68px">ANCHO PX</span>
+              <input type="number" id="led-width-px" class="v2-text-input" min="64" max="7680" step="1" value="1024" style="width:100%;text-align:center;font-weight:700" title="Ancho real en píxeles de la pantalla LED (X)" />
+            </div>
+            <div class="fx-row" style="margin:0">
+              <span class="fft-band-name" style="width:68px">ALTO PX</span>
+              <input type="number" id="led-height-px" class="v2-text-input" min="64" max="4320" step="1" value="512" style="width:100%;text-align:center;font-weight:700" title="Alto real en píxeles de la pantalla LED (Y)" />
+            </div>
+            <div class="fx-row" style="margin:0">
+              <span class="fft-band-name" style="width:68px">INICIO X</span>
+              <input type="number" id="led-offset-x-px" class="v2-text-input" min="0" max="7680" step="1" value="0" style="width:100%;text-align:center" title="Píxel inicial X desde la izquierda (0 en enviadoras NovaStar / Colorlight)" />
+            </div>
+            <div class="fx-row" style="margin:0">
+              <span class="fft-band-name" style="width:68px">INICIO Y</span>
+              <input type="number" id="led-offset-y-px" class="v2-text-input" min="0" max="4320" step="1" value="0" style="width:100%;text-align:center" title="Píxel inicial Y desde arriba (0 en enviadoras NovaStar / Colorlight)" />
+            </div>
+          </div>
+          <div class="fx-axis-group" style="display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-bottom:4px">
+            <button type="button" class="btn-sweep-mode btn-led-preset" data-w="512" data-h="256" title="Cabinas LED 512x256 px">512×256</button>
+            <button type="button" class="btn-sweep-mode btn-led-preset" data-w="768" data-h="384" title="Cabinas LED 768x384 px">768×384</button>
+            <button type="button" class="btn-sweep-mode btn-led-preset" data-w="1024" data-h="512" title="Cabinas LED 1024x512 px">1024×512</button>
+            <button type="button" class="btn-sweep-mode btn-led-preset" data-w="1280" data-h="720" title="HD 1280x720 px">1280×720</button>
+            <button type="button" class="btn-sweep-mode btn-led-preset" data-w="1920" data-h="1080" title="Full HD 1920x1080 px">1920×1080</button>
+          </div>
+          <div class="mixer-quick-btns" style="margin-bottom:6px">
+            <button type="button" id="btn-led-anchor" class="btn-console-pad active" title="Esquina Superior Izquierda (0,0) para enviadoras LED NovaStar/Colorlight, o Centrado en la salida HDMI">
+              ↖ ANCLAJE: ESQUINA (0,0)
+            </button>
+            <button type="button" id="btn-led-aspect" class="btn-console-pad active" title="Adapta la proporción para que círculos y cuadrados no se deformen, o estira toda la imagen 16:9 al tamaño de la pantalla LED">
+              📐 GEOMETRÍA: SIN DEFORMAR
+            </button>
+          </div>
+
+          <div class="sub-label" style="margin-top:2px">DISEÑO DE SLICES (PANTALLAS DIVIDIDAS / TÓTEMS)</div>
+          <div id="slice-mode-grid" class="weight-selector-grid"></div>
+
+          <div class="fx-row" style="margin-top:4px">
+            <span class="fft-band-name" style="width:74px">Nº SLICES</span>
+            <div class="fx-axis-group" id="slice-count-group">
+              <button type="button" class="btn-slice-count" data-count="2">2X</button>
+              <button type="button" class="btn-slice-count active" data-count="3">3X</button>
+              <button type="button" class="btn-slice-count" data-count="4">4X</button>
+              <button type="button" class="btn-slice-count" data-count="5">5X</button>
+              <button type="button" class="btn-slice-count" data-count="6">6X</button>
+            </div>
+            <input type="range" id="slice-gap-slider" class="fx-wet-slider" min="0" max="0.18" step="0.005" value="0.04" title="Hueco negro de separación entre tótems / slices" />
+          </div>
+
+          <div class="sub-label">POSICIÓN Y TAMAÑO DE LA PANTALLA (DOBLE CLIC = CENTRAR)</div>
+          <div class="fx-row">
+            <span class="fft-band-name" style="width:82px">POSICIÓN X</span>
+            <input type="range" id="map-offset-x" class="fx-wet-slider" min="-0.75" max="0.75" step="0.005" value="0" />
+            <span id="map-offset-x-val" class="module-tag">0%</span>
+          </div>
+          <div class="fx-row" style="margin-top:2px">
+            <span class="fft-band-name" style="width:82px">POSICIÓN Y</span>
+            <input type="range" id="map-offset-y" class="fx-wet-slider" min="-0.75" max="0.75" step="0.005" value="0" />
+            <span id="map-offset-y-val" class="module-tag">0%</span>
+          </div>
+          <div class="fx-row" style="margin-top:2px">
+            <span class="fft-band-name" style="width:82px">ANCHO (X)</span>
+            <input type="range" id="map-scale-x" class="fx-wet-slider" min="0.15" max="1.40" step="0.01" value="1" />
+            <span id="map-scale-x-val" class="module-tag">100%</span>
+          </div>
+          <div class="fx-row" style="margin-top:2px">
+            <span class="fft-band-name" style="width:82px">ALTO (Y)</span>
+            <input type="range" id="map-scale-y" class="fx-wet-slider" min="0.15" max="1.40" step="0.01" value="1" />
+            <span id="map-scale-y-val" class="module-tag">100%</span>
+          </div>
+          <div class="fx-row" style="margin-top:2px">
+            <span class="fft-band-name" style="width:82px">TRAPECIO V</span>
+            <input type="range" id="map-keystone-x" class="fx-wet-slider" min="-0.55" max="0.55" step="0.01" value="0" title="Corrección trapezoidal vertical si el proyector está picado" />
+            <span id="map-keystone-x-val" class="module-tag">0%</span>
+          </div>
+          <div class="fx-row" style="margin-top:2px">
+            <span class="fft-band-name" style="width:82px">TRAPECIO H</span>
+            <input type="range" id="map-keystone-y" class="fx-wet-slider" min="-0.55" max="0.55" step="0.01" value="0" title="Corrección trapezoidal horizontal si el proyector está de lado" />
+            <span id="map-keystone-y-val" class="module-tag">0%</span>
+          </div>
+
+          <div class="sub-label">CORNER-PIN: ARRASTRA LAS 4 ESQUINAS (FLECHAS = AJUSTE FINO, MAYÚS = GRUESO)</div>
+          <div class="v2-three-btns" style="margin-bottom:4px">
+            <button type="button" id="btn-cornerpin-toggle" class="btn-console-pad" title="Activa la deformación por 4 esquinas para cuadrar la imagen sobre una pantalla, pared o tela en ángulo">◇ CORNER-PIN: NO</button>
+            <button type="button" id="btn-map-testgrid-2" class="btn-console-pad" title="Muestra la carta de ajuste para cuadrar las esquinas (Tecla G)">🎯 CARTA [G]</button>
+            <button type="button" id="btn-corners-reset" class="btn-console-pad" title="Devuelve las 4 esquinas del proyector seleccionado a su sitio original">↺ ESQUINAS</button>
+          </div>
+          <div id="corner-proj-row" class="mixer-quick-btns hidden-block" style="margin-bottom:4px">
+            <button type="button" class="btn-sweep-mode btn-corner-proj active" data-proj="0">🖥 PROYECTOR 1 (IZQ.)</button>
+            <button type="button" class="btn-sweep-mode btn-corner-proj" data-proj="1">🖥 PROYECTOR 2 (DER.)</button>
+          </div>
+          <div id="corner-editor" class="corner-editor" tabindex="0" title="Arrastra los círculos para mover cada esquina. Teclas 1-4 eligen esquina, flechas la mueven (Mayús = más rápido)">
+            <canvas id="corner-editor-canvas"></canvas>
+          </div>
+          <div id="corner-readout" class="v2-status-line" style="margin-top:3px">ESQUINA 1 (SUP. IZQ.): X 0.000 · Y 0.000</div>
+
+          <div class="sub-label">MÁSCARAS NEGRAS (TAPAR COLUMNAS, PUERTAS, DJ...)</div>
+          <div class="v2-four-grid" style="margin-bottom:4px">
+            <button type="button" class="btn-sweep-mode btn-mask-select active" data-mask="0">MÁSC. 1</button>
+            <button type="button" class="btn-sweep-mode btn-mask-select" data-mask="1">MÁSC. 2</button>
+            <button type="button" class="btn-sweep-mode btn-mask-select" data-mask="2">MÁSC. 3</button>
+            <button type="button" class="btn-sweep-mode btn-mask-select" data-mask="3">MÁSC. 4</button>
+          </div>
+          <button type="button" id="btn-mask-enable" class="btn-console-pad" style="width:100%;margin-bottom:4px" title="Activa o desactiva la máscara seleccionada">⬛ MÁSCARA 1: APAGADA</button>
+          <div class="fx-row">
+            <span class="fft-band-name" style="width:82px">POSICIÓN X</span>
+            <input type="range" id="mask-x-slider" class="fx-wet-slider" min="0" max="1" step="0.005" value="0.4" />
+            <span id="mask-x-val" class="module-tag">40%</span>
+          </div>
+          <div class="fx-row" style="margin-top:2px">
+            <span class="fft-band-name" style="width:82px">POSICIÓN Y</span>
+            <input type="range" id="mask-y-slider" class="fx-wet-slider" min="0" max="1" step="0.005" value="0.6" />
+            <span id="mask-y-val" class="module-tag">60%</span>
+          </div>
+          <div class="fx-row" style="margin-top:2px">
+            <span class="fft-band-name" style="width:82px">ANCHO</span>
+            <input type="range" id="mask-w-slider" class="fx-wet-slider" min="0" max="1" step="0.005" value="0.2" />
+            <span id="mask-w-val" class="module-tag">20%</span>
+          </div>
+          <div class="fx-row" style="margin-top:2px">
+            <span class="fft-band-name" style="width:82px">ALTO</span>
+            <input type="range" id="mask-h-slider" class="fx-wet-slider" min="0" max="1" step="0.005" value="0.3" />
+            <span id="mask-h-val" class="module-tag">30%</span>
+          </div>
+          <div class="fx-row" style="margin-top:2px">
+            <span class="fft-band-name" style="width:82px">BORDE SUAVE</span>
+            <input type="range" id="mask-feather-slider" class="fx-wet-slider" min="0" max="0.2" step="0.002" value="0.01" />
+            <span id="mask-feather-val" class="module-tag">1%</span>
+          </div>
+
+          <div class="sub-label">EDGE BLENDING (UNIR 2 PROYECTORES SIN COSTURA)</div>
+          <div id="edge-mode-grid" class="weight-selector-grid"></div>
+          <div class="fx-row" style="margin-top:4px">
+            <span class="fft-band-name" style="width:82px">SOLAPE</span>
+            <input type="range" id="edge-overlap-slider" class="fx-wet-slider" min="0.02" max="0.45" step="0.005" value="0.15" title="Ancho de la zona donde se superponen los dos proyectores" />
+            <span id="edge-overlap-val" class="module-tag">15%</span>
+          </div>
+          <div class="fx-row" style="margin-top:2px">
+            <span class="fft-band-name" style="width:82px">GAMMA</span>
+            <input type="range" id="edge-gamma-slider" class="fx-wet-slider" min="1.0" max="3.0" step="0.05" value="2.2" title="Compensa el brillo de la zona de solape (doble clic = 2.2)" />
+            <span id="edge-gamma-val" class="module-tag">2.20</span>
+          </div>
+          <div class="fx-row" style="margin-top:2px">
+            <span class="fft-band-name" style="width:82px">CURVA</span>
+            <input type="range" id="edge-curve-slider" class="fx-wet-slider" min="1.0" max="4.0" step="0.05" value="2.0" title="Forma del fundido entre proyectores (doble clic = 2.0)" />
+            <span id="edge-curve-val" class="module-tag">2.00</span>
+          </div>
+
+          <div class="sub-label">SALIDA DE PANTALLA (LED / PROYECTOR)</div>
+          <div class="fx-row">
+            <span class="fft-band-name" style="width:82px">BRILLO</span>
+            <input type="range" id="out-brightness" class="fx-wet-slider" min="0.10" max="1.00" step="0.01" value="1" title="Brillo general de salida. Bájalo en salas pequeñas con pantalla LED potente" />
+            <span id="out-brightness-val" class="module-tag">100%</span>
+          </div>
+          <div class="fx-row" style="margin-top:2px">
+            <span class="fft-band-name" style="width:82px">TEMPERATURA</span>
+            <input type="range" id="out-colortemp" class="fx-wet-slider" min="-1" max="1" step="0.02" value="0" title="Frío (azulado) ⟷ Cálido (ámbar). Doble clic = neutro" />
+            <span id="out-colortemp-val" class="module-tag">NEUTRO</span>
+          </div>
+          <div class="sub-label" id="persist-status" style="color:var(--text-dim, #6b7489)">💾 AJUSTES GUARDADOS AUTOMÁTICAMENTE</div>
+        </section>
+
+      </aside>
+
+    </div>
+
+    <!-- PARTE INFERIOR: PASO 3 (LOS 8 CONTROLES MAESTROS) + PASO 4 (SELECTOR DE 48 VISUALES EN 6 FAMILIAS) -->
+    <footer class="console-bottom-deck">
+
+      <!-- 8 CONTROLES MAESTROS -->
+      <section class="macro-console-section">
+        <div class="section-strip-title">
+          <span>PASO 3: AJUSTA EL VISUAL CON LOS 8 CONTROLES MAESTROS</span>
+          <span class="section-hint">DOBLE CLIC EN UN CONTROL PARA REINICIARLO</span>
+        </div>
+        <div id="macro-fader-bank" class="macro-fader-grid"></div>
+      </section>
+
+      <!-- 48 GENERADORES EN 6 FAMILIAS -->
+      <section class="scene-matrix-section">
+        <div class="section-strip-title">
+          <span id="matrix-bank-title">FAMILIA 1: GEOMETRÍA 100% PLANA (SIN BRILLO NI EFECTOS)</span>
+          <div class="matrix-bank-pills">
+            <button type="button" class="btn-bank-tab active" data-bank="FLT">⏹ 1. PLANOS</button>
+            <button type="button" class="btn-bank-tab" data-bank="MIN">◯ 2. ARCOS/MIN</button>
+            <button type="button" class="btn-bank-tab" data-bank="MOT">◫ 3. ESCENARIO</button>
+            <button type="button" class="btn-bank-tab" data-bank="GEO">□ 4. FORMAS 2D</button>
+            <button type="button" class="btn-bank-tab" data-bank="KIN">≡ 5. BARRIDOS</button>
+            <button type="button" class="btn-bank-tab" data-bank="SPC">🧊 6. OBJETOS 3D</button>
+          </div>
+        </div>
+        <div id="direct-scene-matrix" class="scene-matrix-grid"></div>
+      </section>
+
+    </footer>
+
+  </div>
+
+  <script src="js/aether-vj.bundle.js"></script>
+</body>
+</html>

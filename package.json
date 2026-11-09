@@ -1,0 +1,10 @@
+{
+  "name": "aether-vj-engine",
+  "version": "1.0.0",
+  "description": "AETHER-VJ: Autonomous Generative Visual Engine for 8-Hour Live Festival & Resolume Arena Sessions",
+  "type": "module",
+  "scripts": {
+    "build": "node build-bundle.js",
+    "start": "node build-bundle.js && node server.js"
+  }
+}
