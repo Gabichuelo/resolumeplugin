@@ -1287,7 +1287,7 @@ body.clean-output-active:hover .minimal-restore-pill {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   gap: 6px;
-  height: 198px;
+  height: 214px;
 }
 
 .fader-strip {
@@ -1412,6 +1412,60 @@ body.clean-output-active:hover .minimal-restore-pill {
   writing-mode: vertical-lr;
   direction: rtl;
   z-index: 5;
+}
+
+/* Bar-Step (Cambio de golpe cada X compases) & Audio Routing Box under each Fader */
+.bar-step-mini-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 3px;
+  border-top: 1px solid #1b1f2a;
+}
+
+.bar-step-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 6.5px;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+
+.bar-step-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+}
+
+.btn-bar-step {
+  background: #141822;
+  border: 1px solid #232838;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 6.8px;
+  font-weight: 800;
+  padding: 2px 0;
+  cursor: pointer;
+  border-radius: 1px;
+}
+
+.btn-bar-step:hover {
+  border-color: var(--accent-amber);
+  color: var(--text-primary);
+}
+
+.btn-bar-step.active {
+  background: rgba(255, 157, 0, 0.2);
+  border-color: var(--accent-amber);
+  color: var(--accent-amber);
+}
+
+.btn-bar-step[data-bars="0"].active {
+  background: #1c2130;
+  border-color: #363f58;
+  color: var(--text-secondary);
 }
 
 /* Mini LFO & Audio Routing Box under each Fader */
@@ -1621,7 +1675,7 @@ body.simple-ui-mode .lfo-mini-box {
 }
 
 body.simple-ui-mode .fader-track-wrap {
-  height: 122px;
+  height: 88px;
 }
 
 body.simple-ui-mode .fader-title {

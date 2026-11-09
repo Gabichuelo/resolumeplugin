@@ -743,6 +743,19 @@ export const AUTOPILOT_MODES = {
   }
 };
 
+export const BAR_STEP_OPTIONS = [0, 1, 4, 8, 16];
+
+export const BAR_STEP_SEQUENCES = {
+  speed:      [0.18, 0.46, 0.24, 0.62, 0.16, 0.36],
+  scale:      [0.14, 0.58, 0.26, 0.80, 0.18, 0.44],
+  complexity: [0.16, 0.54, 0.26, 0.72, 0.20, 0.42],
+  thickness:  [0.18, 0.68, 0.32, 0.84, 0.24, 0.52],
+  rotation:   [0.00, 0.25, 0.50, 0.75, 0.125, 0.875],
+  chaos:      [0.04, 0.42, 0.15, 0.64, 0.08, 0.32],
+  strobe:     [0.00, 0.00, 0.00, 0.30],
+  colorShift: [0.08, 0.45, 0.20, 0.68]
+};
+
 export function createInitialState() {
   const macros = {};
   for (const def of MACRO_DEFS) {
@@ -754,7 +767,9 @@ export function createInitialState() {
       lfoRate: def.defaultRate,
       lfoPhaseOffset: def.index * 0.713,
       audioBand: def.audioBand,
-      audioAmount: def.audioAmount
+      audioAmount: def.audioAmount,
+      barStepBars: 0,       // 0 = Fijo/Manual | 1, 4, 8, 16 = Salta de golpe cada X compases
+      barStepIndex: 0       // Índice actual dentro de BAR_STEP_SEQUENCES[key]
     };
   }
 

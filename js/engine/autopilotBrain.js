@@ -14,7 +14,8 @@ import {
   EFFECT_3D_MODES,
   LOGO_FX_MODES,
   TEXT_FX_MODES,
-  MEDIA_FX_MODES
+  MEDIA_FX_MODES,
+  BAR_STEP_SEQUENCES
 } from '../state.js';
 import { PALETTES } from '../palettes.js';
 
@@ -728,10 +729,25 @@ export class AutopilotBrain {
         this._beginLookMorph(pm.preset, pm.bars);
       }
 
-      // Track bar progression for Bar-synced Auto-Scene Morphing
+      // Track bar progression for Bar-synced Auto-Scene Morphing & Per-Macro Bar-Step Jumps
       if (st.bpm.currentBar > st.autopilot.lastBarNumber) {
         st.autopilot.lastBarNumber = st.bpm.currentBar;
         st.autopilot.barsElapsedInScene += 1;
+
+        // Salto de golpe cada X compases (1, 4, 8 o 16 compases) en cualquiera de los 8 Faders Maestros
+        const barZeroIdx = Math.max(0, st.bpm.currentBar - 1);
+        for (const def of MACRO_DEFS) {
+          const m = st.macros[def.key];
+          const everyBars = Number(m.barStepBars) || 0;
+          if (everyBars > 0 && barZeroIdx % everyBars === 0) {
+            const seq = BAR_STEP_SEQUENCES[def.key] || [0.2, 0.6, 0.35, 0.75];
+            m.barStepIndex = ((m.barStepIndex || 0) + 1) % seq.length;
+            const nextVal = seq[m.barStepIndex];
+            m.base = nextVal;
+            m.modulated = nextVal;
+            this.macroBaseTargets[def.key] = nextVal;
+          }
+        }
       }
     } else {
       st.bpm.syncPulse *= Math.pow(0.04, dt);
@@ -751,9 +767,12 @@ export class AutopilotBrain {
       const glideRate = Math.min(1.0, dt * 0.45 * modeCfg.lfoSpeedMult);
       for (const def of MACRO_DEFS) {
         const k = def.key;
+        const m = st.macros[k];
+        // Si este fader está en modo Salto por Compases (1, 4, 8, 16), mantener el salto de golpe limpio
+        if ((Number(m.barStepBars) || 0) > 0) continue;
         const target = this.macroBaseTargets[k];
         if (target !== undefined) {
-          st.macros[k].base += (target - st.macros[k].base) * glideRate;
+          m.base += (target - m.base) * glideRate;
         }
       }
     }

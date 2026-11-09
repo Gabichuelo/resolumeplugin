@@ -278,25 +278,110 @@
     }
     .tabs-nav {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 5px;
       padding: 8px 12px;
+      position: sticky;
+      top: 47px;
+      z-index: 45;
+      background: rgba(8, 9, 13, 0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    body.dj-guest-mode .tabs-nav {
+      grid-template-columns: repeat(3, 1fr);
     }
     .tab-btn {
-      padding: 11px 6px;
+      padding: 10px 4px;
       background: var(--card);
       border: 1px solid var(--border);
       color: var(--muted);
       font-family: inherit;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 800;
       border-radius: 6px;
       cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .tab-btn.active {
-      background: rgba(255, 184, 0, 0.16);
+      background: rgba(255, 184, 0, 0.18);
       border-color: var(--amber);
       color: var(--amber);
+      box-shadow: inset 0 0 8px rgba(255, 184, 0, 0.2);
+    }
+    .macro-card-mobile {
+      background: #0d1018;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 10px;
+      margin-bottom: 8px;
+    }
+    .macro-head-mobile {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .macro-head-mobile .m-title {
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--text);
+    }
+    .macro-head-mobile .m-sub {
+      font-size: 9px;
+      color: var(--muted);
+    }
+    .macro-head-mobile .m-val {
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--cyan);
+      background: rgba(0, 240, 255, 0.12);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .macro-pill-row {
+      display: grid;
+      grid-template-columns: 62px repeat(5, 1fr);
+      gap: 4px;
+      align-items: center;
+      margin-top: 6px;
+    }
+    .macro-audio-row {
+      display: grid;
+      grid-template-columns: 62px repeat(4, 1fr);
+      gap: 4px;
+      align-items: center;
+      margin-top: 5px;
+    }
+    .macro-row-lbl {
+      font-size: 9px;
+      font-weight: 800;
+      color: var(--muted);
+    }
+    .btn-mini-pill {
+      background: var(--slot);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 7px 2px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-mini-pill.active {
+      background: rgba(255, 184, 0, 0.22);
+      border-color: var(--amber);
+      color: var(--amber);
+    }
+    .btn-mini-pill.audio-active {
+      background: rgba(0, 240, 255, 0.2);
+      border-color: var(--cyan);
+      color: var(--cyan);
     }
     .tab-pane { display: none; padding: 6px 12px; }
     .tab-pane.active { display: block; }
@@ -678,11 +763,13 @@
     <button type="button" id="btn-panic" class="btn-hero panic" style="grid-column: span 2">🆘 PÁNICO: VOLVER A VISUAL SEGURO</button>
   </div>
 
-  <!-- NAVEGACIÓN POR PESTAÑAS TÁCTILES (EL DJ SOLO VE LOGO, TEXTO Y VÍDEO; EL TÉCNICO LO VE TODO) -->
+  <!-- NAVEGACIÓN POR PESTAÑAS TÁCTILES ORGANIZADAS POR CATEGORÍA -->
   <nav class="tabs-nav">
-    <button type="button" class="tab-btn admin-only active" data-tab="tab-visuals">🌀 LOOPS / AUTO</button>
-    <button type="button" class="tab-btn admin-only" data-tab="tab-color">🎨 COLOR / FX</button>
-    <button type="button" class="tab-btn admin-only" data-tab="tab-mapping">📐 MAPPING</button>
+    <button type="button" class="tab-btn admin-only active" data-tab="tab-visuals">🌀 1. LOOPS</button>
+    <button type="button" class="tab-btn admin-only" data-tab="tab-modifiers">✨ 2. ESTILO/3D</button>
+    <button type="button" class="tab-btn admin-only" data-tab="tab-faders">🎚 3. FADERS/COMP</button>
+    <button type="button" class="tab-btn admin-only" data-tab="tab-color">🎨 4. COLOR/FX</button>
+    <button type="button" class="tab-btn admin-only" data-tab="tab-mapping">📐 5. MAPPING</button>
     <button type="button" class="tab-btn" data-tab="tab-logo">📸 LOGO DJ</button>
     <button type="button" class="tab-btn" data-tab="tab-text">✍️ TEXTO</button>
     <button type="button" class="tab-btn" data-tab="tab-media">🎬 VÍDEO</button>
@@ -1038,7 +1125,35 @@
       <div class="grid-2" id="m-scene-grid"></div>
     </div>
 
-    <!-- TARJETA 3: FIGURA GEOMÉTRICA + ACABADO VISUAL CON BOTONES AUTO -->
+    <!-- TARJETA 3: MIS LOOKS GUARDADOS -->
+    <div class="card">
+      <div class="card-title">
+        <span>⭐ MIS LOOKS GUARDADOS</span>
+        <span id="m-preset-hint" style="color:var(--muted)">TOCA PARA CARGAR</span>
+      </div>
+      <div class="preset-grid-mobile" id="m-preset-grid"></div>
+      <button type="button" id="btn-m-preset-save" class="btn-pad" style="width:100%;margin-top:8px">
+        💾 GUARDAR LOOK ACTUAL EN UNA CASILLA
+      </button>
+      <div class="card-title" style="margin-top:12px;margin-bottom:6px">
+        <span>🔀 TRANSICIÓN AL CARGAR UN LOOK</span>
+        <span id="m-transition-readout" style="color:var(--amber)">4 COMPASES</span>
+      </div>
+      <div class="grid-3" id="m-transition-grid">
+        <button type="button" class="btn-pad" data-bars="0">✂️ Corte</button>
+        <button type="button" class="btn-pad" data-bars="1">1 compás</button>
+        <button type="button" class="btn-pad" data-bars="2">2 compases</button>
+        <button type="button" class="btn-pad active" data-bars="4">4 compases</button>
+        <button type="button" class="btn-pad" data-bars="8">8 compases</button>
+        <button type="button" class="btn-pad" data-bars="16">16 compases</button>
+      </div>
+      <div class="help-text">La mezcla entre Looks dura los compases elegidos y va sincronizada al BPM.</div>
+    </div>
+  </section>
+
+  <!-- ==================== PESTAÑA 2 TÉCNICO: ESTILO, FIGURA, GROSOR, BARRIDO Y 3D ==================== -->
+  <section id="tab-modifiers" class="tab-pane admin-only">
+    <!-- TARJETA 1: FIGURA GEOMÉTRICA + ACABADO VISUAL CON BOTONES AUTO -->
     <div class="card">
       <div class="card-title">
         <span>1. FIGURA GEOMÉTRICA</span>
@@ -1065,7 +1180,7 @@
       </div>
     </div>
 
-    <!-- TARJETA 4: GROSOR DINÁMICO + BARRIDO DE ESCENARIO CON BOTONES AUTO -->
+    <!-- TARJETA 2: GROSOR DINÁMICO + BARRIDO DE ESCENARIO CON BOTONES AUTO -->
     <div class="card">
       <div class="card-title">
         <span>3. GROSOR DINÁMICO DE LÍNEA</span>
@@ -1092,7 +1207,7 @@
       </div>
     </div>
 
-    <!-- TARJETA 5: MODO 3D EN VIVO CON BOTÓN AUTO -->
+    <!-- TARJETA 3: MODO 3D EN VIVO CON BOTÓN AUTO -->
     <div class="card">
       <div class="card-title">
         <span>5. CONVERTIR CUALQUIER LOOP EN 3D</span>
@@ -1109,30 +1224,43 @@
         <input type="range" id="m-3d-amount" min="0.10" max="1.0" step="0.01" value="0.55" />
       </div>
     </div>
+  </section>
 
-    <!-- TARJETA 6: MIS LOOKS GUARDADOS -->
+  <!-- ==================== PESTAÑA 3 TÉCNICO: PASO 3 (8 CONTROLES MAESTROS + SALTOS POR COMPASES + AUDIO) ==================== -->
+  <section id="tab-faders" class="tab-pane admin-only">
+    <div class="card" style="border-color: rgba(255, 184, 0, 0.45)">
+      <div class="card-title">
+        <span>🥁 RELOJ BPM Y SALTOS POR COMPASES</span>
+        <span id="m-bpm-readout" style="color:var(--amber);font-weight:900">126.0 BPM</span>
+      </div>
+      <div class="grid-2" style="margin-bottom:8px">
+        <button type="button" id="btn-m-tap" class="btn-pad amber-active" style="padding:14px 8px;font-size:12px">
+          🥁 TAP TEMPO
+        </button>
+        <button type="button" id="btn-m-mutate-macros" class="btn-pad active" style="padding:14px 8px;font-size:12px">
+          🎲 VARIAR FADERS YA
+        </button>
+      </div>
+      <div class="slider-row" style="margin-bottom:10px">
+        <span>BPM RELOJ</span>
+        <input type="range" id="m-bpm-slider" min="60" max="180" step="0.5" value="126" />
+      </div>
+      <button type="button" id="btn-m-auto-bar-steps" class="btn-pad amber-active btn-big btn-full" style="font-size:11px">
+        🥁 SALTOS POR COMPASES AUTO (ZOOM 4C · GIRO 8C · MOV 16C)
+      </button>
+      <div class="help-text">
+        Elige en cada control de abajo si quieres que cambie <strong>de golpe cada 1, 4, 8 o 16 compases</strong> (ej. que el Zoom crezca o se encoja cada 4 compases, o la Inclinación cambie cada 8 compases) o que reaccione al <strong>Audio (BASS / MID / HIGH)</strong>.
+      </div>
+    </div>
+
     <div class="card">
       <div class="card-title">
-        <span>⭐ MIS LOOKS GUARDADOS</span>
-        <span id="m-preset-hint" style="color:var(--muted)">TOCA PARA CARGAR</span>
+        <span>🎚 PASO 3: LOS 8 CONTROLES MAESTROS</span>
+        <span id="m-bar-live-pill" style="color:var(--cyan)">COMPÁS 1.1</span>
       </div>
-      <div class="preset-grid-mobile" id="m-preset-grid"></div>
-      <button type="button" id="btn-m-preset-save" class="btn-pad" style="width:100%;margin-top:8px">
-        💾 GUARDAR LOOK ACTUAL EN UNA CASILLA
-      </button>
-      <div class="card-title" style="margin-top:12px;margin-bottom:6px">
-        <span>🔀 TRANSICIÓN AL CARGAR UN LOOK</span>
-        <span id="m-transition-readout" style="color:var(--amber)">4 COMPASES</span>
+      <div id="m-macro-cards-list">
+        <!-- Generado dinámicamente para los 8 Controles Maestros -->
       </div>
-      <div class="grid-3" id="m-transition-grid">
-        <button type="button" class="btn-pad" data-bars="0">✂️ Corte</button>
-        <button type="button" class="btn-pad" data-bars="1">1 compás</button>
-        <button type="button" class="btn-pad" data-bars="2">2 compases</button>
-        <button type="button" class="btn-pad active" data-bars="4">4 compases</button>
-        <button type="button" class="btn-pad" data-bars="8">8 compases</button>
-        <button type="button" class="btn-pad" data-bars="16">16 compases</button>
-      </div>
-      <div class="help-text">La mezcla entre Looks dura los compases elegidos y va sincronizada al BPM.</div>
     </div>
   </section>
 
@@ -1192,57 +1320,6 @@
       <div class="slider-row">
         <span>ESTELA SUAVE</span>
         <input type="range" id="m-fx-feedback-wet" min="0" max="1" step="0.01" value="0.25" />
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">
-        <span>🥁 RITMO BPM Y LOS 8 FADERS MAESTROS</span>
-        <span id="m-bpm-readout" style="color:var(--amber)">126.0 BPM</span>
-      </div>
-      <div class="grid-2" style="margin-bottom:8px">
-        <button type="button" id="btn-m-tap" class="btn-pad amber-active" style="padding:14px 8px;font-size:12px">
-          🥁 TAP TEMPO
-        </button>
-        <button type="button" id="btn-m-mutate-macros" class="btn-pad active" style="padding:14px 8px;font-size:12px">
-          🎲 VARIAR FADERS
-        </button>
-      </div>
-      <div class="slider-row">
-        <span>BPM RELOJ</span>
-        <input type="range" id="m-bpm-slider" min="60" max="180" step="0.5" value="126" />
-      </div>
-      <div class="slider-row">
-        <span>1. VELOCIDAD</span>
-        <input type="range" id="m-macro-speed" min="0" max="1" step="0.01" value="0.22" />
-      </div>
-      <div class="slider-row">
-        <span>2. ZOOM / CANT.</span>
-        <input type="range" id="m-macro-scale" min="0" max="1" step="0.01" value="0.24" />
-      </div>
-      <div class="slider-row">
-        <span>3. COMPLEJIDAD</span>
-        <input type="range" id="m-macro-complexity" min="0" max="1" step="0.01" value="0.22" />
-      </div>
-      <div class="slider-row">
-        <span>4. GROSOR LÍNEA</span>
-        <input type="range" id="m-macro-thickness" min="0" max="1" step="0.01" value="0.38" />
-      </div>
-      <div class="slider-row">
-        <span>5. ROTACIÓN</span>
-        <input type="range" id="m-macro-rotation" min="0" max="1" step="0.01" value="0.00" />
-      </div>
-      <div class="slider-row">
-        <span>6. CAOS</span>
-        <input type="range" id="m-macro-chaos" min="0" max="1" step="0.01" value="0.08" />
-      </div>
-      <div class="slider-row">
-        <span>7. PULSO BEAT</span>
-        <input type="range" id="m-macro-strobe" min="0" max="1" step="0.01" value="0.00" />
-      </div>
-      <div class="slider-row">
-        <span>8. TONO COLOR</span>
-        <input type="range" id="m-macro-colorShift" min="0" max="1" step="0.01" value="0.10" />
       </div>
     </div>
 
@@ -2208,7 +2285,128 @@
       });
       renderPostFxUI();
 
-      // ==================== BPM Y LOS 8 FADERS MAESTROS ====================
+      // ==================== BPM, SALTOS POR COMPASES Y LOS 8 FADERS MAESTROS ====================
+      const MOBILE_MACRO_DEFS = [
+        { key: 'speed', name: '1. VELOCIDAD', sub: 'Ritmo del movimiento', def: 0.22 },
+        { key: 'scale', name: '2. CANTIDAD / ZOOM', sub: 'Crece o encoge de golpe', def: 0.24 },
+        { key: 'complexity', name: '3. CAPAS / DETALLE', sub: 'Simple ⟷ Complejo', def: 0.22 },
+        { key: 'thickness', name: '4. GROSOR DE LÍNEA', sub: 'Fino ⟷ Relleno', def: 0.38 },
+        { key: 'rotation', name: '5. INCLINACIÓN / GIRO', sub: 'Ángulo de figuras', def: 0.00 },
+        { key: 'chaos', name: '6. MOVIMIENTO EXTRA', sub: 'Variación orgánica', def: 0.08 },
+        { key: 'strobe', name: '7. PARPADEO BPM', sub: 'Pulso con la música', def: 0.00 },
+        { key: 'colorShift', name: '8. CAMBIO DE COLOR', sub: 'Variación de paleta', def: 0.10 }
+      ];
+      const macroBarStepsLocal = { speed: 0, scale: 0, complexity: 0, thickness: 0, rotation: 0, chaos: 0, strobe: 0, colorShift: 0 };
+      const macroAudioBandsLocal = { speed: 'none', scale: 'bass', complexity: 'mid', thickness: 'bass', rotation: 'none', chaos: 'high', strobe: 'bass', colorShift: 'mid' };
+
+      function buildMobileMacroCards() {
+        const listEl = document.getElementById('m-macro-cards-list');
+        if (!listEl) return;
+        listEl.innerHTML = '';
+        MOBILE_MACRO_DEFS.forEach((m) => {
+          const card = document.createElement('div');
+          card.className = 'macro-card-mobile';
+          card.innerHTML =
+            '<div class="macro-head-mobile">' +
+              '<div><div class="m-title">' + m.name + '</div><div class="m-sub">' + m.sub + '</div></div>' +
+              '<span class="m-val" id="m-macro-val-' + m.key + '">' + Math.round(m.def * 100) + '%</span>' +
+            '</div>' +
+            '<div class="slider-row" style="margin-top:4px">' +
+              '<span style="min-width:60px">NIVEL</span>' +
+              '<input type="range" id="m-macro-' + m.key + '" min="0" max="1" step="0.01" value="' + m.def + '" />' +
+            '</div>' +
+            '<div class="macro-pill-row" id="m-bar-row-' + m.key + '">' +
+              '<span class="macro-row-lbl">COMPASES</span>' +
+              '<button type="button" class="btn-mini-pill active" data-mkey="' + m.key + '" data-mbars="0">OFF</button>' +
+              '<button type="button" class="btn-mini-pill" data-mkey="' + m.key + '" data-mbars="1">1C</button>' +
+              '<button type="button" class="btn-mini-pill" data-mkey="' + m.key + '" data-mbars="4">4C</button>' +
+              '<button type="button" class="btn-mini-pill" data-mkey="' + m.key + '" data-mbars="8">8C</button>' +
+              '<button type="button" class="btn-mini-pill" data-mkey="' + m.key + '" data-mbars="16">16C</button>' +
+            '</div>' +
+            '<div class="macro-audio-row" id="m-audio-row-' + m.key + '">' +
+              '<span class="macro-row-lbl">AUDIO FFT</span>' +
+              '<button type="button" class="btn-mini-pill" data-mkey="' + m.key + '" data-mband="none">OFF</button>' +
+              '<button type="button" class="btn-mini-pill" data-mkey="' + m.key + '" data-mband="bass">BASS</button>' +
+              '<button type="button" class="btn-mini-pill" data-mkey="' + m.key + '" data-mband="mid">MID</button>' +
+              '<button type="button" class="btn-mini-pill" data-mkey="' + m.key + '" data-mband="high">HIGH</button>' +
+            '</div>';
+          listEl.appendChild(card);
+
+          const rangeEl = card.querySelector('#m-macro-' + m.key);
+          const valBadge = card.querySelector('#m-macro-val-' + m.key);
+          rangeEl.addEventListener('input', (e) => {
+            const v = parseFloat(e.target.value);
+            markTouched(rangeEl);
+            if (valBadge) valBadge.textContent = Math.round(v * 100) + '%';
+            sendCommand({ action: 'SET_MACRO', key: m.key, value: v });
+          });
+
+          card.querySelectorAll('[data-mbars]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              const bars = parseInt(btn.getAttribute('data-mbars'), 10) || 0;
+              macroBarStepsLocal[m.key] = bars;
+              renderMacroModRows();
+              sendCommand({ action: 'SET_MACRO_BAR_STEP', key: m.key, bars: bars });
+            });
+          });
+
+          card.querySelectorAll('[data-mband]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              const band = btn.getAttribute('data-mband') || 'none';
+              macroAudioBandsLocal[m.key] = band;
+              renderMacroModRows();
+              sendCommand({ action: 'SET_MACRO_AUDIO_BAND', key: m.key, band: band });
+            });
+          });
+        });
+      }
+
+      function renderMacroModRows() {
+        let anyBars = false;
+        MOBILE_MACRO_DEFS.forEach((m) => {
+          const curBars = Number(macroBarStepsLocal[m.key]) || 0;
+          if (curBars > 0) anyBars = true;
+          const barRow = document.getElementById('m-bar-row-' + m.key);
+          if (barRow) {
+            barRow.querySelectorAll('[data-mbars]').forEach((b) => {
+              const bVal = parseInt(b.getAttribute('data-mbars'), 10) || 0;
+              b.classList.toggle('active', bVal === curBars);
+            });
+          }
+          const curBand = macroAudioBandsLocal[m.key] || 'none';
+          const audRow = document.getElementById('m-audio-row-' + m.key);
+          if (audRow) {
+            audRow.querySelectorAll('[data-mband]').forEach((b) => {
+              const bBand = b.getAttribute('data-mband') || 'none';
+              b.classList.toggle('audio-active', bBand === curBand);
+            });
+          }
+        });
+        const btnAutoBars = document.getElementById('btn-m-auto-bar-steps');
+        if (btnAutoBars) {
+          btnAutoBars.classList.toggle('green-live', anyBars);
+          btnAutoBars.classList.toggle('amber-active', !anyBars);
+          btnAutoBars.textContent = anyBars
+            ? '🟢 SALTOS POR COMPASES ACTIVOS (TOCA PARA APAGAR)'
+            : '🥁 SALTOS POR COMPASES AUTO (ZOOM 4C · GIRO 8C · MOV 16C)';
+        }
+      }
+
+      buildMobileMacroCards();
+      renderMacroModRows();
+
+      document.getElementById('btn-m-auto-bar-steps')?.addEventListener('click', () => {
+        const anyBars = Object.values(macroBarStepsLocal).some((v) => (Number(v) || 0) > 0);
+        const nextOn = !anyBars;
+        if (nextOn) {
+          Object.assign(macroBarStepsLocal, { speed: 0, scale: 4, complexity: 8, thickness: 0, rotation: 8, chaos: 16, strobe: 0, colorShift: 16 });
+        } else {
+          Object.keys(macroBarStepsLocal).forEach((k) => { macroBarStepsLocal[k] = 0; });
+        }
+        renderMacroModRows();
+        sendCommand({ action: 'SET_AUTO_BAR_STEPS_PRESET', enabled: nextOn });
+      });
+
       document.getElementById('btn-m-tap').addEventListener('click', () => {
         sendCommand({ action: 'TAP_TEMPO' });
       });
@@ -2219,14 +2417,6 @@
         const bpm = parseFloat(e.target.value);
         document.getElementById('m-bpm-readout').textContent = bpm.toFixed(1) + ' BPM';
         sendCommand({ action: 'SET_BPM', value: bpm });
-      });
-
-      ['speed', 'scale', 'complexity', 'thickness', 'rotation', 'chaos', 'strobe', 'colorShift'].forEach((k) => {
-        const el = document.getElementById('m-macro-' + k);
-        if (!el) return;
-        el.addEventListener('input', (e) => {
-          sendCommand({ action: 'SET_MACRO', key: k, value: parseFloat(e.target.value) });
-        });
       });
 
       // Momentary & Toggle Kill Buttons
@@ -3451,8 +3641,24 @@
 
         if (st.macros && typeof st.macros === 'object') {
           ['speed', 'scale', 'complexity', 'thickness', 'rotation', 'chaos', 'strobe', 'colorShift'].forEach((k) => {
-            if (typeof st.macros[k] === 'number') setRangeIfIdle('m-macro-' + k, st.macros[k]);
+            if (typeof st.macros[k] === 'number') {
+              setRangeIfIdle('m-macro-' + k, st.macros[k]);
+              const badge = document.getElementById('m-macro-val-' + k);
+              const el = document.getElementById('m-macro-' + k);
+              if (badge && isIdle(el)) badge.textContent = Math.round(st.macros[k] * 100) + '%';
+            }
           });
+        }
+        if (st.macroBarSteps && typeof st.macroBarSteps === 'object') {
+          Object.assign(macroBarStepsLocal, st.macroBarSteps);
+        }
+        if (st.macroAudioBands && typeof st.macroAudioBands === 'object') {
+          Object.assign(macroAudioBandsLocal, st.macroAudioBands);
+        }
+        renderMacroModRows();
+        const barPill = document.getElementById('m-bar-live-pill');
+        if (barPill && typeof st.currentBar === 'number') {
+          barPill.textContent = 'COMPÁS ' + st.currentBar + '.' + (st.currentBeat || 1);
         }
 
         if (st.postFx && typeof st.postFx === 'object') {

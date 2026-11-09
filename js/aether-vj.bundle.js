@@ -868,6 +868,17 @@ const AUTOPILOT_MODES = {
     chaosCeiling: 0.75
   }
 };
+const BAR_STEP_OPTIONS = [0, 1, 4, 8, 16];
+const BAR_STEP_SEQUENCES = {
+  speed:      [0.18, 0.46, 0.24, 0.62, 0.16, 0.36],
+  scale:      [0.14, 0.58, 0.26, 0.80, 0.18, 0.44],
+  complexity: [0.16, 0.54, 0.26, 0.72, 0.20, 0.42],
+  thickness:  [0.18, 0.68, 0.32, 0.84, 0.24, 0.52],
+  rotation:   [0.00, 0.25, 0.50, 0.75, 0.125, 0.875],
+  chaos:      [0.04, 0.42, 0.15, 0.64, 0.08, 0.32],
+  strobe:     [0.00, 0.00, 0.00, 0.30],
+  colorShift: [0.08, 0.45, 0.20, 0.68]
+};
 function createInitialState() {
   const macros = {};
   for (const def of MACRO_DEFS) {
@@ -879,7 +890,9 @@ function createInitialState() {
       lfoRate: def.defaultRate,
       lfoPhaseOffset: def.index * 0.713,
       audioBand: def.audioBand,
-      audioAmount: def.audioAmount
+      audioAmount: def.audioAmount,
+      barStepBars: 0,       // 0 = Fijo/Manual | 1, 4, 8, 16 = Salta de golpe cada X compases
+      barStepIndex: 0       // Índice actual dentro de BAR_STEP_SEQUENCES[key]
     };
   }
 
@@ -6364,10 +6377,25 @@ class AutopilotBrain {
         this._beginLookMorph(pm.preset, pm.bars);
       }
 
-      // Track bar progression for Bar-synced Auto-Scene Morphing
+      // Track bar progression for Bar-synced Auto-Scene Morphing & Per-Macro Bar-Step Jumps
       if (st.bpm.currentBar > st.autopilot.lastBarNumber) {
         st.autopilot.lastBarNumber = st.bpm.currentBar;
         st.autopilot.barsElapsedInScene += 1;
+
+        // Salto de golpe cada X compases (1, 4, 8 o 16 compases) en cualquiera de los 8 Faders Maestros
+        const barZeroIdx = Math.max(0, st.bpm.currentBar - 1);
+        for (const def of MACRO_DEFS) {
+          const m = st.macros[def.key];
+          const everyBars = Number(m.barStepBars) || 0;
+          if (everyBars > 0 && barZeroIdx % everyBars === 0) {
+            const seq = BAR_STEP_SEQUENCES[def.key] || [0.2, 0.6, 0.35, 0.75];
+            m.barStepIndex = ((m.barStepIndex || 0) + 1) % seq.length;
+            const nextVal = seq[m.barStepIndex];
+            m.base = nextVal;
+            m.modulated = nextVal;
+            this.macroBaseTargets[def.key] = nextVal;
+          }
+        }
       }
     } else {
       st.bpm.syncPulse *= Math.pow(0.04, dt);
@@ -6387,9 +6415,12 @@ class AutopilotBrain {
       const glideRate = Math.min(1.0, dt * 0.45 * modeCfg.lfoSpeedMult);
       for (const def of MACRO_DEFS) {
         const k = def.key;
+        const m = st.macros[k];
+        // Si este fader está en modo Salto por Compases (1, 4, 8, 16), mantener el salto de golpe limpio
+        if ((Number(m.barStepBars) || 0) > 0) continue;
         const target = this.macroBaseTargets[k];
         if (target !== undefined) {
-          st.macros[k].base += (target - st.macros[k].base) * glideRate;
+          m.base += (target - m.base) * glideRate;
         }
       }
     }
@@ -6502,7 +6533,8 @@ function capturePreset(st) {
       lfoDepth: m.lfoDepth,
       lfoRate: m.lfoRate,
       audioBand: m.audioBand,
-      audioAmount: m.audioAmount
+      audioAmount: m.audioAmount,
+      barStepBars: m.barStepBars || 0
     };
   }
 
@@ -6613,6 +6645,7 @@ function applyPresetImmediate(st, autopilot, p, cut = false) {
       if (typeof src.lfoRate === 'number') m.lfoRate = src.lfoRate;
       if (src.audioBand) m.audioBand = src.audioBand;
       if (typeof src.audioAmount === 'number') m.audioAmount = src.audioAmount;
+      if (typeof src.barStepBars === 'number') m.barStepBars = src.barStepBars;
     }
   }
 }
@@ -6647,6 +6680,14 @@ class Persistence {
   _buildSmallSnapshot() {
     const st = this.state;
     const logo = st.fx.logo;
+    const macroBarSteps = {};
+    const macroAudioBands = {};
+    if (st.macros) {
+      for (const k of Object.keys(st.macros)) {
+        macroBarSteps[k] = Number(st.macros[k].barStepBars) || 0;
+        macroAudioBands[k] = st.macros[k].audioBand || 'none';
+      }
+    }
     return {
       version: 1,
       mapping: st.fx.mapping,
@@ -6655,6 +6696,8 @@ class Persistence {
       calmColor: st.calmColor !== false,
       autoRotatePalette: Boolean(st.autoRotatePalette),
       autopilotBankPool: st.autopilotBankPool,
+      macroBarSteps,
+      macroAudioBands,
       autoMods: st.autoMods ? {
         changeEvery: st.autoMods.changeEvery || 'LAP',
         shape: Boolean(st.autoMods.shape),
@@ -6761,6 +6804,21 @@ class Persistence {
     }
     if (typeof cfg.autopilotBankPool === 'string' && cfg.autopilotBankPool) {
       st.autopilotBankPool = cfg.autopilotBankPool;
+    }
+    if (cfg.macroBarSteps && typeof cfg.macroBarSteps === 'object' && st.macros) {
+      for (const k of Object.keys(cfg.macroBarSteps)) {
+        if (st.macros[k]) {
+          const bars = Number(cfg.macroBarSteps[k]) || 0;
+          st.macros[k].barStepBars = [0, 1, 4, 8, 16].includes(bars) ? bars : 0;
+        }
+      }
+    }
+    if (cfg.macroAudioBands && typeof cfg.macroAudioBands === 'object' && st.macros) {
+      for (const k of Object.keys(cfg.macroAudioBands)) {
+        if (st.macros[k] && ['none', 'bass', 'mid', 'high'].includes(cfg.macroAudioBands[k])) {
+          st.macros[k].audioBand = cfg.macroAudioBands[k];
+        }
+      }
     }
     if (cfg.autoMods && typeof cfg.autoMods === 'object') {
       if (!st.autoMods) st.autoMods = {};
@@ -7845,10 +7903,14 @@ class SyncBridge {
     const st = this.state;
     const dominantGenIdx = st.crossfade >= 0.5 ? st.deckB : st.deckA;
     const macrosPayload = {};
+    const macroBarSteps = {};
+    const macroAudioBands = {};
     for (let i = 0; i < MACRO_DEFS.length; i++) {
       const k = MACRO_DEFS[i].key;
       if (st.macros[k]) {
         macrosPayload[k] = Math.round(st.macros[k].base * 100) / 100;
+        macroBarSteps[k] = Number(st.macros[k].barStepBars) || 0;
+        macroAudioBands[k] = st.macros[k].audioBand || 'none';
       }
     }
     const payload = {
@@ -7869,8 +7931,21 @@ class SyncBridge {
         allActive: Boolean(this.autopilot && this.autopilot.areAllAutoModsActive && this.autopilot.areAllAutoModsActive())
       }),
       macros: macrosPayload,
+      macroBarSteps,
+      macroAudioBands,
+      currentBar: st.bpm.currentBar || 1,
+      currentBeat: st.bpm.currentBeatInBar || 1,
       postFx: {
         bypass: Boolean(st.pureFlatBypassFx),
+        kaleidoEnabled: Boolean(st.fx.kaleidoscope.enabled),
+        kaleidoAxes: st.fx.kaleidoscope.axes || 2,
+        kaleidoWet: st.fx.kaleidoscope.wet,
+        rgbShiftEnabled: Boolean(st.fx.rgbShift.enabled),
+        rgbShiftWet: st.fx.rgbShift.wet,
+        feedbackEnabled: Boolean(st.fx.feedback.enabled),
+        feedbackWet: st.fx.feedback.wet,
+        glitchEnabled: Boolean(st.fx.glitch.enabled),
+        pixelateEnabled: Boolean(st.fx.pixelate.enabled),
         kaleidoscope: st.fx.kaleidoscope,
         rgbShift: st.fx.rgbShift,
         feedback: st.fx.feedback,
@@ -8042,14 +8117,45 @@ class SyncBridge {
         }
         break;
       case 'SET_POST_FX':
-        if (cmd.key === 'bypass') {
-          st.pureFlatBypassFx = Boolean(cmd.enabled);
+        if (cmd.key === 'bypass' || cmd.prop === 'bypass') {
+          st.pureFlatBypassFx = Boolean(cmd.enabled !== undefined ? cmd.enabled : cmd.value);
           if (st.pureFlatBypassFx) {
             st.fx.kaleidoscope.enabled = false;
             st.fx.rgbShift.enabled = false;
             st.fx.feedback.enabled = false;
             st.fx.glitch.enabled = false;
             st.fx.pixelate.enabled = false;
+          }
+        } else if (cmd.prop) {
+          const propMap = {
+            kaleidoEnabled: ['kaleidoscope', 'enabled'],
+            kaleidoAxes: ['kaleidoscope', 'axes'],
+            kaleidoWet: ['kaleidoscope', 'wet'],
+            rgbShiftEnabled: ['rgbShift', 'enabled'],
+            rgbShiftWet: ['rgbShift', 'wet'],
+            feedbackEnabled: ['feedback', 'enabled'],
+            feedbackWet: ['feedback', 'wet'],
+            glitchEnabled: ['glitch', 'enabled'],
+            pixelateEnabled: ['pixelate', 'enabled']
+          };
+          const target = propMap[cmd.prop];
+          if (target && st.fx[target[0]]) {
+            const slot = st.fx[target[0]];
+            const field = target[1];
+            if (field === 'enabled') {
+              slot.enabled = Boolean(cmd.value);
+              if (slot.enabled) st.pureFlatBypassFx = false;
+            } else if (field === 'axes') {
+              slot.axes = [2, 4, 8].includes(Number(cmd.value)) ? Number(cmd.value) : 2;
+              slot.enabled = true;
+              st.pureFlatBypassFx = false;
+            } else if (field === 'wet') {
+              slot.wet = clampNum(cmd.value, 0, 1, slot.wet);
+              if (slot.wet > 0.02) {
+                slot.enabled = true;
+                st.pureFlatBypassFx = false;
+              }
+            }
           }
         } else if (['kaleidoscope', 'rgbShift', 'feedback', 'glitch', 'pixelate'].includes(cmd.key)) {
           const fxSlot = st.fx[cmd.key];
@@ -8082,6 +8188,57 @@ class SyncBridge {
           }
         }
         break;
+      case 'SET_MACRO_BAR_STEP':
+        if (cmd.key && st.macros[cmd.key]) {
+          const bars = Number(cmd.bars) || 0;
+          st.macros[cmd.key].barStepBars = BAR_STEP_OPTIONS.includes(bars) ? bars : 0;
+          if (st.macros[cmd.key].barStepBars > 0) {
+            const seq = BAR_STEP_SEQUENCES[cmd.key];
+            if (Array.isArray(seq) && seq.length > 0) {
+              const nextIdx = ((st.macros[cmd.key].barStepIndex || 0) + 1) % seq.length;
+              st.macros[cmd.key].barStepIndex = nextIdx;
+              const nextVal = seq[nextIdx];
+              st.macros[cmd.key].base = nextVal;
+              if (this.autopilot && this.autopilot.macroBaseTargets) {
+                this.autopilot.macroBaseTargets[cmd.key] = nextVal;
+              }
+            }
+          }
+        }
+        break;
+      case 'SET_MACRO_AUDIO_BAND':
+        if (cmd.key && st.macros[cmd.key]) {
+          const band = ['none', 'bass', 'mid', 'high'].includes(cmd.band) ? cmd.band : 'none';
+          st.macros[cmd.key].audioBand = band;
+          if (band !== 'none' && st.macros[cmd.key].audioAmount < 0.1) {
+            st.macros[cmd.key].audioAmount = 0.35;
+          }
+        }
+        break;
+      case 'SET_AUTO_BAR_STEPS_PRESET': {
+        const anyActive = Object.values(st.macros).some((m) => (Number(m.barStepBars) || 0) > 0);
+        const turnOn = cmd.enabled !== undefined ? Boolean(cmd.enabled) : !anyActive;
+        if (turnOn) {
+          const preset = {
+            speed: 0,
+            scale: 4,
+            complexity: 8,
+            thickness: 0,
+            rotation: 8,
+            chaos: 16,
+            strobe: 0,
+            colorShift: 16
+          };
+          for (const k of Object.keys(st.macros)) {
+            st.macros[k].barStepBars = preset[k] || 0;
+          }
+        } else {
+          for (const k of Object.keys(st.macros)) {
+            st.macros[k].barStepBars = 0;
+          }
+        }
+        break;
+      }
       case 'UPLOAD_LOGO':
         if (typeof cmd.dataUrl === 'string') {
           const slot = (typeof cmd.slot === 'number') ? cmd.slot : st.fx.logo.activeSlot;
@@ -9057,6 +9214,29 @@ class ConsoleController {
           <div class="fader-mod-cap" id="mod-cap-${def.key}"></div>
         </div>
 
+        <div class="bar-step-mini-box">
+          <div class="bar-step-label-row">
+            <span>SALTO COMPÁS</span>
+            <span id="bar-step-tag-${def.key}" style="color:var(--accent-amber)">${m.barStepBars > 0 ? m.barStepBars + 'C' : 'MANUAL'}</span>
+          </div>
+          <div class="bar-step-row" id="bar-steps-${def.key}" title="Cambia este control de golpe cada X compases (OFF = fijo/manual, 1C, 4C, 8C o 16C)">
+            <button type="button" class="btn-bar-step ${(m.barStepBars || 0) === 0 ? 'active' : ''}" data-bars="0">OFF</button>
+            <button type="button" class="btn-bar-step ${m.barStepBars === 1 ? 'active' : ''}" data-bars="1">1C</button>
+            <button type="button" class="btn-bar-step ${m.barStepBars === 4 ? 'active' : ''}" data-bars="4">4C</button>
+            <button type="button" class="btn-bar-step ${m.barStepBars === 8 ? 'active' : ''}" data-bars="8">8C</button>
+            <button type="button" class="btn-bar-step ${m.barStepBars === 16 ? 'active' : ''}" data-bars="16">16C</button>
+          </div>
+          <div class="audio-route-row">
+            <span class="route-label">AUDIO</span>
+            <select class="audio-band-select" id="audio-band-${def.key}">
+              <option value="none" ${m.audioBand === 'none' ? 'selected' : ''}>OFF</option>
+              <option value="bass" ${m.audioBand === 'bass' ? 'selected' : ''}>BASS</option>
+              <option value="mid" ${m.audioBand === 'mid' ? 'selected' : ''}>MID</option>
+              <option value="high" ${m.audioBand === 'high' ? 'selected' : ''}>HIGH</option>
+            </select>
+          </div>
+        </div>
+
         <div class="lfo-mini-box">
           <div class="lfo-wave-row" id="lfo-waves-${def.key}">
             ${LFO_WAVES.map((w) => `
@@ -9075,15 +9255,6 @@ class ConsoleController {
               <input type="range" class="mini-slider" id="lfo-rate-${def.key}" min="0" max="1" step="0.01" value="${m.lfoRate}" />
             </label>
           </div>
-          <div class="audio-route-row">
-            <span class="route-label">FFT</span>
-            <select class="audio-band-select" id="audio-band-${def.key}">
-              <option value="none" ${m.audioBand === 'none' ? 'selected' : ''}>OFF</option>
-              <option value="bass" ${m.audioBand === 'bass' ? 'selected' : ''}>BASS</option>
-              <option value="mid" ${m.audioBand === 'mid' ? 'selected' : ''}>MID</option>
-              <option value="high" ${m.audioBand === 'high' ? 'selected' : ''}>HIGH</option>
-            </select>
-          </div>
         </div>
       `;
 
@@ -9094,6 +9265,8 @@ class ConsoleController {
       const ledFillEl = strip.querySelector(`#led-fill-${def.key}`);
       const baseMarkerEl = strip.querySelector(`#base-marker-${def.key}`);
       const modCapEl = strip.querySelector(`#mod-cap-${def.key}`);
+      const barStepBtns = Array.from(strip.querySelectorAll('.btn-bar-step'));
+      const barStepTagEl = strip.querySelector(`#bar-step-tag-${def.key}`);
       const waveBtns = Array.from(strip.querySelectorAll('.btn-lfo-wave'));
       const depthEl = strip.querySelector(`#lfo-depth-${def.key}`);
       const rateEl = strip.querySelector(`#lfo-rate-${def.key}`);
@@ -9105,6 +9278,8 @@ class ConsoleController {
         ledFillEl,
         baseMarkerEl,
         modCapEl,
+        barStepBtns,
+        barStepTagEl,
         waveBtns,
         depthEl,
         rateEl,
@@ -9119,8 +9294,16 @@ class ConsoleController {
 
       inputEl.addEventListener('dblclick', () => {
         this.state.macros[def.key].base = def.defaultVal;
+        this.state.macros[def.key].barStepBars = 0;
         this.autopilot.macroBaseTargets[def.key] = def.defaultVal;
         inputEl.value = def.defaultVal;
+      });
+
+      barStepBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const bars = parseInt(btn.getAttribute('data-bars'), 10) || 0;
+          this._cmd({ action: 'SET_MACRO_BAR_STEP', key: def.key, bars });
+        });
       });
 
       waveBtns.forEach((btn) => {
@@ -9275,6 +9458,7 @@ class ConsoleController {
       crossfaderVal: $('crossfader-val'),
       btnNextScene: $('btn-next-scene'),
       btnMutateMacros: $('btn-mutate-macros'),
+      btnAutoBarSteps: $('btn-auto-bar-steps'),
 
       btnAutopilotToggle: $('btn-autopilot-toggle'),
       btnLfoMasterToggle: $('btn-lfo-master-toggle'),
@@ -9631,6 +9815,10 @@ class ConsoleController {
 
     d.btnMutateMacros?.addEventListener('click', () => {
       this.autopilot.randomizeMacrosNow();
+    });
+
+    d.btnAutoBarSteps?.addEventListener('click', () => {
+      this._cmd({ action: 'SET_AUTO_BAR_STEPS_PRESET' });
     });
 
     d.btnAutopilotToggle?.addEventListener('click', () => {
@@ -10130,6 +10318,7 @@ class ConsoleController {
     });
 
     // Visually move & animate all 8 Macro Faders + LED Bars
+    let anyBarStepActive = false;
     for (let i = 0; i < MACRO_DEFS.length; i++) {
       const key = MACRO_DEFS[i].key;
       const m = st.macros[key];
@@ -10138,6 +10327,8 @@ class ConsoleController {
 
       const modPct = (m.modulated * 100).toFixed(1);
       const basePct = (m.base * 100).toFixed(1);
+      const barStepBars = Number(m.barStepBars) || 0;
+      if (barStepBars > 0) anyBarStepActive = true;
 
       mDom.valEl.textContent = `${Math.round(m.modulated * 100)}%`;
       mDom.ledFillEl.style.height = `${modPct}%`;
@@ -10147,6 +10338,27 @@ class ConsoleController {
       if (document.activeElement !== mDom.inputEl) {
         mDom.inputEl.value = m.base;
       }
+      if (mDom.barStepBtns) {
+        for (let b = 0; b < mDom.barStepBtns.length; b++) {
+          const btn = mDom.barStepBtns[b];
+          const bVal = parseInt(btn.getAttribute('data-bars'), 10) || 0;
+          btn.classList.toggle('active', bVal === barStepBars);
+        }
+      }
+      if (mDom.barStepTagEl) {
+        mDom.barStepTagEl.textContent = barStepBars > 0 ? `${barStepBars} COMP` : 'MANUAL';
+        mDom.barStepTagEl.style.color = barStepBars > 0 ? 'var(--accent-amber)' : 'var(--text-muted)';
+      }
+      if (mDom.audioBandEl && document.activeElement !== mDom.audioBandEl && mDom.audioBandEl.value !== m.audioBand) {
+        mDom.audioBandEl.value = m.audioBand || 'none';
+      }
+    }
+    if (d.btnAutoBarSteps) {
+      d.btnAutoBarSteps.classList.toggle('active', anyBarStepActive);
+      d.btnAutoBarSteps.style.background = anyBarStepActive ? 'rgba(255, 157, 0, 0.22)' : '';
+      d.btnAutoBarSteps.textContent = anyBarStepActive
+        ? '🟢 SALTOS POR COMPASES: ACTIVOS (PULSA PARA APAGAR)'
+        : '🥁 SALTOS POR COMPASES AUTO (ZOOM 4C · GIRO 8C · MOV 16C)';
     }
 
     // Crossfader & Deck Generator Highlight

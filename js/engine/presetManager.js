@@ -24,7 +24,8 @@ export function capturePreset(st) {
       lfoDepth: m.lfoDepth,
       lfoRate: m.lfoRate,
       audioBand: m.audioBand,
-      audioAmount: m.audioAmount
+      audioAmount: m.audioAmount,
+      barStepBars: m.barStepBars || 0
     };
   }
 
@@ -136,6 +137,7 @@ export function applyPresetImmediate(st, autopilot, p, cut = false) {
       if (typeof src.lfoRate === 'number') m.lfoRate = src.lfoRate;
       if (src.audioBand) m.audioBand = src.audioBand;
       if (typeof src.audioAmount === 'number') m.audioAmount = src.audioAmount;
+      if (typeof src.barStepBars === 'number') m.barStepBars = src.barStepBars;
     }
   }
 }

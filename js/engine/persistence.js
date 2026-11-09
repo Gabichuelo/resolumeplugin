@@ -27,6 +27,14 @@ export class Persistence {
   _buildSmallSnapshot() {
     const st = this.state;
     const logo = st.fx.logo;
+    const macroBarSteps = {};
+    const macroAudioBands = {};
+    if (st.macros) {
+      for (const k of Object.keys(st.macros)) {
+        macroBarSteps[k] = Number(st.macros[k].barStepBars) || 0;
+        macroAudioBands[k] = st.macros[k].audioBand || 'none';
+      }
+    }
     return {
       version: 1,
       mapping: st.fx.mapping,
@@ -35,6 +43,8 @@ export class Persistence {
       calmColor: st.calmColor !== false,
       autoRotatePalette: Boolean(st.autoRotatePalette),
       autopilotBankPool: st.autopilotBankPool,
+      macroBarSteps,
+      macroAudioBands,
       autoMods: st.autoMods ? {
         changeEvery: st.autoMods.changeEvery || 'LAP',
         shape: Boolean(st.autoMods.shape),
@@ -141,6 +151,21 @@ export class Persistence {
     }
     if (typeof cfg.autopilotBankPool === 'string' && cfg.autopilotBankPool) {
       st.autopilotBankPool = cfg.autopilotBankPool;
+    }
+    if (cfg.macroBarSteps && typeof cfg.macroBarSteps === 'object' && st.macros) {
+      for (const k of Object.keys(cfg.macroBarSteps)) {
+        if (st.macros[k]) {
+          const bars = Number(cfg.macroBarSteps[k]) || 0;
+          st.macros[k].barStepBars = [0, 1, 4, 8, 16].includes(bars) ? bars : 0;
+        }
+      }
+    }
+    if (cfg.macroAudioBands && typeof cfg.macroAudioBands === 'object' && st.macros) {
+      for (const k of Object.keys(cfg.macroAudioBands)) {
+        if (st.macros[k] && ['none', 'bass', 'mid', 'high'].includes(cfg.macroAudioBands[k])) {
+          st.macros[k].audioBand = cfg.macroAudioBands[k];
+        }
+      }
     }
     if (cfg.autoMods && typeof cfg.autoMods === 'object') {
       if (!st.autoMods) st.autoMods = {};

@@ -515,6 +515,29 @@ export class ConsoleController {
           <div class="fader-mod-cap" id="mod-cap-${def.key}"></div>
         </div>
 
+        <div class="bar-step-mini-box">
+          <div class="bar-step-label-row">
+            <span>SALTO COMPÁS</span>
+            <span id="bar-step-tag-${def.key}" style="color:var(--accent-amber)">${m.barStepBars > 0 ? m.barStepBars + 'C' : 'MANUAL'}</span>
+          </div>
+          <div class="bar-step-row" id="bar-steps-${def.key}" title="Cambia este control de golpe cada X compases (OFF = fijo/manual, 1C, 4C, 8C o 16C)">
+            <button type="button" class="btn-bar-step ${(m.barStepBars || 0) === 0 ? 'active' : ''}" data-bars="0">OFF</button>
+            <button type="button" class="btn-bar-step ${m.barStepBars === 1 ? 'active' : ''}" data-bars="1">1C</button>
+            <button type="button" class="btn-bar-step ${m.barStepBars === 4 ? 'active' : ''}" data-bars="4">4C</button>
+            <button type="button" class="btn-bar-step ${m.barStepBars === 8 ? 'active' : ''}" data-bars="8">8C</button>
+            <button type="button" class="btn-bar-step ${m.barStepBars === 16 ? 'active' : ''}" data-bars="16">16C</button>
+          </div>
+          <div class="audio-route-row">
+            <span class="route-label">AUDIO</span>
+            <select class="audio-band-select" id="audio-band-${def.key}">
+              <option value="none" ${m.audioBand === 'none' ? 'selected' : ''}>OFF</option>
+              <option value="bass" ${m.audioBand === 'bass' ? 'selected' : ''}>BASS</option>
+              <option value="mid" ${m.audioBand === 'mid' ? 'selected' : ''}>MID</option>
+              <option value="high" ${m.audioBand === 'high' ? 'selected' : ''}>HIGH</option>
+            </select>
+          </div>
+        </div>
+
         <div class="lfo-mini-box">
           <div class="lfo-wave-row" id="lfo-waves-${def.key}">
             ${LFO_WAVES.map((w) => `
@@ -533,15 +556,6 @@ export class ConsoleController {
               <input type="range" class="mini-slider" id="lfo-rate-${def.key}" min="0" max="1" step="0.01" value="${m.lfoRate}" />
             </label>
           </div>
-          <div class="audio-route-row">
-            <span class="route-label">FFT</span>
-            <select class="audio-band-select" id="audio-band-${def.key}">
-              <option value="none" ${m.audioBand === 'none' ? 'selected' : ''}>OFF</option>
-              <option value="bass" ${m.audioBand === 'bass' ? 'selected' : ''}>BASS</option>
-              <option value="mid" ${m.audioBand === 'mid' ? 'selected' : ''}>MID</option>
-              <option value="high" ${m.audioBand === 'high' ? 'selected' : ''}>HIGH</option>
-            </select>
-          </div>
         </div>
       `;
 
@@ -552,6 +566,8 @@ export class ConsoleController {
       const ledFillEl = strip.querySelector(`#led-fill-${def.key}`);
       const baseMarkerEl = strip.querySelector(`#base-marker-${def.key}`);
       const modCapEl = strip.querySelector(`#mod-cap-${def.key}`);
+      const barStepBtns = Array.from(strip.querySelectorAll('.btn-bar-step'));
+      const barStepTagEl = strip.querySelector(`#bar-step-tag-${def.key}`);
       const waveBtns = Array.from(strip.querySelectorAll('.btn-lfo-wave'));
       const depthEl = strip.querySelector(`#lfo-depth-${def.key}`);
       const rateEl = strip.querySelector(`#lfo-rate-${def.key}`);
@@ -563,6 +579,8 @@ export class ConsoleController {
         ledFillEl,
         baseMarkerEl,
         modCapEl,
+        barStepBtns,
+        barStepTagEl,
         waveBtns,
         depthEl,
         rateEl,
@@ -577,8 +595,16 @@ export class ConsoleController {
 
       inputEl.addEventListener('dblclick', () => {
         this.state.macros[def.key].base = def.defaultVal;
+        this.state.macros[def.key].barStepBars = 0;
         this.autopilot.macroBaseTargets[def.key] = def.defaultVal;
         inputEl.value = def.defaultVal;
+      });
+
+      barStepBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const bars = parseInt(btn.getAttribute('data-bars'), 10) || 0;
+          this._cmd({ action: 'SET_MACRO_BAR_STEP', key: def.key, bars });
+        });
       });
 
       waveBtns.forEach((btn) => {
@@ -733,6 +759,7 @@ export class ConsoleController {
       crossfaderVal: $('crossfader-val'),
       btnNextScene: $('btn-next-scene'),
       btnMutateMacros: $('btn-mutate-macros'),
+      btnAutoBarSteps: $('btn-auto-bar-steps'),
 
       btnAutopilotToggle: $('btn-autopilot-toggle'),
       btnLfoMasterToggle: $('btn-lfo-master-toggle'),
@@ -1089,6 +1116,10 @@ export class ConsoleController {
 
     d.btnMutateMacros?.addEventListener('click', () => {
       this.autopilot.randomizeMacrosNow();
+    });
+
+    d.btnAutoBarSteps?.addEventListener('click', () => {
+      this._cmd({ action: 'SET_AUTO_BAR_STEPS_PRESET' });
     });
 
     d.btnAutopilotToggle?.addEventListener('click', () => {
@@ -1588,6 +1619,7 @@ export class ConsoleController {
     });
 
     // Visually move & animate all 8 Macro Faders + LED Bars
+    let anyBarStepActive = false;
     for (let i = 0; i < MACRO_DEFS.length; i++) {
       const key = MACRO_DEFS[i].key;
       const m = st.macros[key];
@@ -1596,6 +1628,8 @@ export class ConsoleController {
 
       const modPct = (m.modulated * 100).toFixed(1);
       const basePct = (m.base * 100).toFixed(1);
+      const barStepBars = Number(m.barStepBars) || 0;
+      if (barStepBars > 0) anyBarStepActive = true;
 
       mDom.valEl.textContent = `${Math.round(m.modulated * 100)}%`;
       mDom.ledFillEl.style.height = `${modPct}%`;
@@ -1605,6 +1639,27 @@ export class ConsoleController {
       if (document.activeElement !== mDom.inputEl) {
         mDom.inputEl.value = m.base;
       }
+      if (mDom.barStepBtns) {
+        for (let b = 0; b < mDom.barStepBtns.length; b++) {
+          const btn = mDom.barStepBtns[b];
+          const bVal = parseInt(btn.getAttribute('data-bars'), 10) || 0;
+          btn.classList.toggle('active', bVal === barStepBars);
+        }
+      }
+      if (mDom.barStepTagEl) {
+        mDom.barStepTagEl.textContent = barStepBars > 0 ? `${barStepBars} COMP` : 'MANUAL';
+        mDom.barStepTagEl.style.color = barStepBars > 0 ? 'var(--accent-amber)' : 'var(--text-muted)';
+      }
+      if (mDom.audioBandEl && document.activeElement !== mDom.audioBandEl && mDom.audioBandEl.value !== m.audioBand) {
+        mDom.audioBandEl.value = m.audioBand || 'none';
+      }
+    }
+    if (d.btnAutoBarSteps) {
+      d.btnAutoBarSteps.classList.toggle('active', anyBarStepActive);
+      d.btnAutoBarSteps.style.background = anyBarStepActive ? 'rgba(255, 157, 0, 0.22)' : '';
+      d.btnAutoBarSteps.textContent = anyBarStepActive
+        ? '🟢 SALTOS POR COMPASES: ACTIVOS (PULSA PARA APAGAR)'
+        : '🥁 SALTOS POR COMPASES AUTO (ZOOM 4C · GIRO 8C · MOV 16C)';
     }
 
     // Crossfader & Deck Generator Highlight

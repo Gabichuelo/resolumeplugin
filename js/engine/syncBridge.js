@@ -4,7 +4,7 @@
  * via BroadcastChannel and direct window reference for zero-latency Resolume / NDI / Spout capture.
  */
 
-import { MACRO_DEFS, TRANSITION_BARS, defaultCorners, defaultMasks } from '../state.js';
+import { MACRO_DEFS, TRANSITION_BARS, BAR_STEP_OPTIONS, BAR_STEP_SEQUENCES, defaultCorners, defaultMasks } from '../state.js';
 import { capturePreset, applyPreset } from './presetManager.js';
 import { processLogoDataUrl } from './logoProcessor.js';
 import { detectMediaKind } from './mediaLayer.js';
@@ -259,10 +259,14 @@ export class SyncBridge {
     const st = this.state;
     const dominantGenIdx = st.crossfade >= 0.5 ? st.deckB : st.deckA;
     const macrosPayload = {};
+    const macroBarSteps = {};
+    const macroAudioBands = {};
     for (let i = 0; i < MACRO_DEFS.length; i++) {
       const k = MACRO_DEFS[i].key;
       if (st.macros[k]) {
         macrosPayload[k] = Math.round(st.macros[k].base * 100) / 100;
+        macroBarSteps[k] = Number(st.macros[k].barStepBars) || 0;
+        macroAudioBands[k] = st.macros[k].audioBand || 'none';
       }
     }
     const payload = {
@@ -283,8 +287,21 @@ export class SyncBridge {
         allActive: Boolean(this.autopilot && this.autopilot.areAllAutoModsActive && this.autopilot.areAllAutoModsActive())
       }),
       macros: macrosPayload,
+      macroBarSteps,
+      macroAudioBands,
+      currentBar: st.bpm.currentBar || 1,
+      currentBeat: st.bpm.currentBeatInBar || 1,
       postFx: {
         bypass: Boolean(st.pureFlatBypassFx),
+        kaleidoEnabled: Boolean(st.fx.kaleidoscope.enabled),
+        kaleidoAxes: st.fx.kaleidoscope.axes || 2,
+        kaleidoWet: st.fx.kaleidoscope.wet,
+        rgbShiftEnabled: Boolean(st.fx.rgbShift.enabled),
+        rgbShiftWet: st.fx.rgbShift.wet,
+        feedbackEnabled: Boolean(st.fx.feedback.enabled),
+        feedbackWet: st.fx.feedback.wet,
+        glitchEnabled: Boolean(st.fx.glitch.enabled),
+        pixelateEnabled: Boolean(st.fx.pixelate.enabled),
         kaleidoscope: st.fx.kaleidoscope,
         rgbShift: st.fx.rgbShift,
         feedback: st.fx.feedback,
@@ -456,14 +473,45 @@ export class SyncBridge {
         }
         break;
       case 'SET_POST_FX':
-        if (cmd.key === 'bypass') {
-          st.pureFlatBypassFx = Boolean(cmd.enabled);
+        if (cmd.key === 'bypass' || cmd.prop === 'bypass') {
+          st.pureFlatBypassFx = Boolean(cmd.enabled !== undefined ? cmd.enabled : cmd.value);
           if (st.pureFlatBypassFx) {
             st.fx.kaleidoscope.enabled = false;
             st.fx.rgbShift.enabled = false;
             st.fx.feedback.enabled = false;
             st.fx.glitch.enabled = false;
             st.fx.pixelate.enabled = false;
+          }
+        } else if (cmd.prop) {
+          const propMap = {
+            kaleidoEnabled: ['kaleidoscope', 'enabled'],
+            kaleidoAxes: ['kaleidoscope', 'axes'],
+            kaleidoWet: ['kaleidoscope', 'wet'],
+            rgbShiftEnabled: ['rgbShift', 'enabled'],
+            rgbShiftWet: ['rgbShift', 'wet'],
+            feedbackEnabled: ['feedback', 'enabled'],
+            feedbackWet: ['feedback', 'wet'],
+            glitchEnabled: ['glitch', 'enabled'],
+            pixelateEnabled: ['pixelate', 'enabled']
+          };
+          const target = propMap[cmd.prop];
+          if (target && st.fx[target[0]]) {
+            const slot = st.fx[target[0]];
+            const field = target[1];
+            if (field === 'enabled') {
+              slot.enabled = Boolean(cmd.value);
+              if (slot.enabled) st.pureFlatBypassFx = false;
+            } else if (field === 'axes') {
+              slot.axes = [2, 4, 8].includes(Number(cmd.value)) ? Number(cmd.value) : 2;
+              slot.enabled = true;
+              st.pureFlatBypassFx = false;
+            } else if (field === 'wet') {
+              slot.wet = clampNum(cmd.value, 0, 1, slot.wet);
+              if (slot.wet > 0.02) {
+                slot.enabled = true;
+                st.pureFlatBypassFx = false;
+              }
+            }
           }
         } else if (['kaleidoscope', 'rgbShift', 'feedback', 'glitch', 'pixelate'].includes(cmd.key)) {
           const fxSlot = st.fx[cmd.key];
@@ -496,6 +544,57 @@ export class SyncBridge {
           }
         }
         break;
+      case 'SET_MACRO_BAR_STEP':
+        if (cmd.key && st.macros[cmd.key]) {
+          const bars = Number(cmd.bars) || 0;
+          st.macros[cmd.key].barStepBars = BAR_STEP_OPTIONS.includes(bars) ? bars : 0;
+          if (st.macros[cmd.key].barStepBars > 0) {
+            const seq = BAR_STEP_SEQUENCES[cmd.key];
+            if (Array.isArray(seq) && seq.length > 0) {
+              const nextIdx = ((st.macros[cmd.key].barStepIndex || 0) + 1) % seq.length;
+              st.macros[cmd.key].barStepIndex = nextIdx;
+              const nextVal = seq[nextIdx];
+              st.macros[cmd.key].base = nextVal;
+              if (this.autopilot && this.autopilot.macroBaseTargets) {
+                this.autopilot.macroBaseTargets[cmd.key] = nextVal;
+              }
+            }
+          }
+        }
+        break;
+      case 'SET_MACRO_AUDIO_BAND':
+        if (cmd.key && st.macros[cmd.key]) {
+          const band = ['none', 'bass', 'mid', 'high'].includes(cmd.band) ? cmd.band : 'none';
+          st.macros[cmd.key].audioBand = band;
+          if (band !== 'none' && st.macros[cmd.key].audioAmount < 0.1) {
+            st.macros[cmd.key].audioAmount = 0.35;
+          }
+        }
+        break;
+      case 'SET_AUTO_BAR_STEPS_PRESET': {
+        const anyActive = Object.values(st.macros).some((m) => (Number(m.barStepBars) || 0) > 0);
+        const turnOn = cmd.enabled !== undefined ? Boolean(cmd.enabled) : !anyActive;
+        if (turnOn) {
+          const preset = {
+            speed: 0,
+            scale: 4,
+            complexity: 8,
+            thickness: 0,
+            rotation: 8,
+            chaos: 16,
+            strobe: 0,
+            colorShift: 16
+          };
+          for (const k of Object.keys(st.macros)) {
+            st.macros[k].barStepBars = preset[k] || 0;
+          }
+        } else {
+          for (const k of Object.keys(st.macros)) {
+            st.macros[k].barStepBars = 0;
+          }
+        }
+        break;
+      }
       case 'UPLOAD_LOGO':
         if (typeof cmd.dataUrl === 'string') {
           const slot = (typeof cmd.slot === 'number') ? cmd.slot : st.fx.logo.activeSlot;
