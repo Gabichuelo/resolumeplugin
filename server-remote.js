@@ -621,6 +621,52 @@ let latestMasterStatus = {
   presets: [null, null, null, null, null, null, null, null]
 };
 
+function applyLinuxKioskKeyringFix() {
+  if (process.platform !== 'linux') return;
+  try {
+    const homes = [os.homedir()];
+    if (fs.existsSync('/home')) {
+      for (const d of fs.readdirSync('/home')) {
+        homes.push(path.join('/home', d));
+      }
+    }
+    for (const h of [...new Set(homes)]) {
+      const autostart = path.join(h, '.config', 'autostart', 'aether-kiosk.desktop');
+      if (fs.existsSync(autostart)) {
+        const content = fs.readFileSync(autostart, 'utf8');
+        if (!content.includes('--password-store=basic')) {
+          fs.writeFileSync(
+            autostart,
+            content.replace('--kiosk', '--kiosk --password-store=basic'),
+            'utf8'
+          );
+        }
+      }
+      const keyringsDir = path.join(h, '.local', 'share', 'keyrings');
+      const defFile = path.join(keyringsDir, 'default');
+      const loginKeyring = path.join(keyringsDir, 'login.keyring');
+      if (fs.existsSync(loginKeyring)) {
+        try { fs.unlinkSync(loginKeyring); } catch (_) {}
+      }
+      if (!fs.existsSync(keyringsDir)) {
+        try { fs.mkdirSync(keyringsDir, { recursive: true }); } catch (_) {}
+      }
+      if (fs.existsSync(keyringsDir)) {
+        try {
+          fs.writeFileSync(defFile, 'Default_keyring\n', 'utf8');
+          fs.writeFileSync(
+            path.join(keyringsDir, 'Default_keyring.keyring'),
+            '[keyring]\ndisplay-name=Default keyring\nctime=0\nmtime=0\nlock-on-idle=false\nlock-after=false\n',
+            'utf8'
+          );
+        } catch (_) {}
+      }
+    }
+    exec('chmod +x quitar-claves.sh instalar-luces.sh 2>/dev/null; sudo -n bash quitar-claves.sh 2>/dev/null || true', { cwd: __dirname }, () => {});
+  } catch (_) {}
+}
+applyLinuxKioskKeyringFix();
+
 function writeSse(set, payloadObj) {
   const data = `data: ${JSON.stringify(payloadObj)}\n\n`;
   for (const res of set) {
@@ -802,6 +848,7 @@ const requestHandler = async (req, res) => {
         }
         persistedConfig.lastUpdateAt = new Date().toISOString();
         scheduleConfigSave();
+        applyLinuxKioskKeyringFix();
         // Avisar al kiosco y a los mandos para que recarguen el nuevo bundle automáticamente
         writeSse(masterClients, { type: 'REMOTE_COMMAND', action: 'RELOAD_ENGINE' });
         sendJson(res, 200, {

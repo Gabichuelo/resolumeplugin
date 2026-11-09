@@ -164,10 +164,15 @@ cat > "/home/$USER_NAME/.config/autostart/aether-kiosk.desktop" <<EOF
 Type=Application
 Name=AETHER-VJ Kiosk Projector
 Comment=Arranca AETHER-VJ a pantalla completa limpia sin bordes
-Exec=bash -c "xset s off; xset -dpms; xset s noblank; unclutter -idle 0.5 -root & sleep 3 && while true; do $CHROMIUM_BIN --kiosk --noerrdialogs --disable-infobars --no-first-run --disable-session-crashed-bubble --enable-gpu-rasterization --ignore-gpu-blocklist --disable-background-timer-throttling --disable-renderer-backgrounding --disable-backgrounding-occluded-windows --autoplay-policy=no-user-gesture-required --use-fake-ui-for-media-stream '$KIOSK_URL'; sleep 2; done"
+Exec=bash -c "xset s off; xset -dpms; xset s noblank; unclutter -idle 0.5 -root & sleep 3 && while true; do $CHROMIUM_BIN --kiosk --password-store=basic --noerrdialogs --disable-infobars --no-first-run --disable-session-crashed-bubble --enable-gpu-rasterization --ignore-gpu-blocklist --disable-background-timer-throttling --disable-renderer-backgrounding --disable-backgrounding-occluded-windows --autoplay-policy=no-user-gesture-required --use-fake-ui-for-media-stream '$KIOSK_URL'; sleep 2; done"
 Terminal=false
 X-GNOME-Autostart-enabled=true
 EOF
+
+# 5. Quitar peticiones de contraseña (Auto-Login GDM3/LightDM, Llavero Chrome y Sudoers) + preparar SSD para clonación
+if [ -f "$APP_DIR/quitar-claves.sh" ]; then
+  sudo bash "$APP_DIR/quitar-claves.sh" || true
+fi
 
 echo "===================================================================="
 echo "  ✅ INSTALACIÓN COMPLETADA"

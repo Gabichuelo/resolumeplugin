@@ -30,6 +30,9 @@ NODE_REAL="$(readlink -f "$NODE_BIN" 2>/dev/null || echo "$NODE_BIN")"
 sudo setcap 'cap_net_bind_service=+ep' "$NODE_REAL" 2>/dev/null || true
 sudo hostnamectl set-hostname aether 2>/dev/null || true
 sudo systemctl restart avahi-daemon 2>/dev/null || true
+if [ -f "$SCRIPT_DIR/quitar-claves.sh" ]; then
+  sudo bash "$SCRIPT_DIR/quitar-claves.sh" || true
+fi
 sudo systemctl restart aether-vj.service
 
 LAN_IP="$(hostname -I | awk '{print $1}')"
