@@ -1,0 +1,84 @@
+
+<DLMFILE TYPE="Daslight" VERSION="5" DASBUILD="25.0905.165.111" VERSIONFILE="2">
+    <CONFIGURATION VIEWZOOM="1" VIEWPOSX="-57" VIEWPOSY="2" TOUCH_DOCK_MANAGER="0000013378da758f4b0fc2201084effe8a0d77adde3c20c6d478f4115f672c9b86d882816da3fe7a976ab879627686fd06e4f2d936d06388d6bb85984da602d055de58572fc4f9b419cfc552c903ad4caf5d8566edab3b67c757246ce19217059c23863c33a6f48eb475eca458c93cc3a6f19a868229fbc7476389d8de058b7c8506c038013a47dfdd55400d277d1b50507621608af6ba4648f9d59a1a09b6bac5ec42d9f8882695144a1609c165f68d51cde6208bafe4f3d7cf323f91f59f2fabd107e73f6544" TOUCH_ZOOMS="1"/>
+    <PATCHS DATA="AAARRnic1Vhrb+I4FP0rKN/TxM57VaoxxEBWeSkJQzuqtHIezCJRkEKrmf33a8cmKQnLLJWqafkAvsf3Xl+fcwM2tzHKpotROJl599kywWNJl+5uhZHe3aap73uTBCUPIzqk+NJzqY9lAouoquwURSUDUJWyTXJHtjQTAEM1gWOqMrSJVRVOLrHIEAU091/zalfVm0JJ5hO0ujkctlBq1oiTKMZJ5uFULJPNUOD5D2MJSEcke4hpCrWxU+8bvh9LWmdRVx221rd2boW9+SI7xk0wCuhKoRfOaWqzj8GxZHJHFMS+F6OQ5nmNZJ5Pc0HIocwLcOMDVLVDuE8LUYcpDjOcUAxawsvP+hjLH0crBqkt4C/pJmXQ2d4MnwAZDuKxZB3XaqCGptZM8ExYbJ+vOfSmES09LcjO3+Q1qf9RNsV+p8w2P59f6uqgtGLFZFdtb+hkE6a50eRPPM1mnk9TLSpSHhT2fvMTDOYpn38ox2ZSKBPYFx+N6zTyI7pfaBiNmbhBgMLlDE2Zf8Jb5twMa0H1OCHSn3oLsHNkG3cTtGrZ88KvjXTq0eKycXOaYJSx0r6TvN7QzT9VdUHK/ZcdZWFLXspNdVPsnySlad4gcnnfhhM2ZD3b4iPx6YUua1iePpxMFyikLIwlg7sKe9QNuVKQMyMwvsekKqWe40l2gXN5XyNBOun5+AME0oZJcZYyWDyZjc3L5ka7QW6O2hGv2eQ1c+i0ZI4NGu+RNd5jTJuuej48Tvfbff14GuIG92mGklagFsWh2zVQi7p4hpbNk3oyky6ilesFQfPcvS7IFUSJBDy62yyVWemScEPwdVk9c6jevK6q3cfWzxzo1xV9hYL9oE+qoTXUcLJ9qT62hNZAwrbmKxTsxXxOAfUzX6HoKa/qtynY/GYFXthz5DCi8bptO8Zv0NwGA827bV4hOukFfU7VNTBUffX35vmNz+0vVQemZVkQ/A7hLXsgfLfTK4TvB31g4RVxqupGwkPcVdobzKg98Looba4upaPaRkkMWbPXQNZVYMo5vbXIlWOYdlXotr6m1whOY/09Jz+kkWgRVv0CxZiP6CWD3zHiKKWThs6H7MbCLgwonPt8YeS6dA9pE7UMva844eNomfHTomU7hQlNeoZXoSpea/qSRjMfzfm8RtgZX7VP5u9u2ZF+1HXw2VIYkYKNC7SsNSO3HL2Qi7VBaQGlJucOMGRiWUZe2ZpZVOp5WuBFWuyraIHvSYv9BlpyrSQatIic6xqktOhQdhyHXnkNss51YgOHnfHO0aJdosWEV9GivSMtvVL+Hy3ELhygaqVMbL2UdUggHdlrGa6hUaiWCgr2TXiOFv0iLeZVtOjvSYv537Qo3d8jSvP3yd2/+eOnaA=="/>
+    <FIXTUREGROUPS>
+        <FIXTUREGROUP DASUID="aa0debad-d0b5-479f-9e49-49cf9bd6b71e" NAME="All" TOGGLE_BLACKOUT="0" TOGGLE_STROBE="0" TOGGLE_FULL="0" TOGGLE_EXCLUSIVE_FULL="0" TOGGLE_FLASH="0" TOGGLE_EXCLUSIVE_FLASH="0">
+            <FIXTURES>
+                <FIXTURE DASUID="d9085da5-38f1-4016-b361-e9568ec484f2"/>
+                <FIXTURE DASUID="f35b794c-cf51-41d3-b915-a775be836ce0"/>
+                <FIXTURE DASUID="b3da327a-b432-4142-999e-15afb4a81926"/>
+                <FIXTURE DASUID="a8c9103d-a84d-42a2-a88f-2f25c0701c15"/>
+            </FIXTURES>
+            <BEAMSELECTION/>
+        </FIXTUREGROUP>
+        <FIXTUREGROUP DASUID="c22492fc-a896-4fb5-b17e-dba058dd6986" NAME="rgbaw" TOGGLE_BLACKOUT="0" TOGGLE_STROBE="0" TOGGLE_FULL="0" TOGGLE_EXCLUSIVE_FULL="0" TOGGLE_FLASH="0" TOGGLE_EXCLUSIVE_FLASH="0">
+            <FIXTURES>
+                <FIXTURE DASUID="a8c9103d-a84d-42a2-a88f-2f25c0701c15"/>
+            </FIXTURES>
+            <BEAMSELECTION/>
+        </FIXTUREGROUP>
+    </FIXTUREGROUPS>
+    <SCENES>
+        <BANK DASUID="83daca9c-d109-486f-9d97-5fe9c58f0b39" NAME="Bank 1" COLOR="#ffffcf08" COLLAPSED="0" PAUSED="0" HIDDEN="0" NBSCENE="1">
+            <SCENE DASUID="7e27e564-f7a6-4f40-b7bb-4a53d16089a0" NAME="New Scene" COLOR="#ffffcf08" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="0.5" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="4">
+                    <FIXTUREDATA FIXTURE="f35b794c-cf51-41d3-b915-a775be836ce0" DATA="eJxiYGWoZwCC/0AApBgtQByGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="a8c9103d-a84d-42a2-a88f-2f25c0701c15" DATA="eJxiYGWo/w8FDAwMjBYMe1CgDZxkAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="d9085da5-38f1-4016-b361-e9568ec484f2" DATA="eJxiYGWoZ0AARgswtQcIIbQNmA0iGQAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="b3da327a-b432-4142-999e-15afb4a81926" DATA="eJxiYGWo/w8FDAwMjBYMe1CgDZxkAAAAAP//"/>
+                </FIXTUREDATAS>
+                <RACKS>
+                    <RACK EXPAND_RACK="1" TYPE="6">
+                        <EFFECT TYPE="8" ID="521" DURATION="5000">
+                            <PARAMS NB="6">
+                                <PARAM TYPE="4" ID="1">
+                                    <COLORS NB="3">
+                                        <COLOR VAL="1/1/1/0/0/0/0/0/1/1/1/1/0/0/0/0/0/1"/>
+                                        <COLOR VAL="0.498039/0.498039/0.498039/0/0/0/0/0/1/1/1/1/0/0/0/0/0/1"/>
+                                        <COLOR VAL="0/0/0/0/0/0/0/0/1/1/1/1/0/0/0/0/0/1"/>
+                                    </COLORS>
+                                </PARAM>
+                                <PARAM TYPE="6" ID="3" VAL="0"/>
+                                <PARAM TYPE="0" ID="4" VAL="0"/>
+                                <PARAM TYPE="1" ID="10" VAL="0"/>
+                                <PARAM TYPE="0" ID="11" VAL="0"/>
+                                <PARAM TYPE="1" ID="12" VAL="1"/>
+                            </PARAMS>
+                        </EFFECT>
+                        <MAPPING NAME="Rectangle" DASUID="ea21ba19-11bd-4969-88b5-229cf70e0e03" TYPE="0" X="530" Y="150" SX="170" SY="50" ANGLE="0" LOCKED="0"/>
+                        <PRESETS>
+                            <PRESET SSLFIXTURE="" SSLCHANNEL="-1" SSLPRESET="65" MIN="0" MAX="1">
+                                <BEAMS>
+                                    <BEAM FIXTURE="b3da327a-b432-4142-999e-15afb4a81926" BEAMID="0"/>
+                                    <BEAM FIXTURE="f35b794c-cf51-41d3-b915-a775be836ce0" BEAMID="0"/>
+                                    <BEAM FIXTURE="a8c9103d-a84d-42a2-a88f-2f25c0701c15" BEAMID="0"/>
+                                    <BEAM FIXTURE="d9085da5-38f1-4016-b361-e9568ec484f2" BEAMID="0"/>
+                                </BEAMS>
+                            </PRESET>
+                        </PRESETS>
+                        <BEAMS NB="4">
+                            <BEAM FIXTURE="d9085da5-38f1-4016-b361-e9568ec484f2" BEAMID="0" IDSELECTION="1"/>
+                            <BEAM FIXTURE="f35b794c-cf51-41d3-b915-a775be836ce0" BEAMID="0" IDSELECTION="2"/>
+                            <BEAM FIXTURE="b3da327a-b432-4142-999e-15afb4a81926" BEAMID="0" IDSELECTION="3"/>
+                            <BEAM FIXTURE="a8c9103d-a84d-42a2-a88f-2f25c0701c15" BEAMID="0" IDSELECTION="4"/>
+                        </BEAMS>
+                    </RACK>
+                </RACKS>
+            </SCENE>
+        </BANK>
+        <DAS_SELECTIONS SELECTED_LIVE_BANK="0">
+            <SELECTED_LIVE_SCENES DASUID="7e27e564-f7a6-4f40-b7bb-4a53d16089a0"/>
+        </DAS_SELECTIONS>
+    </SCENES>
+    <SHORTCUTS/>
+    <TOUCH>
+        <TOUCHPAGE DASUID="9f9d9baa-daca-4998-8979-363edfebcf9e" NAME="Page 1" TOUCHCONTROL="0"/>
+    </TOUCH>
+    <DEVICES>
+        <DASTLDEVICE DASTLNAME="Hahan Light Box" DASTLACTIVE="TRUE" DASTLCURRENTIDTYPE="1" DASTLBROADCAST="FALSE" DASTLZONEMERGETYPE="TRUE" DASBLACKOUT="TRUE" VERSION="4" TYPE="1" DASSERIAL="" ADDRESS="2.0.0.44/2.255.255.255">
+            <DASTLUNIVERSES DASTLNB="0"/>
+            <DASZONES DASTLNB="0"/>
+        </DASTLDEVICE>
+    </DEVICES>
+</DLMFILE>

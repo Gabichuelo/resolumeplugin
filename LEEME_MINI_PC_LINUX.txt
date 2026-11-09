@@ -1,0 +1,50 @@
+========================================================================
+   GRANDDAS DMX512 STUDIO - GUÍA PARA MINI PC LINUX + MÓVIL (4 BOTONES)
+========================================================================
+
+¿PUEDE CORRER EN UN MINI PC CON LINUX SIN PANTALLA + CAJA HAHAN + MÓVIL?
+¡SÍ! Está 100% preparado para funcionar de forma autónoma:
+
+  • Cuando enciendes el Mini PC Linux (sin monitor, ni ratón, ni teclado),
+    arranca automáticamente el motor DMX512 a 30/40 Hz, detecta el USB de la
+    caja Hahan SL04 Box (IP 2.0.0.10 -> 2.0.0.44) y enciende su LED verde.
+  • Cuando abres la dirección en tu móvil, aparece directamente la pantalla
+    "🎛️ 4 BOTONES (MINI PC)":
+      - BOTÓN 1: 🎉 FIESTA / CÍRCULO (Focos al público + Círculo Simétrico + Color Fiesta)
+      - BOTÓN 2: 🔥 MODO CAÑA / DROP (Energía 100% + Ballyhoo Rápido + Chase)
+      - BOTÓN 3: 🕯️ CALMA / AMBIENTE (Blanco Cálido 3200K + Barrido Lento)
+      - BOTÓN 4: 💡 LUZ FIJA SALA (85% sin mover) / 🌑 APAGAR TODO (Blackout)
+      - Más botón de ráfaga ⚡ FLASH CEGADORA, 🤖 AUTO-SHOW y barra de Potencia.
+  • ¡Y aunque bloquees la pantalla del móvil y te lo guardes en el bolsillo,
+    el Mini PC sigue moviendo los Beams y Barras él solo toda la noche!
+
+------------------------------------------------------------------------
+PASOS CUANDO TENGAS EL MINI PC CON LINUX (Ubuntu / Mint / Debian):
+------------------------------------------------------------------------
+
+PASO 1: Copiar la carpeta
+  Copia la carpeta "PORTABLE_PARA_PORTATIL" (o toda la carpeta del programa)
+  en un pendrive USB y pásala al Mini PC (por ejemplo al Escritorio).
+
+PASO 2: Ejecutar el instalador automático (solo se hace 1 vez)
+  Abre una Terminal dentro de esa carpeta y escribe:
+
+      sudo bash INSTALAR_EN_LINUX.sh
+
+  Esto instala Node.js, configura la IP automática de la caja Hahan por USB
+  y deja el programa en arranque automático cada vez que enciendas el Mini PC.
+
+PASO 3 (Opcional, ideal para bolos y naves sin router):
+  Si quieres que el Mini PC cree su propio Wi-Fi para conectar el móvil
+  directamente sin depender de ningún router:
+
+      sudo bash CREAR_WIFI_PROPIA_LINUX.sh
+
+  Esto crea el Wi-Fi "GRANDDAS_LUCES" (contraseña: luces1234).
+  En el móvil te conectas a "GRANDDAS_LUCES" y entras en:
+
+      http://10.42.0.1:5175/?remote=1&pin=1234
+
+  (Consejo: en el navegador del móvil pulsa "Añadir a pantalla de inicio"
+  y tendrás un icono directo a los 4 botones como si fuera una App nativa).
+========================================================================

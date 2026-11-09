@@ -1,0 +1,1537 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DLMFILE TYPE="Daslight" VERSION="5" DASBUILD="25.0905.165.111" VERSIONFILE="2">
+    <CONFIGURATION VIEWZOOM="1" VIEWPOSX="0" VIEWPOSY="0" TOUCH_DOCK_MANAGER="" TOUCH_ZOOMS="1"/>
+    <PATCHS DATA="AABn1nic7V1ZTyNJtn6fX5Hy070PZ4jlxCaVS2IxVUhsMtTU8oJiHSyB3deGnpl/PwrbgA3OBZOQdaXuh2pn2s4T/uLE+b6zdPWn893L/a/F6d7h0Y/Lb8NBvydY7/On5dXF578VRVF8urg4Pj7aG+4OfxYXF8eHRz++HR30e7PZDdyOxiNQU5hd2+kf/wEq/XUvf+Z092TQ7x3G2d3oT3uzczIaj67U8Opi/rGrvWhvr6jc//r32eyG9RZWFnbOh2fng+Hl0eBiaerycPfk6Phnv0d7D3cuf54P+j0yv744+jX40e/xp6uf/R6Kx6tf/R6T86vvg6MvXy/7Pbp40N5g9+TsfHB6dPql32PPb7F+j/9dz+/unpwfH53vnvZ7AsnTncuj48t+j6nFrXzv/Oz7YNjvMf506/jbj35PEUKebl0OTs77Pf1wa//s+GzY71HUQhLS21nF4uTsYAHD6V5+mSF4ePvpA8Xy30enBxmIxVNP9/a/7p6eDo77PSpXvrT42vK94unlAlG6XNLi3mIL9yc3k2nx/TrGm+J/KBbz69n/9p59+dH6TlNj4qWti+v7u7s4LXaKi7vpxMW3G8GXRg5Gt7dx+vZHU/7y2Yejf8dQfJm4ySNian7ZBmB0A2Ln09HsttBwaH28a8GELDMxnNzZu9Fk/HYbTL+0cWL9dFIMUor+btbCzzAbtmY6md0Vh6ObuzY2n7ENFib+vo3Fb9gC2wLum59bHI7GLZyzDXBcjm5a8MiSB7e07A1H+NyOd+YWLv6IMbTwAzaEoGGctXFaNz362N7+UexPxnfTyU1xNt45S6mJoU87SxZ5pJ+HGw8SYOdJA3z+W50qyME7/zEaAycEqNisCoYTF6+G+WNXnJCrk0mI/IqKt8kCuioLlhAtZQGXa7IA12SBfqkKlny4LguW2uJJFaB4oQo4eakKxDNVQNlLVSDFuipgnGum6HuoAtFcFfwVkDoNSDuXi1hUQHE5um0Dmw1x4+KP6Ef25jF05LPYgqUNkmXYSlTdIFS+TGNsQ5+ol4/eu7lvY3M3ePz369FdC4/epNz/MZre3c+39FHBt4DOht/wazK5/SsfKH1049DQMgn/y86ugRHGgOFm/v1uZ9dX+RNXx4ODqxN7Nx39+4phi/y7wrg5Lder/MufpeXiJQHjBv6VK2z7iqxcyWf8yxvwLyVGEinegX8Z/sW//z/4t6U84B0jz4dEzvcL/CUiodiP43Zy9TKt0J6FEsnQmoFS5dDeTyjZhOFo/M+CljyftrEJrVko24S2DJRvQms/oWoTWMnzWWub0IaFyk1owUDNJrRgobwIPq9Svk8B9NzmcD1elkDf18bvUNhqWerOMslNsthFoHqz2J0T4STLXbwaftn7fkX164QueyZ02arQXZG2P9fKTr9yb2dN6JoNhSa2qdL0cHdFxdJVzTqXsSgayFippESJ71FH0o117AZ/ObGzrFLeUwjN5U9xOI3/dx/H/j/vaeTgftpWj2QTEXzZK3LftHi3AsqjhXespDzaeOeSSnF579pTRxu2Y8XK4Y2dXbcntDcY+zUZx4JW7Pwbldjy+VX7/kYltrRQsetv1ElzA6wCojfqpOXzqyB6o05aWqiA6DUGyiDiFRDxFiDilRC9xkIZRLwKotcYKG1E71/bWSwOf3SgZNzNaBziFNBPHJjNSmZv8ZkrvNo/27sybaqYp6ufa1e/HmcDKtplcpOIkS80DD6XMFS/lDD8+XyMJEYR/h6lOPMbKZgNFvbP9gpabeAVobPEAKs28IrAU2KAVxt4xbEtMYDVBvA3U5Gbgs/u/d1D7JnHoRaGSTaZWVh477JmsX8//TMWO8Xl/fifs7s4Lga39zeN9fErw+rDwGJx+TAaeLB7MQ+qlJjkc17olFCAkhHQmmtIzGhDgmOCxl6xPMyj8ahQw2IxpTjXqb3i4YyRLDW/7j5Uzo9+DRZTh+dnF/ltNPOXP/NoX6/YPf1yvFjH7sHBcHBxMf/St9OjfwyGi9dn3y4XIUtp4yWTBAnJqdz8n5Ty2Mbh8e6Xp/elljr/ybUnhFjURBNNCV35xudPOfYWT4Fu09p2Pn/aWaL1uRw2VJ6lKBEIcwQQIwUnnYbkndSKRY2ZD5aaPp+N+RhHMR98eAga1YixLFEWq6IlkDFtOgPt2fKaoZYckzQFD84rB0hdBCMdASo5R6F84CY1czZW6Wxa1jmb6s7b1hbX0NuEE4I7BwGJAszH1SRU4ARakYiNxoRab6uEjKlab+MEu/M2tYW3CSJCiCEAcyEBGoeguRHgkenEUwreYzNv49UHldd4G+cdHlP+am9LxGuquQB00QGqJMFawUALoSPRjvs8Il7jbZWQ8frYxml3sY1vE9tUdKiTkmA804CeMbCGaDCKU8od8fOI2cTbsNLbJKnxNuyQFNYW1ww3GoUiyiuIwSdARgIYKy0kETz30RCWf1AT3EQlbkbV4CZFd7itLa6hvxnmnU4x06gDDNqCVijAJssZk4FIgrWntNLVeANO4N1xAt+GE4LkNAiaIGHwgFYmsI5piI64qJEI6Wgzb5OV0GVcKr1Nd6d31xfXkBOYicIJDdJLveQEIhEsGiGIj2iypKrxtsoDig04ocPQhttwQjRcuCQ1BJ8MII8MjCEStKTa22R48KGZt6nqg0prvM10p3fXF9cMN+kFC0Ym0C4iYAoaHJEcgkxoiWWJcl3rbZUHFBvENtldbMNtYpvFZLUyCDooD+g4AZ0cBzTaJse4Flo28zZdCV1+uzq7ot0J3vXVNZQgNBBGvQaDPAIqHsEoGSEI9IJamzh7PKaLNnmR2+SPgPHqTH5FTvKyTJ78FmqXN1cfIaJwWoONXgAyntWui6CUlIIZGmLg1ZBVpqMr3F4KGesypm0BmU6a8MARJOpMoSqBo4GAk4ppGxJxdV5WmVNhAy/D7iQubuNlnFBndbKglLGAud5mqOFgTbCKquQ0V9WQVQpcbOBlssNQto2XWRsltWggGEEAbU6nJLPgtPI0UKWJ0c1IwFRCh6KOBFZw4x+L29raGio1z5ygQYFIMTNmNGAp4RCE8lZ6I7X1tYqjUqSJBvpWmc5AE9voW0t4lAETCOctYDIJrDEGIk3aaMl48r6Rs82HCsudTbPX1HM/2NvWFte0nhuptlJBUJQAesrBURpBcS+5Mz5YVa9vK0WaaKBvDXbnbdvoW2WI0JIzSPPQRiQBR6IEj0qgsERL2qxSRCvlmqB1raq1eu4HA0e36VWRJJFKMJEawJQiGJ4UaCOYZCEkG+p7VZVsIOtjG5LuYpvcKnfnMhFjELjIClfrAFbGBCSyIJlMgsRmREorla4Qdb0q7JAUxOt7VZElIYK0oJzxgDEm0JEo4NIlbSS11tb2qqrpQNbHNmTdxTa5TWzzLnKDjANSm5WuSGCRe0iJB+JoQEyqmbdVJgnC1PWq1qrgH+xt5vW9KhEjZ1Jw4JpwQCkVOOU9JC0DQxWJ5bW9qmo6UA1iG+/uiKptYpuQlkVmFDCtbW4gIGgqLEjKGQqvnEusmbdV5leS1/WqdHdZwvriGsY2gpbmGhFJigLSYMGEnJ4GQy3lNHhX23OppgPVILaJ7mKb2kq3JauIZxy01AJQGgbOEQNWR0+Ttqidrs7iKxsHokHhQ3Wo2LYpfHg0IYiYwCTjADGHNe89GCtiMi4m9tSC3wxZZfVbNCh8mO6Optim8MG8Y4RxBBOdAnS5FWoVB2+VI0hskuirIatM32W9l/HfQ+K+wstiEixyCUxJmkWHBpvHsYTn3pjkSLSsGrLKHFTWexln3SXuchsvSxQVktw/tip7mbNgmCegtLGOSsv9U8VjOYdeIOyf7T2CpqqbBSt1Uiw7mlmVP4LGuirjYvPKtzQxqajAJzSALuRAxhIo4YwUlJuVsb8y0CpZc6VSWgramrD9YNDUFqBZJylDEoGyfDiFEaBDCBA1RymMtfk/WKwBrToXaOBpCjsDTWzjacyoIJThOV/PoPHcY1EBUBAfGEne2NrjWSlpRQNP07w70LbyNMucjDGAZjQAcp1zqETAGh4tOuetfBQb+a/EySTAiuPBwYqobTrux0rlBusMtGfLawaac06hI3kMRmHu5jkwQihIlidOvCNM2TrQmk5flYHGaXdE8Gx5Daev0EnN0YIMeSI3cA+OEAlRBOqkF1ZZWQda0yGiUtDyX4fUPXs2B41zmoSXEgRBCRgJBxMUgkfPrUvIrPJ1oDWdhSkFTXZHBLiNpwnKkUpBwZk8QZQlh7aJgTe50GZIUqw2pjVt55WCpvXvwJ7NQcMkgmaagvHUAboMnwsWkhZWco3SJVMHWtOuVBloSLsjArGNp8V5nhQ5EBJZrm4QcJY7UNEl7oXxSGpjWtPmSilovDsikNt4GlMyMpLnvb3MrTyawHjLINmkOEPqtQw1oLGmPYJS0GR3RCC38TTmRIjMKtAizyggUtDaGeCKyxQIDzY07H9WcqiUdZPyvDuBu764ZrgRliJKn4CSEAGRWdDMZ+UmXBJE8aQbdvIqaXSeOTTv5H0sbuuLaziFGwSnWlEITErAYBho7zR4dLmtIoPVDXtSlUyqsG56ucPUfX1xTTN3hzERAyKPySNJEoyOHiQmqhVJgSBvhlslmSpVN4e71l35YNzU68dwSYzMioQgPOZGqHegBRJwiQnPlWYom03LV/OppnWja2vT8h+L2/riGmrdZYkbiCIsz3cgmCA4SJWSJiEKGZtNYVVTqha1U1i0O2JYX90acA+vLj5/2pn/73w+/xfSZOJh"/>
+    <FIXTUREGROUPS>
+        <FIXTUREGROUP DASUID="96dfdf53-c45b-4d60-b74d-f7070117df95" NAME="Todos los Focos (All - 42 Uds)" TOGGLE_BLACKOUT="0" TOGGLE_STROBE="0" TOGGLE_FULL="0" TOGGLE_EXCLUSIVE_FULL="0" TOGGLE_FLASH="0" TOGGLE_EXCLUSIVE_FLASH="0">
+            <FIXTURES>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+            </FIXTURES>
+            <BEAMSELECTION/>
+        </FIXTUREGROUP>
+        <FIXTUREGROUP DASUID="ec9c482f-4053-4085-aed0-3b5a3d6810a9" NAME="Sharpies 7R Beams (20 Uds)" TOGGLE_BLACKOUT="0" TOGGLE_STROBE="0" TOGGLE_FULL="0" TOGGLE_EXCLUSIVE_FULL="0" TOGGLE_FLASH="0" TOGGLE_EXCLUSIVE_FLASH="0">
+            <FIXTURES>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+            </FIXTURES>
+            <BEAMSELECTION/>
+        </FIXTUREGROUP>
+        <FIXTUREGROUP DASUID="4597e73c-e996-4a20-905c-8d216b064e55" NAME="Sharpies Truss Trasero (8 Uds)" TOGGLE_BLACKOUT="0" TOGGLE_STROBE="0" TOGGLE_FULL="0" TOGGLE_EXCLUSIVE_FULL="0" TOGGLE_FLASH="0" TOGGLE_EXCLUSIVE_FLASH="0">
+            <FIXTURES>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+            </FIXTURES>
+            <BEAMSELECTION/>
+        </FIXTUREGROUP>
+        <FIXTUREGROUP DASUID="8c6a601e-7b23-4eb4-8da2-29eb28726176" NAME="Sharpies Truss Central (6 Uds)" TOGGLE_BLACKOUT="0" TOGGLE_STROBE="0" TOGGLE_FULL="0" TOGGLE_EXCLUSIVE_FULL="0" TOGGLE_FLASH="0" TOGGLE_EXCLUSIVE_FLASH="0">
+            <FIXTURES>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+            </FIXTURES>
+            <BEAMSELECTION/>
+        </FIXTUREGROUP>
+        <FIXTUREGROUP DASUID="78f58084-bed0-44c9-89d9-54ff80095da1" NAME="Sharpies Suelo / Deck (6 Uds)" TOGGLE_BLACKOUT="0" TOGGLE_STROBE="0" TOGGLE_FULL="0" TOGGLE_EXCLUSIVE_FULL="0" TOGGLE_FLASH="0" TOGGLE_EXCLUSIVE_FLASH="0">
+            <FIXTURES>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+            </FIXTURES>
+            <BEAMSELECTION/>
+        </FIXTUREGROUP>
+        <FIXTUREGROUP DASUID="e2f35c09-9331-4e2e-9d6e-d00b730f50aa" NAME="Robe Robin 300 (12 Uds)" TOGGLE_BLACKOUT="0" TOGGLE_STROBE="0" TOGGLE_FULL="0" TOGGLE_EXCLUSIVE_FULL="0" TOGGLE_FLASH="0" TOGGLE_EXCLUSIVE_FLASH="0">
+            <FIXTURES>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+            </FIXTURES>
+            <BEAMSELECTION/>
+        </FIXTUREGROUP>
+        <FIXTUREGROUP DASUID="8817ecdd-5ae9-462d-94ab-9417672cf14e" NAME="Wash 2022 Frontal (8 Uds)" TOGGLE_BLACKOUT="0" TOGGLE_STROBE="0" TOGGLE_FULL="0" TOGGLE_EXCLUSIVE_FULL="0" TOGGLE_FLASH="0" TOGGLE_EXCLUSIVE_FLASH="0">
+            <FIXTURES>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+            </FIXTURES>
+            <BEAMSELECTION/>
+        </FIXTUREGROUP>
+        <FIXTUREGROUP DASUID="841b2850-6d56-42f2-8be0-a35f55cd6d73" NAME="Strobos 2024 (8 Uds)" TOGGLE_BLACKOUT="0" TOGGLE_STROBE="0" TOGGLE_FULL="0" TOGGLE_EXCLUSIVE_FULL="0" TOGGLE_FLASH="0" TOGGLE_EXCLUSIVE_FLASH="0">
+            <FIXTURES>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+            </FIXTURES>
+            <BEAMSELECTION/>
+        </FIXTUREGROUP>
+        <FIXTUREGROUP DASUID="e6a8592a-8396-47ed-81b3-d5c37ad5a16a" NAME="Cegadoras 4-COB (4 Uds)" TOGGLE_BLACKOUT="0" TOGGLE_STROBE="0" TOGGLE_FULL="0" TOGGLE_EXCLUSIVE_FULL="0" TOGGLE_FLASH="0" TOGGLE_EXCLUSIVE_FLASH="0">
+            <FIXTURES>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+                <FIXTURE DASUID="undefined"/>
+            </FIXTURES>
+            <BEAMSELECTION/>
+        </FIXTUREGROUP>
+    </FIXTUREGROUPS>
+    <SCENES>
+        <BANK DASUID="8dccbbde-eee0-4242-b7f1-540f2a3f06cf" NAME="1. ENCENDIDO POR TIPO (DIMMERS)" COLOR="#ff22c55e" COLLAPSED="0" PAUSED="0" HIDDEN="0" NBSCENE="8">
+            <SCENE DASUID="d57d215d-337a-4d1b-b3c1-a4b1824fef85" NAME="✨ TODOS AL 100% (ALL ON)" COLOR="#ff22c55e" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="b0f1f57f-6a32-4237-817b-a43c37d5ffbf" NAME="🌑 BLACKOUT TOTAL (ALL OFF)" COLOR="#ff0f172a" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="be356989-88e6-47d1-b51e-cd9f727221c0" NAME="⚡ SOLO SHARPIES 7R (20 UDS)" COLOR="#ff10b981" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="d6c87692-5368-4d83-b17b-404f41961cbe" NAME="🔵 SOLO ROBE ROBIN 300 (12 UDS)" COLOR="#ff0284c7" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="9f095200-33e7-40eb-988b-cf7b2a3331ba" NAME="🟢 SOLO WASH 2022 FRONTAL" COLOR="#ff10b981" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="7b42ee7a-8f7e-45bf-854c-8a3058845445" NAME="⚪ SOLO STROBOS 2024" COLOR="#ffffffff" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="5659bf3f-7a5b-4666-baca-c0c0072f5731" NAME="🟠 SOLO CEGADORAS (4-COB)" COLOR="#fff97316" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="42d04cf9-1fb8-4317-8ad2-948c5980e09a" NAME="🟢 SHARPIES SUELO ONLY (6 UDS)" COLOR="#ff14b8a6" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                </FIXTUREDATAS>
+            </SCENE>
+        </BANK>
+        <BANK DASUID="baad6792-8e1a-4ac9-9403-6f7d1933c099" NAME="2. PALETAS DE COLOR" COLOR="#ff38bdf8" COLLAPSED="0" PAUSED="0" HIDDEN="0" NBSCENE="7">
+            <SCENE DASUID="3047d5ee-a5f1-4616-a061-c15041b72ead" NAME="BLANCO PURO (7000K)" COLOR="#ffffffff" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="42a70b32-3c39-41f6-8f95-e3f0215d4d99" NAME="BLANCO CALIDO (3200K)" COLOR="#fffef08a" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYNBgGGPXBoAycZAAAAAP//"/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="7c98c546-52c0-4013-9849-2caf28e75a00" NAME="AZUL FESTIVAL / CYAN" COLOR="#ff0284c7" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbINwDhwxgEiTCAAAAAP//"/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="29c5579e-aff1-404c-96d4-23f743bf79ab" NAME="ROJO INTENSO" COLOR="#ffef4444" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ2AOHELYNiAUAAAD//w=="/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="0a853622-9f80-4e69-b400-276cf81d2a30" NAME="MAGENTA / PURPLE" COLOR="#ffa855f7" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYGBhuGPXDIACZBIgwAAAAA//8="/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="0f6c3f0f-042c-4e5b-85e0-73430627f4ae" NAME="AMBAR / SUNSET" COLOR="#fff97316" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="d3223770-9c44-4dc2-8a77-4d7eafcfe98b" NAME="VERDE MATRIX" COLOR="#ff22c55e" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGBgYbBgaGPXAIYduAWAAAAAD//w=="/>
+                </FIXTUREDATAS>
+            </SCENE>
+        </BANK>
+        <BANK DASUID="199ede99-7d71-43e1-b206-0f6ab094c143" NAME="3. POSICIONES MOVING HEADS" COLOR="#ffa855f7" COLLAPSED="0" PAUSED="0" HIDDEN="0" NBSCENE="5">
+            <SCENE DASUID="2de0d096-67d0-45ab-9bfe-4a90556cebca" NAME="FRENTE ESCENARIO (Downstage)" COLOR="#ff38bdf8" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MDgy7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MFQw7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MFQw7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MFQw7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MFQw7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MFQw7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MFQw7MGANgx7GBgAAAAA//8="/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="f75fd020-52cd-4a89-9407-d611ea0dd792" NAME="ABANICO AL CIELO (Fans Up)" COLOR="#ffa855f7" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBqMexk2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDCaM+xk2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDC6Muxk2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAGMexk2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDGM+xk2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDmMOxk2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBWMuxk2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDC2M+xk2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBOYdjJsAcD2jDsYWAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAuZNjJsAcD2jDsYWAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDCuY9jJsAcD2jDsYWAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuZtjJsAcD2jDsYWAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDCeZNjJsAcD2jDsYWAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBeY9jJsAcD2jDsYWAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBqM+xk2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBaM+xk2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDB6Mexk2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBGMexk2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBmMuxk2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBWMOxk2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDB2MOxk2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBOZ9jJsAcD2jDsYWAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAuZ9jJsAcD2jDsYWAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBuY9jJsAcD2jDsYWAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZdjJsAcD2jDsYWAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBeZdjJsAcD2jDsYWAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDqMSxg2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDD6Myxg2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAWMCxg2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBOZFjAsAcD2jDsYWAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBuYljAsAcD2jDsYWAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBeZljAsAcD2jDsYWAAAAAA//8="/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="b652b624-70c5-436b-a640-691a025d3731" NAME="CRUCES SIMETRICOS (X-Pattern)" COLOR="#ffec4899" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZihm2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZihm2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZihm2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZihm2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZihm2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZihm2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZihm2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDaMBQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDaMBQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDaMBQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDaMBQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDaMBQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDaMBQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDaMBQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZihm2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZihm2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZihm2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZihm2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZihm2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZihm2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDaMBQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDaMBQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDaMBQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDaMBQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDaMBQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDaMBQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZihm2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZihm2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZihm2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDaMBQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDaMBQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDaMBQz7MGANgx7GBgAAAAA//8="/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="3de41aeb-6313-437d-b9e5-8accc7a38012" NAME="CENTRO ESCENARIO (Focus Center)" COLOR="#ff06b6d4" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeY4hn2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuZohn2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBuZIhn2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAuY4hn2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDOZohn2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBOYIhn2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDC2MsQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBWM8Qz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAWMMQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDCmMsQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBGMcQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDD6M8Qz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDC6MsQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBaMcQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeZYhn2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuZIhn2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDCuYYhn2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAuYIhn2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBOZohn2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDC2McQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBWMcQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDmMsQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAmMsQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDCGMMQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDC6M8Qz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBaM8Qz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAeYYhn2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDCuZIhn2IMBbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDD2McQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDAWM8Qz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDBGMMQz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDaMsQz7MGANgx7GBgAAAAA//8="/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="04e85252-a785-47a1-a411-1b573fe8df1d" NAME="ENFOQUE SUELO (Floor Wash)" COLOR="#ff10b981" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="2" FLASH="0" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGbRj2MDAAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDA2MPAz7MGANgx7GBgAAAAA//8="/>
+                </FIXTUREDATAS>
+            </SCENE>
+        </BANK>
+        <BANK DASUID="6c7169a6-c692-48dd-a9d6-eeba648c15ff" NAME="4. FLASH &amp; STROBES" COLOR="#ffeab308" COLLAPSED="0" PAUSED="0" HIDDEN="0" NBSCENE="4">
+            <SCENE DASUID="649daca7-f19c-4d02-95ac-585602c43b0d" NAME="⚡ STROBO WHITE FLASH" COLOR="#ffffff00" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="1" FLASH="1" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="2af72ffb-aace-4bc0-9cf7-358790283d09" NAME="💥 CEGADORAS FLASH" COLOR="#fff59e0b" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="1" FLASH="1" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwY5BgaGPXAIYduAWAAAAAD//w=="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="5170c99c-9521-410b-b508-163bd18bcbc8" NAME="⚡ SHARPIES BEAM FLASH" COLOR="#ff00ffff" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="1" FLASH="1" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPhPADAwMDDuYcAGGUAYAAAA//8="/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                </FIXTUREDATAS>
+            </SCENE>
+            <SCENE DASUID="66dadd97-b5a3-4d37-8a73-e0a764ca8878" NAME="🔥 FULL RIG BLINDER FLASH" COLOR="#ffffaa00" ENABLE="1" VISIBLE="1" LOOP_MODE="0" LOOP="0" PLAY_DIRECTION="-1" PLAY_MODE="1" FLASH="1" BOUNCE_MODE="1" PLAY_TRIGGER="2" PLAY_DIVISION="8" DIMMER="1" D_FEATURE="1" SPEED="1" PHASE="0" SIZE="1" PHASE_IN="0" PHASE_OUT="0" AUTO_RELEASE_END="1" JUMP_MODE="-1" RELEASE_MODE="2" RELEASE_PROTECT_MODE="0" FADE_IN="0" FADE_OUT="0" ATTRIBUTEVALUE_MODE="0" LTPPRIORITY="2" PAUSE="1" SAIMAGEPATH="">
+                <FIXTUREDATAS NB="52">
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                    <FIXTUREDATA FIXTURE="undefined" DATA="eJxiEPiPBBj+YwIGBgZGGwYQ3AOHNnCSAQAAAP//"/>
+                </FIXTUREDATAS>
+            </SCENE>
+        </BANK>
+    </SCENES>
+    <DAS_SELECTIONS FIXTUREGROUP="aa0debad-d0b5-479f-9e49-49cf9bd6b71e" BANK="" SCENE=""/>
+    <SHORTCUTS/>
+    <SELECTED_LIVE_SCENES/>
+    <TOUCH>
+        <TOUCHPAGE DASUID="374419e3-6120-49ba-ac60-8256065ef909" NAME="Live Touch" TOUCHCONTROL="0"/>
+    </TOUCH>
+    <DEVICES/>
+</DLMFILE>

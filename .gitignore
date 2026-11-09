@@ -1,0 +1,5 @@
+node_modules
+PORTABLE_PARA_PORTATIL
+*.exe
+*.tsbuildinfo
+.DS_Store
