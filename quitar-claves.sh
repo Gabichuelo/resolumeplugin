@@ -128,6 +128,7 @@ if command -v nmcli >/dev/null 2>&1; then
     nmcli connection modify "$uuid" 802-3-ethernet.mac-address "" 2>/dev/null || true
     nmcli connection modify "$uuid" 802-11-wireless.mac-address "" 2>/dev/null || true
     nmcli connection modify "$uuid" connection.interface-name "" 2>/dev/null || true
+    nmcli connection modify "$uuid" 802-11-wireless-security.psk-flags 0 2>/dev/null || true
   done
 fi
 rm -f /etc/udev/rules.d/70-persistent-net.rules 2>/dev/null || true
