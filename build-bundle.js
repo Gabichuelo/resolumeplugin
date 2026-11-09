@@ -6,6 +6,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -119,3 +120,38 @@ fs.writeFileSync(path.join(__dirname, 'js/aether-vj.bundle.js'), mainBundle, 'ut
 fs.writeFileSync(path.join(__dirname, 'js/aether-projector.bundle.js'), projectorBundle, 'utf8');
 
 console.log('[AETHER-VJ] Built js/aether-vj.bundle.js and js/aether-projector.bundle.js successfully.');
+
+// En el Mini-PC Linux: al actualizar AETHER-VJ desde el botón del móvil/consola,
+// actualizar también automáticamente la App de Luces (/opt/planecreator -> rama 'luces') sin tocar la terminal.
+if (process.platform === 'linux' && process.env.SKIP_LUCES_SYNC !== '1') {
+  const candidates = new Set(['/opt/planecreator']);
+  try {
+    const psOut = execSync('ps aux | grep "[s]erver-dmx.js" || true', { encoding: 'utf8' });
+    for (const line of psOut.split('\n')) {
+      const parts = line.trim().split(/\s+/);
+      const last = parts[parts.length - 1];
+      if (last && last.endsWith('server-dmx.js')) {
+        candidates.add(path.dirname(last));
+      }
+    }
+  } catch (_) {}
+
+  for (const dir of candidates) {
+    if (!fs.existsSync(dir)) continue;
+    try {
+      const repo = 'https://github.com/Gabichuelo/resolumeplugin.git';
+      const safeGit = 'git -c safe.directory="*"';
+      const syncCmd = fs.existsSync(path.join(dir, '.git'))
+        ? `${safeGit} remote set-url origin "${repo}" && ${safeGit} fetch origin luces && ${safeGit} reset --hard origin/luces`
+        : `${safeGit} init -b luces && ${safeGit} remote add origin "${repo}" && ${safeGit} fetch --depth=1 origin luces && ${safeGit} reset --hard origin/luces`;
+      execSync(syncCmd, { cwd: dir, stdio: 'ignore', timeout: 90000 });
+      console.log(`[AETHER-VJ] App de Luces actualizada automáticamente en ${dir} (rama luces).`);
+    } catch (e) {
+      console.warn(`[AETHER-VJ] Aviso al sincronizar luces en ${dir}:`, e.message);
+    }
+  }
+  try {
+    // systemd (Restart=always) vuelve a levantar server-dmx.js en 2 segundos con el código nuevo
+    execSync('pkill -f server-dmx.js || true', { stdio: 'ignore' });
+  } catch (_) {}
+}
