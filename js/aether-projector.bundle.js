@@ -10984,9 +10984,114 @@ class ConsoleController {
       } catch (_) {}
     };
 
+    const deskSudoPass = document.getElementById('desk-sudo-pass');
+    const deskSharedNotes = document.getElementById('desk-shared-notes');
+    const deskNotesStatus = document.getElementById('desk-notes-status');
+
+    try {
+      const savedSudo = localStorage.getItem('aether_sudo_pass');
+      if (savedSudo && deskSudoPass) deskSudoPass.value = savedSudo;
+    } catch (_) {}
+    deskSudoPass?.addEventListener('input', () => {
+      try { localStorage.setItem('aether_sudo_pass', deskSudoPass.value); } catch (_) {}
+    });
+
+    const loadDeskSharedNotes = async () => {
+      if (!this._isHttp || !deskSharedNotes) return;
+      try {
+        const res = await fetch('/api/shared-notes');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && typeof data.notes === 'string' && data.notes.trim() && document.activeElement !== deskSharedNotes) {
+          deskSharedNotes.value = data.notes;
+        }
+      } catch (_) {}
+    };
+
+    const pushDeskSharedNotes = async (showMsg) => {
+      if (!this._isHttp || !deskSharedNotes) return;
+      try {
+        const res = await fetch('/api/shared-notes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notes: deskSharedNotes.value })
+        });
+        if (res.ok && showMsg && deskNotesStatus) {
+          deskNotesStatus.style.color = '#00e676';
+          deskNotesStatus.textContent = '✅ Texto enviado: ya aparece en el recuadro de tu móvil (remote.html).';
+          setTimeout(() => { deskNotesStatus.textContent = ''; }, 4000);
+        }
+      } catch (_) {}
+    };
+
+    document.getElementById('btn-desk-sync-notes')?.addEventListener('click', () => pushDeskSharedNotes(true));
+    let deskNotesTimer = null;
+    deskSharedNotes?.addEventListener('input', () => {
+      if (deskNotesTimer) clearTimeout(deskNotesTimer);
+      deskNotesTimer = setTimeout(() => pushDeskSharedNotes(false), 600);
+    });
+
+    document.getElementById('btn-desk-copy-notes')?.addEventListener('click', async () => {
+      if (!deskSharedNotes) return;
+      let copied = false;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(deskSharedNotes.value);
+          copied = true;
+        } catch (_) {}
+      }
+      if (!copied) {
+        try {
+          deskSharedNotes.focus();
+          deskSharedNotes.select();
+          copied = document.execCommand('copy');
+        } catch (_) {}
+      }
+      if (deskNotesStatus) {
+        deskNotesStatus.style.color = copied ? '#00e676' : '#ffab00';
+        deskNotesStatus.textContent = copied ? '✅ Copiado al portapapeles.' : '⚠️ Selecciona el texto y pulsa Ctrl+C.';
+        setTimeout(() => { deskNotesStatus.textContent = ''; }, 4000);
+      }
+    });
+
+    document.querySelectorAll('[data-desk-preset]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        if (!this._isHttp) return;
+        const preset = btn.getAttribute('data-desk-preset');
+        if (preset === 'reboot' && !window.confirm('¿Seguro que quieres reiniciar el Mini-PC ahora?')) return;
+        if (deskSharedNotes) {
+          deskSharedNotes.value = `⏳ Ejecutando: ${btn.textContent.trim()}...\nEspera unos segundos...`;
+        }
+        try {
+          const res = await fetch('/api/system-terminal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              pin: '1234',
+              preset,
+              sudoPass: deskSudoPass ? deskSudoPass.value : ''
+            })
+          });
+          const data = await res.json();
+          if (deskSharedNotes) {
+            deskSharedNotes.value = (data.ok ? '✅ COMPLETADO:\n' : `⚠️ AVISO/ERROR (código ${data.exitCode}):\n`) + (data.output || '');
+          }
+          if (deskNotesStatus) {
+            deskNotesStatus.style.color = '#00e676';
+            deskNotesStatus.textContent = '✅ Salida enviada automáticamente a tu móvil.';
+          }
+        } catch (err) {
+          if (deskSharedNotes) {
+            deskSharedNotes.value = '❌ Error al ejecutar: ' + err.message;
+          }
+        }
+      });
+    });
+
     d.btnOpenRemoteModal?.addEventListener('click', () => {
       d.remoteModalBackdrop?.classList.remove('hidden');
       refreshNetworkAndStats();
+      loadDeskSharedNotes();
     });
     d.btnCloseRemoteModal?.addEventListener('click', () => {
       d.remoteModalBackdrop?.classList.add('hidden');
@@ -11012,9 +11117,9 @@ class ConsoleController {
         if (data.ok) {
           if (d.updateStatusMsg) {
             d.updateStatusMsg.style.color = '#00e676';
-            d.updateStatusMsg.textContent = '✅ ' + (data.message || 'Actualizado con éxito. Recargando...');
+            d.updateStatusMsg.textContent = '✅ ' + (data.message || 'Actualizado con éxito. Recargando en 5s...');
           }
-          setTimeout(() => window.location.reload(), 1000);
+          setTimeout(() => window.location.reload(), 4800);
         } else if (d.updateStatusMsg) {
           d.updateStatusMsg.style.color = '#ff5252';
           d.updateStatusMsg.textContent = '❌ ' + (data.error || 'No se pudo actualizar');
@@ -11029,7 +11134,12 @@ class ConsoleController {
 
     if (this._isHttp) {
       refreshNetworkAndStats();
-      setInterval(refreshNetworkAndStats, 3500);
+      setInterval(() => {
+        refreshNetworkAndStats();
+        if (d.remoteModalBackdrop && !d.remoteModalBackdrop.classList.contains('hidden')) {
+          loadDeskSharedNotes();
+        }
+      }, 3500);
     }
 
     // ---- Máscaras ----

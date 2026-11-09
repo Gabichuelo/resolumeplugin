@@ -883,10 +883,14 @@ const requestHandler = async (req, res) => {
       const sudoPass = String(body.sudoPass || '').trim();
 
       let rawCmd = '';
-      if (preset === 'quitar-claves') {
-        rawCmd = 'sudo -S bash quitar-claves.sh';
+      if (preset === 'quitar-claves' || preset === 'fix-ethernet') {
+        rawCmd = 'sudo -S bash quitar-claves.sh ; echo "=== ESTADO ETHERNET (eno1) ===" ; nmcli device status 2>/dev/null || true ; nmcli connection show 2>/dev/null || true ; ip -br addr 2>/dev/null || true';
       } else if (preset === 'diag-login') {
         rawCmd = [
+          'echo "=== RED ETHERNET (eno1) Y PERFILES NMCLI ==="',
+          'nmcli device status 2>/dev/null || true',
+          'nmcli connection show 2>/dev/null || true',
+          'ip -br addr 2>/dev/null || true',
           'echo "=== USUARIO Y DISPLAY MANAGER ==="',
           'whoami; id',
           'cat /etc/X11/default-display-manager 2>/dev/null || true',
@@ -900,10 +904,9 @@ const requestHandler = async (req, res) => {
           'cat ~/.dmrc 2>/dev/null || true',
           'sudo -S head -n 50 /var/lib/AccountsService/users/* 2>/dev/null || true',
           'echo "=== ULTIMAS LINEAS LIGHTDM.LOG ==="',
-          'sudo -S tail -n 40 /var/log/lightdm/lightdm.log 2>/dev/null || true',
-          'echo "=== SERVICIOS Y RED ==="',
-          'systemctl is-active aether-vj.service granddas-luces.service 2>/dev/null || true',
-          'ip -br addr 2>/dev/null || true'
+          'sudo -S tail -n 35 /var/log/lightdm/lightdm.log 2>/dev/null || true',
+          'echo "=== SERVICIOS AETHER Y LUCES ==="',
+          'systemctl is-active aether-vj.service granddas-luces.service 2>/dev/null || true'
         ].join(' ; ');
       } else if (preset === 'update-luces') {
         rawCmd = 'if [ -f /usr/local/bin/actualizar-luces-sl04 ]; then sudo -S /usr/local/bin/actualizar-luces-sl04; else sudo -S bash instalar-todo.sh; fi';
@@ -918,10 +921,19 @@ const requestHandler = async (req, res) => {
 
       const child = exec(rawCmd, { cwd: __dirname, timeout: 120000, maxBuffer: 1024 * 1024 }, (err, stdout, stderr) => {
         const combined = ((stdout || '') + (stderr ? '\n' + stderr : '')).trim();
+        const outText = combined || (err ? err.message : '(Comando ejecutado sin texto de salida)');
+        persistedConfig.sharedNotes = outText.slice(-12000);
+        persistedConfig.sharedNotesAt = new Date().toISOString();
+        scheduleConfigSave();
+        writeSse(remoteClients, {
+          type: 'SHARED_NOTES',
+          notes: persistedConfig.sharedNotes,
+          updatedAt: persistedConfig.sharedNotesAt
+        });
         sendJson(res, 200, {
           ok: !err,
           exitCode: err ? (err.code || 1) : 0,
-          output: combined || (err ? err.message : '(Comando ejecutado sin texto de salida)')
+          output: outText
         });
       });
 
@@ -935,6 +947,39 @@ const requestHandler = async (req, res) => {
       sendJson(res, 400, { ok: false, error: err.message });
     }
     return;
+  }
+
+  // 2a-quinquies. Buzón compartido de errores/notas Mini-PC <-> Móvil
+  if (pathname === '/api/shared-notes') {
+    if (req.method === 'GET') {
+      sendJson(res, 200, {
+        ok: true,
+        notes: persistedConfig.sharedNotes || '',
+        updatedAt: persistedConfig.sharedNotesAt || null
+      });
+      return;
+    }
+    if (req.method === 'POST') {
+      try {
+        const body = await readJsonBody(req, 65536);
+        persistedConfig.sharedNotes = String(body.notes || '').slice(0, 30000);
+        persistedConfig.sharedNotesAt = new Date().toISOString();
+        scheduleConfigSave();
+        writeSse(remoteClients, {
+          type: 'SHARED_NOTES',
+          notes: persistedConfig.sharedNotes,
+          updatedAt: persistedConfig.sharedNotesAt
+        });
+        sendJson(res, 200, {
+          ok: true,
+          notes: persistedConfig.sharedNotes,
+          updatedAt: persistedConfig.sharedNotesAt
+        });
+      } catch (err) {
+        sendJson(res, 400, { ok: false, error: err.message });
+      }
+      return;
+    }
   }
 
   // 2b. Vídeos / GIF del DJ

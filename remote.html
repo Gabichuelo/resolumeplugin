@@ -1562,10 +1562,10 @@
 
       <div class="grid-2" style="margin-bottom:8px">
         <button type="button" class="btn-pad green-live" data-term-preset="quitar-claves" style="padding:13px 8px;font-size:11px">
-          🔓 1. Quitar Claves / Auto-Login
+          🔓 1. Quitar Claves + Reparar Ethernet (eno1)
         </button>
         <button type="button" class="btn-pad active" data-term-preset="diag-login" style="padding:13px 8px;font-size:11px">
-          🔍 2. Ver Diagnóstico Login
+          🔍 2. Capturar Errores / Red / Login
         </button>
         <button type="button" class="btn-pad amber-active" data-term-preset="update-luces" style="padding:13px 8px;font-size:11px">
           💡 3. Actualizar Luces SL04
@@ -1576,20 +1576,30 @@
       </div>
 
       <div class="card-title" style="margin-top:8px;margin-bottom:4px">
-        <span>⌨️ EJECUTAR COMANDO O PEGAR TEXTO AL TERMINAL</span>
+        <span>⌨️ EJECUTAR COMANDO EN EL TERMINAL DEL MINI-PC</span>
       </div>
-      <div style="display:flex;gap:6px;margin-bottom:8px">
+      <div style="display:flex;gap:6px;margin-bottom:10px">
         <input type="text" id="m-term-custom-cmd" class="text-input" placeholder="Ej: sudo bash quitar-claves.sh" autocomplete="off" autocapitalize="none" spellcheck="false" style="margin:0;flex:1" />
         <button type="button" id="btn-term-run-cmd" class="btn-pad active" style="padding:0 14px;white-space:nowrap">
           ▶ EJECUTAR
         </button>
       </div>
 
-      <div class="card-title" style="margin-bottom:4px">
-        <span>📋 SALIDA DEL TERMINAL / ERRORES (PARA COPIAR AL CHAT)</span>
-        <button type="button" id="btn-term-copy" class="btn-logout" style="color:var(--green);border-color:var(--green)">📋 COPIAR TEXTO</button>
+      <div class="card-title" style="margin-bottom:4px;color:var(--green)">
+        <span>📝 BUZÓN DE ERRORES / TEXTO COMPARTIDO (MINI-PC ⟷ MÓVIL)</span>
       </div>
-      <pre id="m-term-output" style="background:#05070d;border:1px solid var(--border);border-radius:10px;padding:10px;font-family:var(--mono);font-size:11px;color:#b8ffe3;max-height:240px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0;user-select:all;-webkit-user-select:all">Pulsa "🔓 1. Quitar Claves / Auto-Login" o "🔍 2. Ver Diagnóstico Login" para ver aquí toda la respuesta del Mini-PC...</pre>
+      <div class="help-text" style="margin-bottom:6px">
+        Aquí aparece la salida de los botones de arriba, o puedes <strong>pegar/escribir cualquier error en el Mini-PC</strong> y pulsar <strong>📤 Pasar al Móvil / PC</strong> para copiarlo desde tu móvil o PC al chat.
+      </div>
+      <textarea id="m-term-output" rows="9" placeholder="Pega aquí cualquier error desde el Mini-PC o pulsa los botones de arriba para capturar los errores automáticamente..." style="width:100%;box-sizing:border-box;background:#05070d;border:1px solid var(--border);border-radius:10px;padding:10px;font-family:var(--mono);font-size:11px;color:#b8ffe3;resize:vertical;margin-bottom:6px"></textarea>
+      <div class="grid-2" style="margin-bottom:4px">
+        <button type="button" id="btn-term-sync" class="btn-pad amber-active" style="padding:12px 8px;font-size:11px">
+          📤 PASAR TEXTO MINI-PC ⟷ MÓVIL
+        </button>
+        <button type="button" id="btn-term-copy" class="btn-pad green-live" style="padding:12px 8px;font-size:11px">
+          📋 COPIAR TEXTO PARA EL CHAT
+        </button>
+      </div>
       <div id="m-term-copy-msg" class="msg-line"></div>
     </div>
   </section>
@@ -2706,14 +2716,14 @@
             msgUpdate.style.color = 'var(--green)';
             msgUpdate.textContent = '✅ ' + (data.message || 'Mini-PC actualizado. Recargando mando en 5s...');
             if (termOutput && (data.output || data.log)) {
-              termOutput.textContent = '=== SALIDA DE ACTUALIZACIÓN ===\n' + (data.output || data.log);
+              termOutput.value = '=== SALIDA DE ACTUALIZACIÓN ===\n' + (data.output || data.log);
             }
             setTimeout(() => { window.location.reload(); }, 4800);
           } else {
             msgUpdate.style.color = 'var(--red)';
             msgUpdate.textContent = '❌ ' + (data.error || 'Error al actualizar');
             if (termOutput && (data.log || data.error)) {
-              termOutput.textContent = '=== ERROR AL ACTUALIZAR ===\n' + (data.error || '') + '\n' + (data.log || '');
+              termOutput.value = '=== ERROR AL ACTUALIZAR ===\n' + (data.error || '') + '\n' + (data.log || '');
             }
           }
         } catch (err) {
@@ -2722,7 +2732,7 @@
         }
       });
 
-      // ==================== TERMINAL Y DIAGNÓSTICO REMOTO ====================
+      // ==================== TERMINAL Y DIAGNÓSTICO REMOTO + BUZÓN COMPARTIDO ====================
       const inpSudoPass = document.getElementById('m-term-sudo-pass');
       const inpCustomCmd = document.getElementById('m-term-custom-cmd');
       const termOutput = document.getElementById('m-term-output');
@@ -2737,11 +2747,47 @@
         try { localStorage.setItem('aether_sudo_pass', inpSudoPass.value); } catch (_) {}
       });
 
+      async function loadSharedNotes() {
+        if (!window.location.protocol.startsWith('http') || !termOutput) return;
+        try {
+          const res = await fetch('/api/shared-notes');
+          if (!res.ok) return;
+          const data = await res.json();
+          if (data && typeof data.notes === 'string' && data.notes.trim() && document.activeElement !== termOutput) {
+            termOutput.value = data.notes;
+          }
+        } catch (_) {}
+      }
+      setTimeout(loadSharedNotes, 600);
+
+      async function pushSharedNotes(showFeedback) {
+        if (!window.location.protocol.startsWith('http') || !termOutput) return;
+        try {
+          const res = await fetch('/api/shared-notes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ notes: termOutput.value })
+          });
+          if (res.ok && showFeedback && termCopyMsg) {
+            termCopyMsg.style.color = 'var(--green)';
+            termCopyMsg.textContent = '✅ Texto sincronizado entre Mini-PC y Móvil.';
+            setTimeout(() => { termCopyMsg.textContent = ''; }, 3500);
+          }
+        } catch (_) {}
+      }
+
+      document.getElementById('btn-term-sync')?.addEventListener('click', () => pushSharedNotes(true));
+      let notesSyncTimer = null;
+      termOutput?.addEventListener('input', () => {
+        if (notesSyncTimer) clearTimeout(notesSyncTimer);
+        notesSyncTimer = setTimeout(() => pushSharedNotes(false), 600);
+      });
+
       async function runRemoteTerminal(payload, label) {
         if (!termOutput) return;
         const sudoPass = inpSudoPass ? inpSudoPass.value : '';
         termOutput.style.color = 'var(--cyan)';
-        termOutput.textContent = '⏳ Ejecutando en Mini-PC: ' + label + '...\nEspera unos segundos...';
+        termOutput.value = '⏳ Ejecutando en Mini-PC: ' + label + '...\nEspera unos segundos...';
         try {
           const res = await fetch('/api/system-terminal', {
             method: 'POST',
@@ -2753,11 +2799,11 @@
           });
           const data = await res.json();
           termOutput.style.color = data.ok ? '#b8ffe3' : '#ff99bb';
-          const header = (data.ok ? '✅ COMPLETADO (' : '⚠️ SALIDA CON AVISO/ERROR (código ' + data.code + ' - ') + label + '):\n';
-          termOutput.textContent = header + (data.output || '(Sin salida de texto)');
+          const header = (data.ok ? '✅ COMPLETADO (' : '⚠️ SALIDA CON AVISO/ERROR (código ' + data.exitCode + ' - ') + label + '):\n';
+          termOutput.value = header + (data.output || '(Sin salida de texto)');
         } catch (err) {
           termOutput.style.color = '#ff99bb';
-          termOutput.textContent = '❌ Error de red o servidor reiniciándose: ' + err.message +
+          termOutput.value = '❌ Error de red o servidor reiniciándose: ' + err.message +
             '\n(Si acabas de pulsar Actualizar o Reiniciar, espera 5 segundos y recarga la página del móvil).';
         }
       }
@@ -2785,7 +2831,7 @@
       });
 
       document.getElementById('btn-term-copy')?.addEventListener('click', async () => {
-        const txt = termOutput ? termOutput.textContent : '';
+        const txt = termOutput ? (termOutput.value || termOutput.textContent || '') : '';
         let copied = false;
         if (navigator.clipboard && navigator.clipboard.writeText) {
           try {
@@ -2793,17 +2839,11 @@
             copied = true;
           } catch (_) {}
         }
-        if (!copied) {
+        if (!copied && termOutput) {
           try {
-            const ta = document.createElement('textarea');
-            ta.value = txt;
-            ta.style.position = 'fixed';
-            ta.style.top = '-1000px';
-            document.body.appendChild(ta);
-            ta.focus();
-            ta.select();
+            termOutput.focus();
+            termOutput.select();
             copied = document.execCommand('copy');
-            document.body.removeChild(ta);
           } catch (_) {}
         }
         if (termCopyMsg) {
@@ -3833,6 +3873,12 @@
         es.onmessage = (ev) => {
           try {
             const msg = JSON.parse(ev.data);
+            if (msg && msg.type === 'SHARED_NOTES' && typeof msg.notes === 'string') {
+              if (termOutput && document.activeElement !== termOutput) {
+                termOutput.value = msg.notes;
+              }
+              return;
+            }
             if (msg && msg.type === 'MASTER_STATUS' && msg.status) {
               const st = msg.status;
               connLed.classList.add('online');

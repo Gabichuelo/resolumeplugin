@@ -182,15 +182,66 @@ ResultInactive=yes
 ResultActive=yes
 EOF
 
-# 5. Preparar Red y Arranque UEFI para que al CLONAR el SSD funcione en cualquier Mini-PC
-echo "[5/6] Preparando red universal y arranque UEFI para clonación de SSD..."
-# Limpiar direcciones MAC fijadas en NetworkManager para que en el nuevo Mini-PC detecte su propia tarjeta Ethernet/Wi-Fi
+# 5. Preparar Red (Ethernet eno1 auto-conexión sin duplicados) y Arranque UEFI para clonar SSD
+echo "[5/6] Reparando auto-conexión Ethernet (eno1) sin duplicados y preparando SSD para clonar..."
+mkdir -p /etc/NetworkManager/conf.d
+cat > /etc/NetworkManager/conf.d/99-aether-ethernet.conf <<EOF
+[main]
+no-auto-default=*
+
+[device]
+match-device=type:ethernet
+managed=1
+EOF
+
 if command -v nmcli >/dev/null 2>&1; then
-  for uuid in $(nmcli -g UUID connection show 2>/dev/null || true); do
-    nmcli connection modify "$uuid" 802-3-ethernet.mac-address "" 2>/dev/null || true
-    nmcli connection modify "$uuid" 802-11-wireless.mac-address "" 2>/dev/null || true
-    nmcli connection modify "$uuid" connection.interface-name "" 2>/dev/null || true
-    nmcli connection modify "$uuid" 802-11-wireless-security.psk-flags 0 2>/dev/null || true
+  nmcli general reload 2>/dev/null || true
+  nmcli networking on 2>/dev/null || true
+
+  # Eliminar perfiles Ethernet duplicados (eno1, eno1 1, Wired connection...) y dejar un único perfil universal auto-conectable
+  ETH_UUIDS="$(nmcli -t -f UUID,TYPE connection show 2>/dev/null | awk -F: '$2=="802-3-ethernet"{print $1}')"
+  PRIMARY_UUID=""
+  for u in $ETH_UUIDS; do
+    if [ -z "$PRIMARY_UUID" ]; then
+      PRIMARY_UUID="$u"
+    else
+      nmcli connection delete uuid "$u" 2>/dev/null || true
+    fi
+  done
+
+  if [ -n "$PRIMARY_UUID" ]; then
+    nmcli connection modify "$PRIMARY_UUID" \
+      connection.id "Ethernet-Auto" \
+      connection.interface-name "" \
+      802-3-ethernet.mac-address "" \
+      connection.autoconnect yes \
+      connection.autoconnect-priority 100 \
+      connection.autoconnect-retries 0 \
+      connection.permissions "" \
+      ipv4.method auto \
+      ipv6.method auto 2>/dev/null || true
+  else
+    nmcli connection add type ethernet con-name "Ethernet-Auto" \
+      autoconnect yes autoconnect-priority 100 \
+      ipv4.method auto ipv6.method auto 2>/dev/null || true
+  fi
+
+  # Conectar la tarjeta Ethernet física ahora mismo (ej. eno1)
+  ETH_DEV="$(nmcli -t -f DEVICE,TYPE device status 2>/dev/null | awk -F: '$2=="ethernet"{print $1; exit}')"
+  if [ -n "$ETH_DEV" ]; then
+    nmcli device set "$ETH_DEV" managed yes 2>/dev/null || true
+    nmcli device set "$ETH_DEV" autoconnect yes 2>/dev/null || true
+    nmcli connection up "Ethernet-Auto" ifname "$ETH_DEV" 2>/dev/null || nmcli device connect "$ETH_DEV" 2>/dev/null || true
+  fi
+
+  # Para perfiles Wi-Fi (sin tocar loopback 'lo'): limpiar MAC fijada y permitir conexión antes del login
+  WIFI_UUIDS="$(nmcli -t -f UUID,TYPE connection show 2>/dev/null | awk -F: '$2=="802-11-wireless"{print $1}')"
+  for u in $WIFI_UUIDS; do
+    nmcli connection modify "$u" \
+      802-11-wireless.mac-address "" \
+      connection.interface-name "" \
+      connection.permissions "" \
+      802-11-wireless-security.psk-flags 0 2>/dev/null || true
   done
 fi
 rm -f /etc/udev/rules.d/70-persistent-net.rules 2>/dev/null || true

@@ -103,6 +103,39 @@
             <div id="update-status-msg" style="margin-top:6px;font-size:12px;color:#98a4b8"></div>
           </div>
         </div>
+
+        <div class="help-step-box">
+          <div class="help-step-num">🛠️</div>
+          <div style="flex:1">
+            <h3>REPARAR CLAVES / ETHERNET (eno1) Y PASAR ERRORES AL MÓVIL</h3>
+            <p>Ejecuta las reparaciones con 1 clic o pega aquí cualquier error desde el Mini-PC para que aparezca al instante en tu móvil (`remote.html`) y puedas copiarlo al chat:</p>
+            <input type="text" id="desk-sudo-pass" class="v2-text-input" style="width:100%;margin-top:6px;margin-bottom:6px" placeholder="🔑 Clave de Ubuntu (escríbela una vez para sudo)" autocomplete="off" spellcheck="false" />
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+              <button type="button" class="btn-console-action primary" data-desk-preset="quitar-claves">
+                🔓 1. Quitar Claves + Reparar Ethernet (eno1)
+              </button>
+              <button type="button" class="btn-console-action" data-desk-preset="diag-login">
+                🔍 2. Capturar Errores / Red / Login
+              </button>
+              <button type="button" class="btn-console-action" data-desk-preset="update-luces">
+                💡 3. Actualizar Luces SL04
+              </button>
+              <button type="button" class="btn-console-action panic-btn" data-desk-preset="reboot">
+                🔄 4. Reiniciar Mini-PC
+              </button>
+            </div>
+            <textarea id="desk-shared-notes" class="v2-text-input" rows="6" style="width:100%;font-family:monospace;font-size:11px;color:#b8ffe3;background:#05070d;resize:vertical" placeholder="Pega o escribe aquí cualquier error desde el Mini-PC (o pulsa los botones de arriba) y aparecerá automáticamente en tu móvil..."></textarea>
+            <div style="display:flex;gap:6px;margin-top:6px">
+              <button type="button" id="btn-desk-sync-notes" class="btn-console-action primary" style="flex:1">
+                📤 PASAR TEXTO AL MÓVIL / GUARDAR
+              </button>
+              <button type="button" id="btn-desk-copy-notes" class="btn-console-action" style="flex:1">
+                📋 COPIAR TEXTO
+              </button>
+            </div>
+            <div id="desk-notes-status" style="margin-top:4px;font-size:12px;color:#00e676"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
