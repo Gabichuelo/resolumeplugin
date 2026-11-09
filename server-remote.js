@@ -787,9 +787,9 @@ const requestHandler = async (req, res) => {
       const safeGit = 'git -c safe.directory="*"';
       const cmd = hasGitDir
         ? (repoUrl
-          ? `${safeGit} remote set-url origin "${repoUrl}" && ${safeGit} fetch --all && ${safeGit} reset --hard origin/HEAD && node build-bundle.js`
-          : `${safeGit} pull --ff-only && node build-bundle.js`)
-        : `${safeGit} init && ${safeGit} remote add origin "${repoUrl}" && ${safeGit} fetch --depth=1 origin && ${safeGit} reset --hard FETCH_HEAD && node build-bundle.js`;
+          ? `${safeGit} remote set-url origin "${repoUrl}" && ${safeGit} fetch origin main && ${safeGit} reset --hard origin/main && node build-bundle.js`
+          : `${safeGit} fetch origin main && ${safeGit} reset --hard origin/main && node build-bundle.js`)
+        : `${safeGit} init && ${safeGit} remote add origin "${repoUrl}" && ${safeGit} fetch --depth=1 origin main && ${safeGit} reset --hard origin/main && node build-bundle.js`;
 
       exec(cmd, { cwd: __dirname, timeout: 120000 }, (err, stdout, stderr) => {
         if (err) {
