@@ -3,7 +3,19 @@
  * Master BPM Rhythm Clock & 8-Channel Multi-Wave LFO Modulator.
  */
 
-import { GENERATORS, MACRO_DEFS, AUTOPILOT_MODES } from '../state.js';
+import {
+  GENERATORS,
+  MACRO_DEFS,
+  AUTOPILOT_MODES,
+  SHAPE_MODES,
+  STYLE_MODES,
+  SWEEP_MODES,
+  WEIGHT_MODES,
+  EFFECT_3D_MODES,
+  LOGO_FX_MODES,
+  TEXT_FX_MODES,
+  MEDIA_FX_MODES
+} from '../state.js';
 import { PALETTES } from '../palettes.js';
 
 const MORPH_FX_KEYS = ['kaleidoscope', 'rgbShift', 'feedback', 'glitch', 'pixelate'];
@@ -253,39 +265,242 @@ export class AutopilotBrain {
   }
 
   /**
+   * Devuelve la lista de IDs de loops activos según la familia seleccionada en el Piloto Automático
+   */
+  _getAllowedGenerators() {
+    const bankPool = this.state.autopilotBankPool || 'FLT';
+    return GENERATORS.filter((g) => {
+      if (bankPool === 'FLAT_GEO_KIN') return g.bank !== 'SPC'; // 40 Loops Planos, Minimal, Escenario, Formas y Barridos (Sin 3D)
+      if (bankPool === 'FLT') return g.bank === 'FLT';
+      if (bankPool === 'MIN') return g.bank === 'MIN';
+      if (bankPool === 'MOT') return g.bank === 'MOT';
+      if (bankPool === 'KIN') return g.bank === 'KIN';
+      if (bankPool === 'GEO') return g.bank === 'GEO';
+      if (bankPool === 'SPC') return g.bank === 'SPC';
+      return true;
+    }).map((g) => g.id);
+  }
+
+  /**
+   * Comprueba si TODAS las opciones de modificadores están en modo 🤖 AUTO
+   */
+  areAllAutoModsActive() {
+    const st = this.state;
+    const am = st.autoMods;
+    if (!am) return false;
+    return Boolean(
+      st.autopilot.enabled &&
+      st.autoRotatePalette &&
+      am.shape &&
+      am.style &&
+      am.weight &&
+      am.sweep &&
+      am.effect3d &&
+      am.postFx &&
+      am.logoFx &&
+      am.textFx &&
+      am.mediaFx
+    );
+  }
+
+  /**
+   * Activa o desactiva "🤖 PONER TODO EN AUTO" con un solo clic
+   */
+  setAllAutoMods(enable) {
+    const st = this.state;
+    const on = Boolean(enable);
+    if (!st.autoMods) st.autoMods = {};
+    const am = st.autoMods;
+    if (on) {
+      st.autopilot.enabled = true;
+      st.autopilot.lfoMasterEnabled = true;
+    }
+    st.autoRotatePalette = on;
+    am.shape = on;
+    am.style = on;
+    am.weight = on;
+    am.sweep = on;
+    am.effect3d = on;
+    am.postFx = on;
+    am.logoFx = on;
+    am.textFx = on;
+    am.mediaFx = on;
+  }
+
+  /**
+   * Avanza al siguiente valor cada opción que tenga su botón "🤖 AUTO" activado.
+   * Por defecto se ejecuta automáticamente cada vez que el Piloto Automático completa
+   * una vuelta entera de todos los loops de la familia activa, haciendo que cada vuelta
+   * sea totalmente única durante horas.
+   */
+  stepAutoModifiers(forceManual = false) {
+    const st = this.state;
+    const am = st.autoMods || {};
+
+    // 1. Figura Geométrica (0..5)
+    if (am.shape) {
+      st.shapeMode = (st.shapeMode + 1) % SHAPE_MODES.length;
+    }
+
+    // 2. Acabado Visual (0..3)
+    if (am.style) {
+      st.styleMode = (st.styleMode + 1) % STYLE_MODES.length;
+      if (st.styleMode === 1 && !am.postFx) {
+        st.fx.kaleidoscope.enabled = false;
+        st.fx.rgbShift.enabled = false;
+        st.fx.feedback.enabled = false;
+        st.fx.glitch.enabled = false;
+        st.fx.pixelate.enabled = false;
+      }
+    }
+
+    // 3. Grosor Dinámico de Línea (0..3)
+    if (am.weight) {
+      st.weightMode = (st.weightMode + 1) % WEIGHT_MODES.length;
+    }
+
+    // 4. Barrido de Escenario (0..5)
+    if (am.sweep) {
+      st.sweepMode = (st.sweepMode + 1) % SWEEP_MODES.length;
+    }
+
+    // 5. Efecto 3D en Vivo (0..3)
+    if (am.effect3d) {
+      if (!st.fx.effect3d) st.fx.effect3d = { mode: 0, amount: 0.55 };
+      st.fx.effect3d.mode = (st.fx.effect3d.mode + 1) % EFFECT_3D_MODES.length;
+      if (st.fx.effect3d.mode > 0) {
+        st.fx.effect3d.amount = Math.round((0.40 + Math.random() * 0.35) * 100) / 100;
+      }
+    }
+
+    // 6. Efectos Opcionales Post-FX (ciclo limpio de 7 combinaciones)
+    if (am.postFx) {
+      am.postFxStep = ((am.postFxStep || 0) + 1) % 7;
+      const step = am.postFxStep;
+      st.fx.kaleidoscope.enabled = false;
+      st.fx.rgbShift.enabled = false;
+      st.fx.feedback.enabled = false;
+      st.fx.glitch.enabled = false;
+      st.fx.pixelate.enabled = false;
+
+      if (step === 0) {
+        // 100% Limpio sin efectos
+        st.pureFlatBypassFx = true;
+      } else {
+        st.pureFlatBypassFx = false;
+        if (step === 1) {
+          st.fx.kaleidoscope.enabled = true;
+          st.fx.kaleidoscope.axes = 2;
+          st.fx.kaleidoscope.wet = 0.55;
+        } else if (step === 2) {
+          st.fx.feedback.enabled = true;
+          st.fx.feedback.wet = 0.28;
+        } else if (step === 3) {
+          st.fx.kaleidoscope.enabled = true;
+          st.fx.kaleidoscope.axes = 4;
+          st.fx.kaleidoscope.wet = 0.65;
+        } else if (step === 4) {
+          st.fx.rgbShift.enabled = true;
+          st.fx.rgbShift.wet = 0.18;
+        } else if (step === 5) {
+          st.fx.kaleidoscope.enabled = true;
+          st.fx.kaleidoscope.axes = 2;
+          st.fx.kaleidoscope.wet = 0.45;
+          st.fx.feedback.enabled = true;
+          st.fx.feedback.wet = 0.24;
+        } else if (step === 6) {
+          st.fx.pixelate.enabled = true;
+          st.fx.pixelate.wet = 0.24;
+        }
+      }
+    }
+
+    // 7. Efecto Dinámico del Logo DJ (0..4)
+    if (am.logoFx && st.fx.logo) {
+      st.fx.logo.fxMode = (st.fx.logo.fxMode + 1) % LOGO_FX_MODES.length;
+    }
+
+    // 8. Efecto del Texto (0..6)
+    if (am.textFx && st.text) {
+      st.text.fxMode = (st.text.fxMode + 1) % TEXT_FX_MODES.length;
+    }
+
+    // 9. Efecto de Vídeo / Cámara (0..6)
+    if (am.mediaFx && st.media) {
+      st.media.fx = (st.media.fx + 1) % MEDIA_FX_MODES.length;
+    }
+
+    // 10. Paleta de Color (si se pulsa manualmente "Girar opciones Auto ahora" o al completar vuelta)
+    if (forceManual && st.autoRotatePalette) {
+      st.paletteActive = st.paletteTarget;
+      st.paletteTarget = (st.paletteActive + 1) % PALETTES.length;
+      st.paletteMix = 0.0;
+      this._lastPaletteChangeSec = st.renderTime || 0;
+    }
+  }
+
+  /**
    * Triggers a smooth A/B GPU Crossfade to the specified generator (or chooses an intelligent next generator)
    */
   triggerNextScene(forcedGeneratorId = null) {
     const st = this.state;
     const modeCfg = AUTOPILOT_MODES[st.autopilot.mode] || AUTOPILOT_MODES.CLUB_DYNAMIC;
+    if (!st.autoMods) {
+      st.autoMods = {
+        changeEvery: 'LAP',
+        lapsCompleted: 0,
+        loopsInCurrentLap: 1,
+        lapTotalLoops: 8,
+        visitedInLap: [],
+        postFxStep: 0
+      };
+    }
+    const am = st.autoMods;
 
     // Determine currently dominant deck (0 = Deck A, 1 = Deck B)
     const onDeckB = st.crossfade >= 0.5;
     const currentGen = onDeckB ? st.deckB : st.deckA;
 
+    const allowedGens = this._getAllowedGenerators();
+    am.lapTotalLoops = Math.max(1, allowedGens.length);
+    if (!Array.isArray(am.visitedInLap)) am.visitedInLap = [];
+    // Limpiar de visitedInLap los loops que no pertenezcan al banco activo actual
+    am.visitedInLap = am.visitedInLap.filter((id) => allowedGens.includes(id));
+
     let nextGen = forcedGeneratorId;
+    let lapCompletedNow = false;
+
     if (nextGen === null || nextGen === undefined) {
-      // Filter pool by active bank selection
-      const bankPool = st.autopilotBankPool || 'FLAT_GEO_KIN';
-      const allowedGens = GENERATORS.filter((g) => {
-        if (bankPool === 'FLAT_GEO_KIN') return g.bank !== 'SPC'; // 40 Loops Planos, Minimal, Escenario, Formas y Barridos (Cero túneles)
-        if (bankPool === 'FLT') return g.bank === 'FLT';
-        if (bankPool === 'MIN') return g.bank === 'MIN';
-        if (bankPool === 'MOT') return g.bank === 'MOT';
-        if (bankPool === 'KIN') return g.bank === 'KIN';
-        if (bankPool === 'GEO') return g.bank === 'GEO';
-        if (bankPool === 'SPC') return g.bank === 'SPC';
-        return true;
-      }).map((g) => g.id);
-
-      const candidates = allowedGens.filter(
-        (id) => id !== currentGen && !st.autopilot.historyQueue.includes(id)
+      // Buscar loops de la familia activa que aún NO hayan salido en esta vuelta
+      const unvisited = allowedGens.filter(
+        (id) => id !== currentGen && !am.visitedInLap.includes(id)
       );
-      const pool = candidates.length > 0
-        ? candidates
-        : allowedGens.filter((id) => id !== currentGen);
 
-      nextGen = pool[Math.floor(Math.random() * pool.length)];
+      if (unvisited.length > 0) {
+        const recentFiltered = unvisited.filter((id) => !st.autopilot.historyQueue.includes(id));
+        const pool = recentFiltered.length > 0 ? recentFiltered : unvisited;
+        nextGen = pool[Math.floor(Math.random() * pool.length)];
+      } else {
+        // ¡Se ha completado una vuelta entera de todos los loops de la familia activa!
+        lapCompletedNow = true;
+        am.lapsCompleted = (am.lapsCompleted || 0) + 1;
+        am.visitedInLap = [];
+        const freshPool = allowedGens.filter((id) => id !== currentGen);
+        nextGen = freshPool.length > 0
+          ? freshPool[Math.floor(Math.random() * freshPool.length)]
+          : allowedGens[0];
+      }
+    }
+
+    if (allowedGens.includes(nextGen) && !am.visitedInLap.includes(nextGen)) {
+      am.visitedInLap.push(nextGen);
+    }
+    am.loopsInCurrentLap = Math.max(1, am.visitedInLap.length);
+
+    // Si acabamos de completar la vuelta entera de loops (o si está configurado en cada cambio de loop),
+    // rotamos todas las opciones que tengan su botón 🤖 AUTO activado:
+    if (am.changeEvery === 'SCENE' || lapCompletedNow) {
+      this.stepAutoModifiers(false);
     }
 
     // Track in anti-repetition history queue (keep last 4 scenes)
@@ -310,14 +525,13 @@ export class AutopilotBrain {
     st.autoCrossfading = true;
 
     // Rotate Palette if autoRotatePalette is active
-    // En modo Color Suave (anti-feria), evita cambiar de paleta si aún está fundiendo la anterior
-    // o si han pasado menos de 25 segundos desde el último cambio de paleta, y avanza de 1 en 1 sin saltos.
+    // Si changeEvery === 'LAP', puede rotar en cada vuelta o suavemente cada >=25s
     if (st.autoRotatePalette) {
       const calm = st.calmColor !== false;
       const nowSec = st.renderTime || 0;
       const sinceLastPal = nowSec - (this._lastPaletteChangeSec || -999);
       const stillBlending = st.paletteActive !== st.paletteTarget && st.paletteMix < 0.95;
-      if (!calm || (!stillBlending && sinceLastPal >= 25.0)) {
+      if (lapCompletedNow || !calm || (!stillBlending && sinceLastPal >= 25.0)) {
         st.paletteActive = st.paletteTarget;
         let nextPal = calm
           ? (st.paletteActive + 1) % PALETTES.length
@@ -367,6 +581,11 @@ export class AutopilotBrain {
       this.macroBaseTargets.chaos = Math.min(modeCfg.chaosCeiling, 0.10 + Math.random() * 0.40);
       this.macroBaseTargets.strobe = Math.min(modeCfg.strobeCeiling, Math.random() * modeCfg.strobeCeiling * 0.5);
       this.macroBaseTargets.colorShift = st.calmColor !== false ? (0.08 + Math.random() * 0.16) : (0.20 + Math.random() * 0.45);
+    }
+
+    // Si los Efectos Opcionales tienen activado su propio modo 🤖 AUTO por vuelta, respetamos su ciclo
+    if (st.autoMods && st.autoMods.postFx) {
+      return;
     }
 
     // Si el bloqueo sin efectos está activo o estamos en el banco PLANO (16..23), mantener todos los FX apagados

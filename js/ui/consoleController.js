@@ -1990,7 +1990,13 @@ export class ConsoleController {
       hudSysLoad: $('hud-sys-load'),
       updateRepoUrlInput: $('update-repo-url-input'),
       btnRunInternetUpdate: $('btn-run-internet-update'),
-      updateStatusMsg: $('update-status-msg')
+      updateStatusMsg: $('update-status-msg'),
+      // Mutación Automática por Vuelta de Loops (🤖 AUTO por sección)
+      autoModBtns: Array.from(document.querySelectorAll('.btn-auto-mod')),
+      btnAllAutoToggle: $('btn-all-auto-toggle'),
+      autoEveryBtns: Array.from(document.querySelectorAll('.btn-auto-every')),
+      btnStepAutoNow: $('btn-step-auto-now'),
+      apLapReadout: $('ap-lap-readout')
     };
   }
 
@@ -2295,6 +2301,34 @@ export class ConsoleController {
     this._bindCmdSlider(d.edgeOverlap, edgeCmd('overlap'), 0.15);
     this._bindCmdSlider(d.edgeGamma, edgeCmd('gamma'), 2.2);
     this._bindCmdSlider(d.edgeCurve, edgeCmd('curve'), 2.0);
+
+    // ---- Mutación Automática por Vuelta de Loops (🤖 AUTO individual y maestro) ----
+    d.autoModBtns?.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.getAttribute('data-auto-mod');
+        if (!key) return;
+        const cur = key === 'palette'
+          ? Boolean(st.autoRotatePalette)
+          : Boolean(st.autoMods && st.autoMods[key]);
+        this._cmd({ action: 'SET_AUTO_MOD', key, value: !cur });
+      });
+    });
+
+    d.btnAllAutoToggle?.addEventListener('click', () => {
+      const allOn = Boolean(this.autopilot && this.autopilot.areAllAutoModsActive && this.autopilot.areAllAutoModsActive());
+      this._cmd({ action: 'SET_ALL_AUTO', value: !allOn });
+    });
+
+    d.autoEveryBtns?.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const every = btn.getAttribute('data-every') || 'LAP';
+        this._cmd({ action: 'SET_AUTO_CHANGE_EVERY', value: every });
+      });
+    });
+
+    d.btnStepAutoNow?.addEventListener('click', () => {
+      this._cmd({ action: 'STEP_AUTO_MODS_NOW' });
+    });
   }
 
   _sendText() {
@@ -2885,6 +2919,36 @@ export class ConsoleController {
     this._syncSlider(d.edgeOverlap, d.edgeOverlapVal, eo, pct(eo));
     this._syncSlider(d.edgeGamma, d.edgeGammaVal, eg, eg.toFixed(2));
     this._syncSlider(d.edgeCurve, d.edgeCurveVal, ec, ec.toFixed(2));
+
+    // ---- Mutación Automática por Vuelta de Loops (🤖 AUTO individual y maestro) ----
+    const am = st.autoMods || EMPTY;
+    d.autoModBtns?.forEach((btn) => {
+      const key = btn.getAttribute('data-auto-mod');
+      const isOn = key === 'palette' ? Boolean(st.autoRotatePalette) : Boolean(am[key]);
+      btn.classList.toggle('active', isOn);
+      btn.textContent = isOn ? '🤖 AUTO: SÍ' : '🤖 AUTO';
+    });
+
+    const allAutoOn = Boolean(this.autopilot && this.autopilot.areAllAutoModsActive && this.autopilot.areAllAutoModsActive());
+    this._syncToggle(
+      d.btnAllAutoToggle,
+      'allAutoMods',
+      allAutoOn,
+      '🟢 TODO EN AUTO: ACTIVO (CADA VUELTA ES ÚNICA)',
+      '🤖 PONER TODO EN AUTO (LOOPS ÚNICOS POR HORAS)'
+    );
+
+    const changeEvery = am.changeEvery === 'SCENE' ? 'SCENE' : 'LAP';
+    d.autoEveryBtns?.forEach((btn) => {
+      btn.classList.toggle('active', btn.getAttribute('data-every') === changeEvery);
+    });
+
+    if (d.apLapReadout) {
+      const lapNum = n(am.lapsCompleted, 0) + 1;
+      const loopIdx = n(am.loopsInCurrentLap, 1);
+      const totalLoops = n(am.lapTotalLoops, 8);
+      this._setText(d.apLapReadout, `VUELTA #${lapNum} · LOOP ${loopIdx} / ${totalLoops}`);
+    }
 
     // Editor: solo se redibuja si cambia algo y está visible
     const cv = d.cornerCanvas;

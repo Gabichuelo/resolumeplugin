@@ -33,6 +33,20 @@ export class Persistence {
       output: st.fx.output,
       safeStrobe: st.fx.safeStrobe !== false,
       calmColor: st.calmColor !== false,
+      autoRotatePalette: Boolean(st.autoRotatePalette),
+      autopilotBankPool: st.autopilotBankPool,
+      autoMods: st.autoMods ? {
+        changeEvery: st.autoMods.changeEvery || 'LAP',
+        shape: Boolean(st.autoMods.shape),
+        style: Boolean(st.autoMods.style),
+        weight: Boolean(st.autoMods.weight),
+        sweep: Boolean(st.autoMods.sweep),
+        effect3d: Boolean(st.autoMods.effect3d),
+        postFx: Boolean(st.autoMods.postFx),
+        logoFx: Boolean(st.autoMods.logoFx),
+        textFx: Boolean(st.autoMods.textFx),
+        mediaFx: Boolean(st.autoMods.mediaFx)
+      } : null,
       presets: st.presets,
       autoQuality: st.autoQuality,
       logoSettings: {
@@ -121,6 +135,23 @@ export class Persistence {
     }
     if (typeof cfg.calmColor === 'boolean') {
       st.calmColor = cfg.calmColor;
+    }
+    if (typeof cfg.autoRotatePalette === 'boolean') {
+      st.autoRotatePalette = cfg.autoRotatePalette;
+    }
+    if (typeof cfg.autopilotBankPool === 'string' && cfg.autopilotBankPool) {
+      st.autopilotBankPool = cfg.autopilotBankPool;
+    }
+    if (cfg.autoMods && typeof cfg.autoMods === 'object') {
+      if (!st.autoMods) st.autoMods = {};
+      if (cfg.autoMods.changeEvery === 'SCENE' || cfg.autoMods.changeEvery === 'LAP') {
+        st.autoMods.changeEvery = cfg.autoMods.changeEvery;
+      }
+      for (const k of ['shape', 'style', 'weight', 'sweep', 'effect3d', 'postFx', 'logoFx', 'textFx', 'mediaFx']) {
+        if (typeof cfg.autoMods[k] === 'boolean') {
+          st.autoMods[k] = cfg.autoMods[k];
+        }
+      }
     }
     if (typeof cfg.autoQuality === 'boolean') {
       st.autoQuality = cfg.autoQuality;

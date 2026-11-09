@@ -184,19 +184,34 @@
             <span class="module-led cyan"></span>
             <span class="module-title">PASO 1: FORMA, ESTILO Y MOVIMIENTO</span>
           </div>
-          <div class="sub-label" style="margin-top:0">1. ¿QUÉ FIGURA GEOMÉTRICA QUIERES?</div>
+          <div class="sub-label" style="margin-top:0;display:flex;align-items:center;justify-content:space-between">
+            <span>1. ¿QUÉ FIGURA GEOMÉTRICA QUIERES?</span>
+            <button type="button" class="btn-mini btn-auto-mod" data-auto-mod="shape" title="Si está en AUTO, va cambiando automáticamente entre todas las figuras al completar una vuelta de loops">🤖 AUTO</button>
+          </div>
           <div id="shape-mode-grid" class="shape-selector-grid"></div>
 
-          <div class="sub-label">2. ¿QUÉ ACABADO VISUAL? [TECLA: P]</div>
+          <div class="sub-label" style="display:flex;align-items:center;justify-content:space-between">
+            <span>2. ¿QUÉ ACABADO VISUAL? [TECLA: P]</span>
+            <button type="button" class="btn-mini btn-auto-mod" data-auto-mod="style" title="Si está en AUTO, cambia automáticamente entre Normal, 100% Plano, Línea Fina y Bloques Sólidos al dar una vuelta de loops">🤖 AUTO</button>
+          </div>
           <div id="style-mode-grid" class="weight-selector-grid"></div>
 
-          <div class="sub-label">3. ¿CÓMO CAMBIA EL GROSOR DE LÍNEA? [TECLA: W]</div>
+          <div class="sub-label" style="display:flex;align-items:center;justify-content:space-between">
+            <span>3. ¿CÓMO CAMBIA EL GROSOR DE LÍNEA? [TECLA: W]</span>
+            <button type="button" class="btn-mini btn-auto-mod" data-auto-mod="weight" title="Si está en AUTO, rota entre Fijo, Respira Fino↔Grueso, Ola Izq→Der y Alternar al dar una vuelta de loops">🤖 AUTO</button>
+          </div>
           <div id="weight-mode-grid" class="weight-selector-grid"></div>
 
-          <div class="sub-label">4. ¿AÑADIR BARRIDO LATERAL? [TECLA: Q]</div>
+          <div class="sub-label" style="display:flex;align-items:center;justify-content:space-between">
+            <span>4. ¿AÑADIR BARRIDO LATERAL? [TECLA: Q]</span>
+            <button type="button" class="btn-mini btn-auto-mod" data-auto-mod="sweep" title="Si está en AUTO, rota automáticamente entre Sin Barrido, Izq→Der, Der→Izq, Vaivén, Centro y Cortina al dar una vuelta de loops">🤖 AUTO</button>
+          </div>
           <div id="sweep-mode-grid" class="sweep-selector-grid"></div>
 
-          <div class="sub-label">5. ¿CONVERTIR EN 3D EN VIVO? (CUALQUIER LOOP) [TECLA: E]</div>
+          <div class="sub-label" style="display:flex;align-items:center;justify-content:space-between">
+            <span>5. ¿CONVERTIR EN 3D EN VIVO? (CUALQUIER LOOP) [TECLA: E]</span>
+            <button type="button" class="btn-mini btn-auto-mod" data-auto-mod="effect3d" title="Si está en AUTO, alterna entre 2D Plano, Plano Flotante 3D, Relieve 3D y Cilindro 3D al dar una vuelta de loops">🤖 AUTO</button>
+          </div>
           <div id="effect3d-mode-grid" class="weight-selector-grid"></div>
           <div class="fx-row" style="margin-top:4px">
             <span class="fft-band-name" style="width:92px">RELIEVE / GIRO 3D</span>
@@ -223,6 +238,22 @@
             <button type="button" id="btn-auto-palette-toggle" class="btn-ap-sub active" title="Cambia la paleta de colores automáticamente al cambiar de escena">
               AUTO COLOR
             </button>
+          </div>
+
+          <!-- BOTÓN MAESTRO "PONER TODO EN AUTO" Y CONTADOR DE VUELTAS DE LOOPS -->
+          <div style="margin:5px 0;padding:6px;background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.28);border-radius:6px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:10px;font-weight:800;color:#00e5ff;letter-spacing:0.04em">🔄 MUTACIÓN POR VUELTA DE LOOPS</span>
+              <span id="ap-lap-readout" class="module-tag" style="color:#00e5ff">VUELTA #0 · LOOP 1 / 8</span>
+            </div>
+            <button type="button" id="btn-all-auto-toggle" class="btn-console-pad accent" style="width:100%;margin-bottom:4px;font-weight:800" title="Pone TODAS las opciones (Figura, Acabado, Grosor, Barrido, 3D, Color, Efectos, Logo y Texto) en modo 🤖 AUTO para que cambien en cada vuelta de loops y ningún loop se repita igual durante horas">
+              🤖 PONER TODO EN AUTO (LOOPS ÚNICOS POR HORAS)
+            </button>
+            <div class="mixer-quick-btns" style="grid-template-columns:1fr 1fr auto;gap:3px">
+              <button type="button" class="btn-sweep-mode btn-auto-every active" data-every="LAP" title="Cambia las opciones en AUTO cuando el piloto ha dado 1 vuelta completa a todos los loops de la familia activa">🔄 CADA 1 VUELTA DE LOOPS</button>
+              <button type="button" class="btn-sweep-mode btn-auto-every" data-every="SCENE" title="Cambia las opciones en AUTO en cada cambio de loop">⏭ EN CADA LOOP</button>
+              <button type="button" id="btn-step-auto-now" class="btn-mini" title="Avanza ahora mismo todas las opciones que tengan su botón 🤖 AUTO activado">🎲 GIRAR YA</button>
+            </div>
           </div>
 
           <div class="mixer-quick-btns" style="margin-bottom:4px">
@@ -366,6 +397,7 @@
           <div class="module-header">
             <span class="module-led magenta"></span>
             <span class="module-title">PASO 2: ELIGE LA PALETA DE COLOR</span>
+            <button type="button" class="btn-mini btn-auto-mod active" data-auto-mod="palette" title="Si está en AUTO, cambia automáticamente la paleta de color en cada vuelta de loops">🤖 AUTO</button>
           </div>
           <div id="palette-grid" class="palette-swatch-grid"></div>
         </section>
@@ -410,7 +442,10 @@
             <button type="button" class="btn-logo-slot" data-slot="3">DJ 4 (VACÍO)</button>
           </div>
 
-          <div class="sub-label">EFECTO DINÁMICO DEL LOGO</div>
+          <div class="sub-label" style="display:flex;align-items:center;justify-content:space-between">
+            <span>EFECTO DINÁMICO DEL LOGO</span>
+            <button type="button" class="btn-mini btn-auto-mod" data-auto-mod="logoFx" title="Si está en AUTO, cambia automáticamente el efecto del logo al dar una vuelta de loops">🤖 AUTO</button>
+          </div>
           <div id="logo-fx-grid" class="weight-selector-grid"></div>
 
           <div class="sub-label">POSICIÓN EN ESCENARIO</div>
@@ -447,7 +482,10 @@
           <div class="sub-label">TIPO DE LETRA</div>
           <div id="text-font-grid" class="v2-four-grid"></div>
 
-          <div class="sub-label">EFECTO DEL TEXTO</div>
+          <div class="sub-label" style="display:flex;align-items:center;justify-content:space-between">
+            <span>EFECTO DEL TEXTO</span>
+            <button type="button" class="btn-mini btn-auto-mod" data-auto-mod="textFx" title="Si está en AUTO, cambia automáticamente el efecto del texto al dar una vuelta de loops">🤖 AUTO</button>
+          </div>
           <div id="text-fx-grid" class="weight-selector-grid"></div>
 
           <div class="sub-label">POSICIÓN</div>
@@ -514,7 +552,10 @@
           <div class="sub-label">CÓMO SE MEZCLA CON LOS VISUALES</div>
           <div id="media-blend-grid" class="weight-selector-grid"></div>
 
-          <div class="sub-label">EFECTO SOBRE EL VÍDEO / CÁMARA</div>
+          <div class="sub-label" style="display:flex;align-items:center;justify-content:space-between">
+            <span>EFECTO SOBRE EL VÍDEO / CÁMARA</span>
+            <button type="button" class="btn-mini btn-auto-mod" data-auto-mod="mediaFx" title="Si está en AUTO, cambia automáticamente el efecto de vídeo/cámara al dar una vuelta de loops">🤖 AUTO</button>
+          </div>
           <div id="media-fx-grid" class="weight-selector-grid"></div>
 
           <div class="sub-label">ENCUADRE</div>
@@ -623,6 +664,7 @@
           <div class="module-header">
             <span class="module-led green"></span>
             <span class="module-title">EFECTOS OPCIONALES</span>
+            <button type="button" class="btn-mini btn-auto-mod" data-auto-mod="postFx" title="Si está en AUTO, va rotando automáticamente entre Sin Efectos, Espejo 2X/4X, RGB sutil y Estela Suave al dar una vuelta de loops">🤖 AUTO</button>
             <button type="button" id="btn-fx-clean-bypass" class="btn-fx-bypass active" title="Mantiene todos los efectos apagados para que la geometría se vea 100% limpia y plana">
               SIN EFECTOS: SÍ
             </button>

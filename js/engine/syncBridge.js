@@ -258,12 +258,39 @@ export class SyncBridge {
     if (!this.remoteConnected) return;
     const st = this.state;
     const dominantGenIdx = st.crossfade >= 0.5 ? st.deckB : st.deckA;
+    const macrosPayload = {};
+    for (let i = 0; i < MACRO_DEFS.length; i++) {
+      const k = MACRO_DEFS[i].key;
+      if (st.macros[k]) {
+        macrosPayload[k] = Math.round(st.macros[k].base * 100) / 100;
+      }
+    }
     const payload = {
       activeGen: dominantGenIdx,
       activeBankTab: st.activeBankTab,
       autopilotPool: st.autopilotBankPool,
       autopilotEnabled: st.autopilot.enabled,
       autopilotMode: st.autopilot.mode,
+      lfoMasterEnabled: Boolean(st.autopilot.lfoMasterEnabled),
+      autoRotatePalette: Boolean(st.autoRotatePalette),
+      autopilotTriggerUnit: st.autopilot.triggerUnit || 'BARS',
+      autopilotTriggerBars: st.autopilot.triggerBars || 32,
+      autopilotTriggerSeconds: st.autopilot.triggerSeconds || 45,
+      autopilotProgress: Math.round((st.autopilot.sceneProgress || 0) * 100),
+      scenesPlayed: st.autopilot.scenesPlayed || 1,
+      autoMods: Object.assign({}, st.autoMods || {}, {
+        palette: Boolean(st.autoRotatePalette),
+        allActive: Boolean(this.autopilot && this.autopilot.areAllAutoModsActive && this.autopilot.areAllAutoModsActive())
+      }),
+      macros: macrosPayload,
+      postFx: {
+        bypass: Boolean(st.pureFlatBypassFx),
+        kaleidoscope: st.fx.kaleidoscope,
+        rgbShift: st.fx.rgbShift,
+        feedback: st.fx.feedback,
+        glitch: st.fx.glitch,
+        pixelate: st.fx.pixelate
+      },
       shapeMode: st.shapeMode,
       styleMode: st.styleMode,
       weightMode: st.weightMode,
@@ -336,6 +363,12 @@ export class SyncBridge {
             st.activeBankTab = cmd.pool;
             if (this.onBankChanged) this.onBankChanged();
           }
+          if (st.autoMods && this.autopilot && typeof this.autopilot._getAllowedGenerators === 'function') {
+            const allowed = this.autopilot._getAllowedGenerators();
+            st.autoMods.lapTotalLoops = Math.max(1, allowed.length);
+            st.autoMods.visitedInLap = (st.autoMods.visitedInLap || []).filter((id) => allowed.includes(id));
+            st.autoMods.loopsInCurrentLap = Math.max(1, st.autoMods.visitedInLap.length);
+          }
         }
         break;
       case 'SET_SHAPE':
@@ -343,6 +376,13 @@ export class SyncBridge {
         break;
       case 'SET_STYLE':
         st.styleMode = Number(cmd.value) || 0;
+        if (st.styleMode === 1 && !(st.autoMods && st.autoMods.postFx)) {
+          st.fx.kaleidoscope.enabled = false;
+          st.fx.rgbShift.enabled = false;
+          st.fx.feedback.enabled = false;
+          st.fx.glitch.enabled = false;
+          st.fx.pixelate.enabled = false;
+        }
         break;
       case 'SET_WEIGHT':
         st.weightMode = Number(cmd.value) || 0;
@@ -372,6 +412,80 @@ export class SyncBridge {
         break;
       case 'SET_AUTOPILOT_MODE':
         if (cmd.value) st.autopilot.mode = cmd.value;
+        break;
+      case 'SET_LFO_MASTER':
+        st.autopilot.lfoMasterEnabled = Boolean(cmd.value);
+        break;
+      case 'SET_AUTOPILOT_TRIGGER':
+        if (cmd.unit === 'BARS' || cmd.unit === 'SECONDS') {
+          st.autopilot.triggerUnit = cmd.unit;
+        }
+        if (typeof cmd.value === 'number' && Number.isFinite(cmd.value)) {
+          if (st.autopilot.triggerUnit === 'BARS') {
+            st.autopilot.triggerBars = Math.max(1, Math.min(256, Math.round(cmd.value)));
+          } else {
+            st.autopilot.triggerSeconds = Math.max(4, Math.min(600, Math.round(cmd.value)));
+          }
+        }
+        break;
+      case 'SET_AUTO_MOD':
+        if (!st.autoMods) st.autoMods = {};
+        if (cmd.key === 'palette') {
+          st.autoRotatePalette = Boolean(cmd.value);
+        } else if (['shape', 'style', 'weight', 'sweep', 'effect3d', 'postFx', 'logoFx', 'textFx', 'mediaFx'].includes(cmd.key)) {
+          st.autoMods[cmd.key] = Boolean(cmd.value);
+        }
+        break;
+      case 'SET_ALL_AUTO':
+        if (this.autopilot && typeof this.autopilot.setAllAutoMods === 'function') {
+          this.autopilot.setAllAutoMods(Boolean(cmd.value));
+        }
+        break;
+      case 'SET_AUTO_CHANGE_EVERY':
+        if (!st.autoMods) st.autoMods = {};
+        st.autoMods.changeEvery = cmd.value === 'SCENE' ? 'SCENE' : 'LAP';
+        break;
+      case 'STEP_AUTO_MODS_NOW':
+        if (this.autopilot && typeof this.autopilot.stepAutoModifiers === 'function') {
+          this.autopilot.stepAutoModifiers(true);
+        }
+        break;
+      case 'MUTATE_MACROS':
+        if (this.autopilot && typeof this.autopilot.randomizeMacrosNow === 'function') {
+          this.autopilot.randomizeMacrosNow();
+        }
+        break;
+      case 'SET_POST_FX':
+        if (cmd.key === 'bypass') {
+          st.pureFlatBypassFx = Boolean(cmd.enabled);
+          if (st.pureFlatBypassFx) {
+            st.fx.kaleidoscope.enabled = false;
+            st.fx.rgbShift.enabled = false;
+            st.fx.feedback.enabled = false;
+            st.fx.glitch.enabled = false;
+            st.fx.pixelate.enabled = false;
+          }
+        } else if (['kaleidoscope', 'rgbShift', 'feedback', 'glitch', 'pixelate'].includes(cmd.key)) {
+          const fxSlot = st.fx[cmd.key];
+          if (fxSlot) {
+            if (typeof cmd.enabled === 'boolean') {
+              fxSlot.enabled = cmd.enabled;
+              if (cmd.enabled) st.pureFlatBypassFx = false;
+            }
+            if (typeof cmd.wet === 'number' && Number.isFinite(cmd.wet)) {
+              fxSlot.wet = clampNum(cmd.wet, 0, 1, fxSlot.wet);
+              if (fxSlot.wet > 0.02) {
+                fxSlot.enabled = true;
+                st.pureFlatBypassFx = false;
+              }
+            }
+            if (cmd.key === 'kaleidoscope' && typeof cmd.axes === 'number') {
+              fxSlot.axes = [2, 4, 8].includes(cmd.axes) ? cmd.axes : 2;
+              fxSlot.enabled = true;
+              st.pureFlatBypassFx = false;
+            }
+          }
+        }
         break;
       case 'SET_MACRO':
         if (cmd.key && st.macros[cmd.key]) {

@@ -218,6 +218,40 @@
       border-color: var(--magenta);
       color: #ff6d97;
     }
+    .btn-hero.auto-all {
+      background: rgba(255, 184, 0, 0.16);
+      border-color: var(--amber);
+      color: var(--amber);
+    }
+    .btn-hero.auto-all.active {
+      background: rgba(0, 230, 118, 0.24);
+      border-color: var(--green);
+      color: var(--green);
+      box-shadow: 0 0 12px rgba(0, 230, 118, 0.25);
+    }
+    .btn-hero.map-jump {
+      background: rgba(157, 78, 221, 0.18);
+      border-color: #b565f7;
+      color: #dcb0ff;
+    }
+    .btn-auto-badge {
+      background: var(--slot);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 4px 9px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-auto-badge.active {
+      background: rgba(0, 230, 118, 0.22);
+      border-color: var(--green);
+      color: var(--green);
+      box-shadow: 0 0 8px rgba(0, 230, 118, 0.22);
+    }
     .preset-grid-mobile {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -637,6 +671,8 @@
 
   <!-- BOTONES RÁPIDOS SIEMPRE VISIBLES (SOLO TÉCNICO) -->
   <div class="quick-hero-bar admin-only">
+    <button type="button" id="btn-hero-all-auto" class="btn-hero auto-all">🤖 PONER TODO EN AUTO</button>
+    <button type="button" id="btn-hero-mapping" class="btn-hero map-jump">📐 MAPEAR PANTALLA / LED</button>
     <button type="button" id="btn-calm" class="btn-hero calm">🌿 CALMAR VISUAL</button>
     <button type="button" id="btn-next" class="btn-hero next">⏭ SIGUIENTE LOOP</button>
     <button type="button" id="btn-panic" class="btn-hero panic" style="grid-column: span 2">🆘 PÁNICO: VOLVER A VISUAL SEGURO</button>
@@ -644,16 +680,16 @@
 
   <!-- NAVEGACIÓN POR PESTAÑAS TÁCTILES (EL DJ SOLO VE LOGO, TEXTO Y VÍDEO; EL TÉCNICO LO VE TODO) -->
   <nav class="tabs-nav">
-    <button type="button" class="tab-btn active" data-tab="tab-logo">📸 LOGO</button>
-    <button type="button" class="tab-btn" data-tab="tab-text">✍️ TEXTO</button>
-    <button type="button" class="tab-btn" data-tab="tab-media">🎬 VÍDEO Y CÁMARA</button>
-    <button type="button" class="tab-btn admin-only" data-tab="tab-visuals">🌀 LOOPS</button>
-    <button type="button" class="tab-btn admin-only" data-tab="tab-color">🎨 COLOR</button>
+    <button type="button" class="tab-btn admin-only active" data-tab="tab-visuals">🌀 LOOPS / AUTO</button>
+    <button type="button" class="tab-btn admin-only" data-tab="tab-color">🎨 COLOR / FX</button>
     <button type="button" class="tab-btn admin-only" data-tab="tab-mapping">📐 MAPPING</button>
+    <button type="button" class="tab-btn" data-tab="tab-logo">📸 LOGO DJ</button>
+    <button type="button" class="tab-btn" data-tab="tab-text">✍️ TEXTO</button>
+    <button type="button" class="tab-btn" data-tab="tab-media">🎬 VÍDEO</button>
   </nav>
 
-  <!-- ==================== PESTAÑA 1: ESTUDIO DE LOGO PNG DJ ==================== -->
-  <section id="tab-logo" class="tab-pane active">
+  <!-- ==================== PESTAÑA LOGO PNG DJ ==================== -->
+  <section id="tab-logo" class="tab-pane">
     <div class="card">
       <div class="card-title">
         <span>📸 SUBIR Y MOSTRAR LOGO DEL DJ</span>
@@ -716,6 +752,7 @@
     <div class="card">
       <div class="card-title">
         <span>✨ EFECTO DINÁMICO DEL LOGO EN VIVO</span>
+        <button type="button" class="btn-auto-badge admin-only" data-auto-mod="logoFx">🤖 AUTO</button>
       </div>
       <div class="grid-2" id="m-logo-fx-grid">
         <button type="button" class="btn-pad" data-fx="0">⏹ Fijo Limpio</button>
@@ -782,7 +819,10 @@
         <button type="button" class="btn-pad" data-font="3">Redonda</button>
       </div>
 
-      <div class="card-title" style="margin-top:12px"><span>✨ EFECTO DEL TEXTO</span></div>
+      <div class="card-title" style="margin-top:12px">
+        <span>✨ EFECTO DEL TEXTO</span>
+        <button type="button" class="btn-auto-badge admin-only" data-auto-mod="textFx">🤖 AUTO</button>
+      </div>
       <div class="grid-2" id="m-text-fx-grid">
         <button type="button" class="btn-pad" data-tfx="0">⏹ Limpio</button>
         <button type="button" class="btn-pad active" data-tfx="1">💓 Latido + Halo</button>
@@ -883,7 +923,10 @@
         <button type="button" class="btn-pad" data-mblend="4" style="grid-column: span 2">🌗 Mitad y mitad</button>
       </div>
 
-      <div class="card-title" style="margin-top:12px"><span>🎨 EFECTO DEL VÍDEO</span></div>
+      <div class="card-title" style="margin-top:12px">
+        <span>🎨 EFECTO DEL VÍDEO</span>
+        <button type="button" class="btn-auto-badge admin-only" data-auto-mod="mediaFx">🤖 AUTO</button>
+      </div>
       <div class="grid-2" id="m-media-fx-grid">
         <button type="button" class="btn-pad active" data-mfx="0">⏹ Normal</button>
         <button type="button" class="btn-pad" data-mfx="1">💠 Bordes Neón</button>
@@ -915,8 +958,159 @@
     </div>
   </section>
 
-  <!-- ==================== PESTAÑA 2: 48 LOOPS, FORMAS Y 3D (SOLO TÉCNICO) ==================== -->
-  <section id="tab-visuals" class="tab-pane admin-only">
+  <!-- ==================== PESTAÑA PRINCIPAL TÉCNICO: 48 LOOPS, PILOTO AUTO Y MODIFICADORES ==================== -->
+  <section id="tab-visuals" class="tab-pane admin-only active">
+    <!-- TARJETA 1: PILOTO AUTOMÁTICO Y MUTACIÓN POR VUELTA DE LOOPS -->
+    <div class="card" style="border-color: rgba(0, 240, 255, 0.45)">
+      <div class="card-title">
+        <span>🤖 PILOTO AUTO Y MUTACIÓN POR VUELTA</span>
+        <span id="m-lap-readout" style="color:var(--cyan);font-weight:900">VUELTA #1 · LOOP 1/8</span>
+      </div>
+
+      <button type="button" id="btn-m-all-auto" class="btn-pad amber-active btn-big btn-full" style="margin-bottom:8px;font-size:12px">
+        🤖 PONER TODO EN AUTO (LOOPS ÚNICOS POR HORAS)
+      </button>
+
+      <div class="grid-3" style="margin-bottom:8px">
+        <button type="button" id="btn-m-ap-toggle" class="btn-pad green-live">▶ PILOTO: SÍ</button>
+        <button type="button" id="btn-m-lfo-toggle" class="btn-pad active">〰 MOV. SUAVE</button>
+        <button type="button" class="btn-pad active btn-auto-badge-inline" data-auto-mod="palette">🎨 AUTO COLOR</button>
+      </div>
+
+      <div class="card-title" style="margin-top:6px;margin-bottom:6px">
+        <span>🔄 ¿CUÁNDO CAMBIAN LAS OPCIONES EN AUTO?</span>
+      </div>
+      <div class="grid-3" id="m-auto-every-grid" style="margin-bottom:8px">
+        <button type="button" class="btn-pad active" data-every="LAP">🔄 Cada 1 Vuelta</button>
+        <button type="button" class="btn-pad" data-every="SCENE">⏭ En cada Loop</button>
+        <button type="button" id="btn-m-step-auto-now" class="btn-pad amber-active">🎲 Girar YA</button>
+      </div>
+      <div class="help-text" style="margin-bottom:10px">
+        En <strong>Cada 1 Vuelta</strong>, el piloto recorre todos los loops de la familia sin repetir ninguno y, al terminar la vuelta completa, cambia automáticamente todas las opciones que tengan su botón <strong>🤖 AUTO</strong> encendido.
+      </div>
+
+      <div class="card-title" style="margin-bottom:6px">
+        <span>📚 ¿QUÉ FAMILIAS MEZCLA EL PILOTO AUTO?</span>
+      </div>
+      <div class="grid-3" id="m-ap-pool-grid" style="margin-bottom:6px">
+        <button type="button" class="btn-pad active" data-pool="FLT">1. Planos (8)</button>
+        <button type="button" class="btn-pad" data-pool="MIN">2. Arcos (8)</button>
+        <button type="button" class="btn-pad" data-pool="MOT">3. Escena (8)</button>
+        <button type="button" class="btn-pad" data-pool="GEO">4. Formas (8)</button>
+        <button type="button" class="btn-pad" data-pool="KIN">5. Barrido (8)</button>
+        <button type="button" class="btn-pad" data-pool="SPC">6. 🧊 3D (8)</button>
+        <button type="button" class="btn-pad" data-pool="FLAT_GEO_KIN">★ 40 Planos/2D</button>
+        <button type="button" class="btn-pad" data-pool="ALL" style="grid-column: span 2">🌐 MEZCLAR TODOS LOS 48 LOOPS</button>
+      </div>
+
+      <div class="card-title" style="margin-top:10px;margin-bottom:6px">
+        <span>⚡ INTENSIDAD Y CADA CUÁNTO CAMBIA DE LOOP</span>
+      </div>
+      <div class="grid-2" id="m-ap-mode-grid" style="margin-bottom:6px">
+        <button type="button" class="btn-pad active" data-apmode="HYPNOTIC_SLOW">🌿 Suave / Elegante</button>
+        <button type="button" class="btn-pad" data-apmode="CLUB_DYNAMIC">🎵 Club Equilibrado</button>
+        <button type="button" class="btn-pad" data-apmode="FESTIVAL_PEAK">⚡ Energía / Drop</button>
+        <button type="button" class="btn-pad" data-apmode="FULL_RANDOM_CHAOS">🔥 Caos Creativo</button>
+      </div>
+      <div class="grid-3" id="m-ap-trigger-grid">
+        <button type="button" class="btn-pad" data-tunit="BARS" data-tval="8">8 comp.</button>
+        <button type="button" class="btn-pad" data-tunit="BARS" data-tval="16">16 comp.</button>
+        <button type="button" class="btn-pad active" data-tunit="BARS" data-tval="32">32 comp.</button>
+        <button type="button" class="btn-pad" data-tunit="BARS" data-tval="64">64 comp.</button>
+        <button type="button" class="btn-pad" data-tunit="SECONDS" data-tval="30">30 seg.</button>
+        <button type="button" class="btn-pad" data-tunit="SECONDS" data-tval="60">60 seg.</button>
+      </div>
+    </div>
+
+    <!-- TARJETA 2: 48 LOOPS MANUALES POR FAMILIA -->
+    <div class="card">
+      <div class="card-title">
+        <span>🌀 ELEGIR LOOP MANUALMENTE (48 GENERADORES)</span>
+      </div>
+      <div class="grid-6" id="m-bank-tabs" style="margin-bottom:10px">
+        <button type="button" class="btn-pad amber-active" data-bank="FLT">1. PLANOS</button>
+        <button type="button" class="btn-pad" data-bank="MIN">2. ARCOS</button>
+        <button type="button" class="btn-pad" data-bank="MOT">3. ESCENA</button>
+        <button type="button" class="btn-pad" data-bank="GEO">4. FORMAS</button>
+        <button type="button" class="btn-pad" data-bank="KIN">5. BARRIDO</button>
+        <button type="button" class="btn-pad" data-bank="SPC">6. 🧊 3D</button>
+      </div>
+      <div class="grid-2" id="m-scene-grid"></div>
+    </div>
+
+    <!-- TARJETA 3: FIGURA GEOMÉTRICA + ACABADO VISUAL CON BOTONES AUTO -->
+    <div class="card">
+      <div class="card-title">
+        <span>1. FIGURA GEOMÉTRICA</span>
+        <button type="button" class="btn-auto-badge" data-auto-mod="shape">🤖 AUTO</button>
+      </div>
+      <div class="grid-3" id="m-shape-grid" style="margin-bottom:12px">
+        <button type="button" class="btn-pad active" data-shape="0">◈ Original</button>
+        <button type="button" class="btn-pad" data-shape="1">□ Cuadrado</button>
+        <button type="button" class="btn-pad" data-shape="2">△ Triángulo</button>
+        <button type="button" class="btn-pad" data-shape="3">⬡ Hexágono</button>
+        <button type="button" class="btn-pad" data-shape="4">◇ Rombo</button>
+        <button type="button" class="btn-pad" data-shape="5">≡ Líneas</button>
+      </div>
+
+      <div class="card-title">
+        <span>2. ACABADO VISUAL</span>
+        <button type="button" class="btn-auto-badge" data-auto-mod="style">🤖 AUTO</button>
+      </div>
+      <div class="grid-2" id="m-style-grid">
+        <button type="button" class="btn-pad" data-style="0">✨ Normal</button>
+        <button type="button" class="btn-pad active" data-style="1">⏹ 100% Plano</button>
+        <button type="button" class="btn-pad" data-style="2">📐 Línea Fina</button>
+        <button type="button" class="btn-pad" data-style="3">🎨 Bloques Sólidos</button>
+      </div>
+    </div>
+
+    <!-- TARJETA 4: GROSOR DINÁMICO + BARRIDO DE ESCENARIO CON BOTONES AUTO -->
+    <div class="card">
+      <div class="card-title">
+        <span>3. GROSOR DINÁMICO DE LÍNEA</span>
+        <button type="button" class="btn-auto-badge" data-auto-mod="weight">🤖 AUTO</button>
+      </div>
+      <div class="grid-2" id="m-weight-grid" style="margin-bottom:12px">
+        <button type="button" class="btn-pad" data-weight="0">━ Fijo (Manual)</button>
+        <button type="button" class="btn-pad active" data-weight="1">〰 Respira Fino⟷Grueso</button>
+        <button type="button" class="btn-pad" data-weight="2">🌊 Ola Izq ➔ Der</button>
+        <button type="button" class="btn-pad" data-weight="3">◫ Alternar Fino/Grueso</button>
+      </div>
+
+      <div class="card-title">
+        <span>4. BARRIDO LATERAL DE ESCENARIO</span>
+        <button type="button" class="btn-auto-badge" data-auto-mod="sweep">🤖 AUTO</button>
+      </div>
+      <div class="grid-3" id="m-sweep-grid">
+        <button type="button" class="btn-pad active" data-sweep="0">Sin Barrido</button>
+        <button type="button" class="btn-pad" data-sweep="1">➔ Izq a Der</button>
+        <button type="button" class="btn-pad" data-sweep="2">⬅ Der a Izq</button>
+        <button type="button" class="btn-pad" data-sweep="3">↔ Vaivén</button>
+        <button type="button" class="btn-pad" data-sweep="4">◄► Centro</button>
+        <button type="button" class="btn-pad" data-sweep="5">▮ Cortina</button>
+      </div>
+    </div>
+
+    <!-- TARJETA 5: MODO 3D EN VIVO CON BOTÓN AUTO -->
+    <div class="card">
+      <div class="card-title">
+        <span>5. CONVERTIR CUALQUIER LOOP EN 3D</span>
+        <button type="button" class="btn-auto-badge" data-auto-mod="effect3d">🤖 AUTO</button>
+      </div>
+      <div class="grid-2" id="m-3d-grid">
+        <button type="button" class="btn-pad active" data-3d="0">⏹ 2D Normal</button>
+        <button type="button" class="btn-pad" data-3d="1">📐 Plano 3D</button>
+        <button type="button" class="btn-pad" data-3d="2">🧊 Extrusión 3D</button>
+        <button type="button" class="btn-pad" data-3d="3">🏟 Curva 3D</button>
+      </div>
+      <div class="slider-row">
+        <span>RELIEVE 3D</span>
+        <input type="range" id="m-3d-amount" min="0.10" max="1.0" step="0.01" value="0.55" />
+      </div>
+    </div>
+
+    <!-- TARJETA 6: MIS LOOKS GUARDADOS -->
     <div class="card">
       <div class="card-title">
         <span>⭐ MIS LOOKS GUARDADOS</span>
@@ -940,60 +1134,15 @@
       </div>
       <div class="help-text">La mezcla entre Looks dura los compases elegidos y va sincronizada al BPM.</div>
     </div>
-    <div class="card">
-      <div class="card-title">
-        <span>FAMILIAS DE LOOPS (48 GENERADORES)</span>
-      </div>
-      <div class="grid-6" id="m-bank-tabs" style="margin-bottom:10px">
-        <button type="button" class="btn-pad amber-active" data-bank="FLT">1. PLANOS</button>
-        <button type="button" class="btn-pad" data-bank="MIN">2. ARCOS</button>
-        <button type="button" class="btn-pad" data-bank="MOT">3. ESCENA</button>
-        <button type="button" class="btn-pad" data-bank="GEO">4. FORMAS</button>
-        <button type="button" class="btn-pad" data-bank="KIN">5. BARRIDO</button>
-        <button type="button" class="btn-pad" data-bank="SPC">6. 🧊 3D</button>
-      </div>
-      <div class="grid-2" id="m-scene-grid"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">
-        <span>🧊 CONVERTIR CUALQUIER LOOP EN 3D</span>
-      </div>
-      <div class="grid-2" id="m-3d-grid">
-        <button type="button" class="btn-pad active" data-3d="0">⏹ 2D Normal</button>
-        <button type="button" class="btn-pad" data-3d="1">📐 Plano 3D</button>
-        <button type="button" class="btn-pad" data-3d="2">🧊 Extrusión 3D</button>
-        <button type="button" class="btn-pad" data-3d="3">🏟 Curva 3D</button>
-      </div>
-      <div class="slider-row">
-        <span>RELIEVE 3D</span>
-        <input type="range" id="m-3d-amount" min="0.10" max="1.0" step="0.01" value="0.55" />
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><span>FIGURA Y ACABADO</span></div>
-      <div class="grid-3" id="m-shape-grid" style="margin-bottom:8px">
-        <button type="button" class="btn-pad active" data-shape="0">◈ Auto</button>
-        <button type="button" class="btn-pad" data-shape="1">□ Cuadrado</button>
-        <button type="button" class="btn-pad" data-shape="2">△ Triángulo</button>
-        <button type="button" class="btn-pad" data-shape="3">⬡ Hexágono</button>
-        <button type="button" class="btn-pad" data-shape="4">◇ Rombo</button>
-        <button type="button" class="btn-pad" data-shape="5">≡ Líneas</button>
-      </div>
-      <div class="grid-2" id="m-style-grid">
-        <button type="button" class="btn-pad" data-style="0">✨ Normal</button>
-        <button type="button" class="btn-pad active" data-style="1">⏹ 100% Plano</button>
-        <button type="button" class="btn-pad" data-style="2">📐 Línea Fina</button>
-        <button type="button" class="btn-pad" data-style="3">🎨 Sólido</button>
-      </div>
-    </div>
   </section>
 
-  <!-- ==================== PESTAÑA 3: PALETAS DE COLOR, BPM Y DIRECTO (SOLO TÉCNICO) ==================== -->
+  <!-- ==================== PESTAÑA 3: PALETAS DE COLOR, EFECTOS OPCIONALES, 8 FADERS Y BPM (SOLO TÉCNICO) ==================== -->
   <section id="tab-color" class="tab-pane admin-only">
     <div class="card">
-      <div class="card-title"><span>🎨 10 PALETAS DE COLOR</span></div>
+      <div class="card-title">
+        <span>🎨 10 PALETAS DE COLOR</span>
+        <button type="button" class="btn-auto-badge active" data-auto-mod="palette">🤖 AUTO: SÍ</button>
+      </div>
       <div class="grid-2" id="m-palette-grid">
         <button type="button" class="btn-pad active" data-pal="0">Cyberpunk</button>
         <button type="button" class="btn-pad" data-pal="1">Techno Blanco/Negro</button>
@@ -1011,25 +1160,89 @@
       </button>
     </div>
 
+    <!-- EFECTOS OPCIONALES POST-FX CON BOTÓN AUTO -->
     <div class="card">
       <div class="card-title">
-        <span>🥁 RITMO BPM Y VELOCIDAD</span>
+        <span>✨ EFECTOS OPCIONALES (POST-FX)</span>
+        <button type="button" class="btn-auto-badge" data-auto-mod="postFx">🤖 AUTO</button>
+      </div>
+      <button type="button" id="btn-m-fx-bypass" class="btn-pad active btn-full" style="margin-bottom:8px">
+        🛡 SIN EFECTOS (100% LIMPIO): SÍ
+      </button>
+      <div class="grid-4" style="margin-bottom:6px">
+        <button type="button" id="btn-m-fx-kaleido" class="btn-pad">🪞 Espejo</button>
+        <button type="button" class="btn-pad active m-kaleido-axis" data-axes="2">2X</button>
+        <button type="button" class="btn-pad m-kaleido-axis" data-axes="4">4X</button>
+        <button type="button" class="btn-pad m-kaleido-axis" data-axes="8">8X</button>
+      </div>
+      <div class="slider-row" style="margin-top:2px;margin-bottom:8px">
+        <span>INTENS. ESPEJO</span>
+        <input type="range" id="m-fx-kaleido-wet" min="0" max="1" step="0.01" value="0.50" />
+      </div>
+      <div class="grid-2" style="margin-bottom:6px">
+        <button type="button" id="btn-m-fx-rgb" class="btn-pad">🌈 Separar RGB</button>
+        <button type="button" id="btn-m-fx-feedback" class="btn-pad">💫 Estela Suave</button>
+        <button type="button" id="btn-m-fx-glitch" class="btn-pad">⚡ Corte Glitch</button>
+        <button type="button" id="btn-m-fx-pixelate" class="btn-pad">▦ Malla LED</button>
+      </div>
+      <div class="slider-row">
+        <span>SEPARAR RGB</span>
+        <input type="range" id="m-fx-rgb-wet" min="0" max="1" step="0.01" value="0.16" />
+      </div>
+      <div class="slider-row">
+        <span>ESTELA SUAVE</span>
+        <input type="range" id="m-fx-feedback-wet" min="0" max="1" step="0.01" value="0.25" />
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>🥁 RITMO BPM Y LOS 8 FADERS MAESTROS</span>
         <span id="m-bpm-readout" style="color:var(--amber)">126.0 BPM</span>
       </div>
-      <button type="button" id="btn-m-tap" class="btn-pad amber-active" style="width:100%;padding:16px;font-size:13px;margin-bottom:8px">
-        🥁 TOCAR AL RITMO DE LA MÚSICA (TAP TEMPO)
-      </button>
+      <div class="grid-2" style="margin-bottom:8px">
+        <button type="button" id="btn-m-tap" class="btn-pad amber-active" style="padding:14px 8px;font-size:12px">
+          🥁 TAP TEMPO
+        </button>
+        <button type="button" id="btn-m-mutate-macros" class="btn-pad active" style="padding:14px 8px;font-size:12px">
+          🎲 VARIAR FADERS
+        </button>
+      </div>
       <div class="slider-row">
-        <span>VELOCIDAD</span>
+        <span>BPM RELOJ</span>
+        <input type="range" id="m-bpm-slider" min="60" max="180" step="0.5" value="126" />
+      </div>
+      <div class="slider-row">
+        <span>1. VELOCIDAD</span>
         <input type="range" id="m-macro-speed" min="0" max="1" step="0.01" value="0.22" />
       </div>
       <div class="slider-row">
-        <span>GROSOR</span>
+        <span>2. ZOOM / CANT.</span>
+        <input type="range" id="m-macro-scale" min="0" max="1" step="0.01" value="0.24" />
+      </div>
+      <div class="slider-row">
+        <span>3. COMPLEJIDAD</span>
+        <input type="range" id="m-macro-complexity" min="0" max="1" step="0.01" value="0.22" />
+      </div>
+      <div class="slider-row">
+        <span>4. GROSOR LÍNEA</span>
         <input type="range" id="m-macro-thickness" min="0" max="1" step="0.01" value="0.38" />
       </div>
       <div class="slider-row">
-        <span>ZOOM / CANT.</span>
-        <input type="range" id="m-macro-scale" min="0" max="1" step="0.01" value="0.24" />
+        <span>5. ROTACIÓN</span>
+        <input type="range" id="m-macro-rotation" min="0" max="1" step="0.01" value="0.00" />
+      </div>
+      <div class="slider-row">
+        <span>6. CAOS</span>
+        <input type="range" id="m-macro-chaos" min="0" max="1" step="0.01" value="0.08" />
+      </div>
+      <div class="slider-row">
+        <span>7. PULSO BEAT</span>
+        <input type="range" id="m-macro-strobe" min="0" max="1" step="0.01" value="0.00" />
+      </div>
+      <div class="slider-row">
+        <span>8. TONO COLOR</span>
+        <input type="range" id="m-macro-colorShift" min="0" max="1" step="0.01" value="0.10" />
       </div>
     </div>
 
@@ -1039,7 +1252,8 @@
         <button type="button" id="btn-m-flash" class="btn-pad">☀️ DESTELLO (MANTENER)</button>
         <button type="button" id="btn-m-strobe" class="btn-pad">⚡ ESTROBO (MANTENER)</button>
         <button type="button" id="btn-m-mono" class="btn-pad">◑ BLANCO / NEGRO</button>
-        <button type="button" id="btn-m-blackout" class="btn-pad danger">🌑 APAGAR PANTALLA</button>
+        <button type="button" id="btn-m-invert" class="btn-pad">🔄 INVERTIR COLOR</button>
+        <button type="button" id="btn-m-blackout" class="btn-pad danger" style="grid-column: span 2">🌑 APAGAR PANTALLA (BLACKOUT)</button>
       </div>
     </div>
   </section>
@@ -1342,11 +1556,13 @@
         if (role === 'dj') {
           document.body.classList.add('dj-guest-mode');
           roleTitle.textContent = '🎧 MODO DJ INVITADO';
-          // Ensure Logo Tab is active
+          // Ensure Logo Tab is active for DJ
           activateTab('tab-logo');
         } else {
           document.body.classList.remove('dj-guest-mode');
           roleTitle.textContent = '🎛️ MODO TÉCNICO';
+          // Open on Main Loops & Auto tab for Technician
+          activateTab('tab-visuals');
         }
         loginOverlay.classList.add('hidden');
       }
@@ -1488,6 +1704,163 @@
       document.getElementById('btn-next').addEventListener('click', () => {
         sendCommand({ action: 'NEXT_SCENE' });
       });
+      document.getElementById('btn-hero-mapping')?.addEventListener('click', () => {
+        activateTab('tab-mapping');
+      });
+
+      // ==================== PILOTO AUTO Y MUTACIÓN POR VUELTA (AUTO-MODS) ====================
+      let apEnabledLocal = true;
+      let lfoEnabledLocal = true;
+      let autoModsLocal = {
+        changeEvery: 'LAP',
+        lapsCompleted: 0,
+        loopsInCurrentLap: 1,
+        lapTotalLoops: 8,
+        shape: false,
+        style: false,
+        weight: false,
+        sweep: false,
+        effect3d: false,
+        palette: true,
+        postFx: false,
+        logoFx: false,
+        textFx: false,
+        mediaFx: false
+      };
+      const AUTO_MOD_KEYS = ['shape', 'style', 'weight', 'sweep', 'effect3d', 'palette', 'postFx', 'logoFx', 'textFx', 'mediaFx'];
+
+      function isAllAutoActiveLocal() {
+        return apEnabledLocal && AUTO_MOD_KEYS.every((k) => Boolean(autoModsLocal[k]));
+      }
+
+      function renderAutoModsUI() {
+        const allAuto = isAllAutoActiveLocal();
+        const btnHeroAll = document.getElementById('btn-hero-all-auto');
+        if (btnHeroAll) {
+          btnHeroAll.classList.toggle('active', allAuto);
+          btnHeroAll.textContent = allAuto ? '🟢 TODO EN AUTO (ACTIVO)' : '🤖 PONER TODO EN AUTO';
+        }
+        const btnCardAll = document.getElementById('btn-m-all-auto');
+        if (btnCardAll) {
+          btnCardAll.classList.toggle('green-live', allAuto);
+          btnCardAll.classList.toggle('amber-active', !allAuto);
+          btnCardAll.textContent = allAuto
+            ? '🟢 TODO EN AUTO ACTIVO (CADA VUELTA ES ÚNICA)'
+            : '🤖 PONER TODO EN AUTO (LOOPS ÚNICOS POR HORAS)';
+        }
+
+        document.querySelectorAll('[data-auto-mod]').forEach((btn) => {
+          const key = btn.getAttribute('data-auto-mod');
+          const on = Boolean(autoModsLocal[key]);
+          btn.classList.toggle('active', on);
+          if (btn.classList.contains('btn-auto-badge-inline')) {
+            btn.textContent = on ? '🎨 AUTO COLOR: SÍ' : '🎨 AUTO COLOR: NO';
+          } else {
+            btn.textContent = on ? '🤖 AUTO: SÍ' : '🤖 AUTO';
+          }
+        });
+
+        document.querySelectorAll('#m-auto-every-grid .btn-pad[data-every]').forEach((btn) => {
+          btn.classList.toggle('active', btn.getAttribute('data-every') === autoModsLocal.changeEvery);
+        });
+
+        const lapReadout = document.getElementById('m-lap-readout');
+        if (lapReadout) {
+          const lapNum = (autoModsLocal.lapsCompleted || 0) + 1;
+          const curLoop = autoModsLocal.loopsInCurrentLap || 1;
+          const totLoop = autoModsLocal.lapTotalLoops || 8;
+          lapReadout.textContent = 'VUELTA #' + lapNum + ' · LOOP ' + curLoop + '/' + totLoop;
+        }
+
+        const btnAp = document.getElementById('btn-m-ap-toggle');
+        if (btnAp) {
+          btnAp.classList.toggle('green-live', apEnabledLocal);
+          btnAp.textContent = apEnabledLocal ? '▶ PILOTO: SÍ' : '⏸ PILOTO: NO';
+        }
+
+        const btnLfo = document.getElementById('btn-m-lfo-toggle');
+        if (btnLfo) {
+          btnLfo.classList.toggle('active', lfoEnabledLocal);
+          btnLfo.textContent = lfoEnabledLocal ? '〰 MOV. SUAVE: SÍ' : '〰 MOV. SUAVE: NO';
+        }
+      }
+
+      function toggleAllAutoMobile() {
+        const nextVal = !isAllAutoActiveLocal();
+        apEnabledLocal = true;
+        lfoEnabledLocal = true;
+        AUTO_MOD_KEYS.forEach((k) => { autoModsLocal[k] = nextVal; });
+        renderAutoModsUI();
+        sendCommand({ action: 'SET_ALL_AUTO', value: nextVal });
+      }
+      document.getElementById('btn-hero-all-auto')?.addEventListener('click', toggleAllAutoMobile);
+      document.getElementById('btn-m-all-auto')?.addEventListener('click', toggleAllAutoMobile);
+
+      document.querySelectorAll('[data-auto-mod]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const key = btn.getAttribute('data-auto-mod');
+          if (!key) return;
+          autoModsLocal[key] = !autoModsLocal[key];
+          renderAutoModsUI();
+          sendCommand({ action: 'SET_AUTO_MOD', key, value: autoModsLocal[key] });
+        });
+      });
+
+      document.querySelectorAll('#m-auto-every-grid .btn-pad[data-every]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const val = btn.getAttribute('data-every') === 'SCENE' ? 'SCENE' : 'LAP';
+          autoModsLocal.changeEvery = val;
+          renderAutoModsUI();
+          sendCommand({ action: 'SET_AUTO_CHANGE_EVERY', value: val });
+        });
+      });
+
+      document.getElementById('btn-m-step-auto-now')?.addEventListener('click', () => {
+        sendCommand({ action: 'STEP_AUTO_MODS_NOW' });
+      });
+
+      document.getElementById('btn-m-ap-toggle')?.addEventListener('click', () => {
+        apEnabledLocal = !apEnabledLocal;
+        renderAutoModsUI();
+        sendCommand({ action: 'SET_AUTOPILOT', value: apEnabledLocal });
+      });
+
+      document.getElementById('btn-m-lfo-toggle')?.addEventListener('click', () => {
+        lfoEnabledLocal = !lfoEnabledLocal;
+        renderAutoModsUI();
+        sendCommand({ action: 'SET_LFO_MASTER', value: lfoEnabledLocal });
+      });
+
+      document.querySelectorAll('#m-ap-pool-grid .btn-pad[data-pool]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const pool = btn.getAttribute('data-pool') || 'FLT';
+          document.querySelectorAll('#m-ap-pool-grid .btn-pad[data-pool]').forEach((b) => b.classList.toggle('active', b === btn));
+          if (SCENES_BY_BANK[pool]) {
+            currentBank = pool;
+            document.querySelectorAll('#m-bank-tabs .btn-pad').forEach((b) => b.classList.toggle('amber-active', b.getAttribute('data-bank') === pool));
+            renderScenePads();
+          }
+          sendCommand({ action: 'SELECT_POOL', pool });
+        });
+      });
+
+      document.querySelectorAll('#m-ap-mode-grid .btn-pad[data-apmode]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const mode = btn.getAttribute('data-apmode') || 'HYPNOTIC_SLOW';
+          document.querySelectorAll('#m-ap-mode-grid .btn-pad[data-apmode]').forEach((b) => b.classList.toggle('active', b === btn));
+          sendCommand({ action: 'SET_AUTOPILOT_MODE', mode });
+        });
+      });
+
+      document.querySelectorAll('#m-ap-trigger-grid .btn-pad[data-tunit]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const unit = btn.getAttribute('data-tunit') || 'BARS';
+          const value = parseInt(btn.getAttribute('data-tval'), 10) || 32;
+          document.querySelectorAll('#m-ap-trigger-grid .btn-pad[data-tunit]').forEach((b) => b.classList.toggle('active', b === btn));
+          sendCommand({ action: 'SET_AUTOPILOT_TRIGGER', unit, value });
+        });
+      });
+      renderAutoModsUI();
 
       // ==================== LOGO STUDIO LOGIC ====================
       const btnLogoToggle = document.getElementById('btn-m-logo-toggle');
@@ -1730,6 +2103,22 @@
         });
       });
 
+      document.querySelectorAll('#m-weight-grid .btn-pad').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const val = parseInt(btn.getAttribute('data-weight'), 10) || 0;
+          document.querySelectorAll('#m-weight-grid .btn-pad').forEach((b) => b.classList.toggle('active', b === btn));
+          sendCommand({ action: 'SET_WEIGHT', value: val });
+        });
+      });
+
+      document.querySelectorAll('#m-sweep-grid .btn-pad').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const val = parseInt(btn.getAttribute('data-sweep'), 10) || 0;
+          document.querySelectorAll('#m-sweep-grid .btn-pad').forEach((b) => b.classList.toggle('active', b === btn));
+          sendCommand({ action: 'SET_SWEEP', value: val });
+        });
+      });
+
       document.querySelectorAll('#m-palette-grid .btn-pad').forEach((btn) => {
         btn.addEventListener('click', () => {
           const val = parseInt(btn.getAttribute('data-pal'), 10) || 0;
@@ -1738,12 +2127,104 @@
         });
       });
 
+      // ==================== POST-FX OPCIONALES (MÓVIL) ====================
+      let postFxLocal = {
+        bypass: true,
+        kaleidoEnabled: false,
+        kaleidoAxes: 2,
+        kaleidoWet: 0.5,
+        rgbShiftEnabled: false,
+        rgbShiftWet: 0.16,
+        feedbackEnabled: false,
+        feedbackWet: 0.25,
+        glitchEnabled: false,
+        pixelateEnabled: false
+      };
+
+      function renderPostFxUI() {
+        const btnBypass = document.getElementById('btn-m-fx-bypass');
+        if (btnBypass) {
+          btnBypass.classList.toggle('active', postFxLocal.bypass);
+          btnBypass.textContent = postFxLocal.bypass
+            ? '🛡 SIN EFECTOS (100% LIMPIO): SÍ'
+            : '✨ EFECTOS OPCIONALES ACTIVOS (TOCA PARA LIMPIAR)';
+        }
+        document.getElementById('btn-m-fx-kaleido')?.classList.toggle('active', !postFxLocal.bypass && postFxLocal.kaleidoEnabled);
+        document.querySelectorAll('.m-kaleido-axis').forEach((b) => {
+          b.classList.toggle('active', parseInt(b.getAttribute('data-axes'), 10) === postFxLocal.kaleidoAxes);
+        });
+        document.getElementById('btn-m-fx-rgb')?.classList.toggle('active', !postFxLocal.bypass && postFxLocal.rgbShiftEnabled);
+        document.getElementById('btn-m-fx-feedback')?.classList.toggle('active', !postFxLocal.bypass && postFxLocal.feedbackEnabled);
+        document.getElementById('btn-m-fx-glitch')?.classList.toggle('active', !postFxLocal.bypass && postFxLocal.glitchEnabled);
+        document.getElementById('btn-m-fx-pixelate')?.classList.toggle('active', !postFxLocal.bypass && postFxLocal.pixelateEnabled);
+      }
+
+      document.getElementById('btn-m-fx-bypass')?.addEventListener('click', () => {
+        postFxLocal.bypass = !postFxLocal.bypass;
+        renderPostFxUI();
+        sendCommand({ action: 'SET_POST_FX', prop: 'bypass', value: postFxLocal.bypass });
+      });
+
+      const bindPostFxToggle = (btnId, propKey) => {
+        document.getElementById(btnId)?.addEventListener('click', () => {
+          postFxLocal[propKey] = !postFxLocal[propKey];
+          if (postFxLocal[propKey]) postFxLocal.bypass = false;
+          renderPostFxUI();
+          sendCommand({ action: 'SET_POST_FX', prop: propKey, value: postFxLocal[propKey] });
+        });
+      };
+      bindPostFxToggle('btn-m-fx-kaleido', 'kaleidoEnabled');
+      bindPostFxToggle('btn-m-fx-rgb', 'rgbShiftEnabled');
+      bindPostFxToggle('btn-m-fx-feedback', 'feedbackEnabled');
+      bindPostFxToggle('btn-m-fx-glitch', 'glitchEnabled');
+      bindPostFxToggle('btn-m-fx-pixelate', 'pixelateEnabled');
+
+      document.querySelectorAll('.m-kaleido-axis').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const axes = parseInt(btn.getAttribute('data-axes'), 10) || 2;
+          postFxLocal.kaleidoAxes = axes;
+          postFxLocal.kaleidoEnabled = true;
+          postFxLocal.bypass = false;
+          renderPostFxUI();
+          sendCommand({ action: 'SET_POST_FX', prop: 'kaleidoAxes', value: axes });
+          sendCommand({ action: 'SET_POST_FX', prop: 'kaleidoEnabled', value: true });
+        });
+      });
+
+      document.getElementById('m-fx-kaleido-wet')?.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        postFxLocal.kaleidoWet = val;
+        sendCommand({ action: 'SET_POST_FX', prop: 'kaleidoWet', value: val });
+      });
+      document.getElementById('m-fx-rgb-wet')?.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        postFxLocal.rgbShiftWet = val;
+        sendCommand({ action: 'SET_POST_FX', prop: 'rgbShiftWet', value: val });
+      });
+      document.getElementById('m-fx-feedback-wet')?.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        postFxLocal.feedbackWet = val;
+        sendCommand({ action: 'SET_POST_FX', prop: 'feedbackWet', value: val });
+      });
+      renderPostFxUI();
+
+      // ==================== BPM Y LOS 8 FADERS MAESTROS ====================
       document.getElementById('btn-m-tap').addEventListener('click', () => {
         sendCommand({ action: 'TAP_TEMPO' });
       });
+      document.getElementById('btn-m-mutate-macros')?.addEventListener('click', () => {
+        sendCommand({ action: 'MUTATE_MACROS' });
+      });
+      document.getElementById('m-bpm-slider')?.addEventListener('input', (e) => {
+        const bpm = parseFloat(e.target.value);
+        document.getElementById('m-bpm-readout').textContent = bpm.toFixed(1) + ' BPM';
+        sendCommand({ action: 'SET_BPM', value: bpm });
+      });
 
-      ['speed', 'thickness', 'scale'].forEach((k) => {
-        document.getElementById('m-macro-' + k).addEventListener('input', (e) => {
+      ['speed', 'scale', 'complexity', 'thickness', 'rotation', 'chaos', 'strobe', 'colorShift'].forEach((k) => {
+        const el = document.getElementById('m-macro-' + k);
+        if (!el) return;
+        el.addEventListener('input', (e) => {
           sendCommand({ action: 'SET_MACRO', key: k, value: parseFloat(e.target.value) });
         });
       });
@@ -1751,6 +2232,7 @@
       // Momentary & Toggle Kill Buttons
       const bindHold = (id, key) => {
         const el = document.getElementById(id);
+        if (!el) return;
         const start = (e) => { e.preventDefault(); el.classList.add('active'); sendCommand({ action: 'KILL_ACTION', key, active: true }); };
         const end = () => { el.classList.remove('active'); sendCommand({ action: 'KILL_ACTION', key, active: false }); };
         el.addEventListener('touchstart', start, { passive: false });
@@ -1764,6 +2246,10 @@
       document.getElementById('btn-m-mono').addEventListener('click', (e) => {
         e.currentTarget.classList.toggle('active');
         sendCommand({ action: 'KILL_ACTION', key: 'mono' });
+      });
+      document.getElementById('btn-m-invert')?.addEventListener('click', (e) => {
+        e.currentTarget.classList.toggle('active');
+        sendCommand({ action: 'KILL_ACTION', key: 'invert' });
       });
       document.getElementById('btn-m-blackout').addEventListener('click', (e) => {
         e.currentTarget.classList.toggle('active');
@@ -2920,6 +3406,64 @@
         }
         if (st.mapping) applyMappingStatus(st.mapping);
         if (st.edgeBlend) applyEdgeStatus(st.edgeBlend);
+
+        // Sync Autopilot, Auto-Mods, Lap Counter, Modifiers, Post-FX & 8 Macro Faders
+        if (typeof st.autopilotEnabled === 'boolean') apEnabledLocal = st.autopilotEnabled;
+        if (typeof st.lfoMasterEnabled === 'boolean') lfoEnabledLocal = st.lfoMasterEnabled;
+        if (st.autoMods && typeof st.autoMods === 'object') {
+          Object.assign(autoModsLocal, st.autoMods);
+        }
+        if (typeof st.autoRotatePalette === 'boolean') {
+          autoModsLocal.palette = st.autoRotatePalette;
+        }
+        renderAutoModsUI();
+
+        if (typeof st.autopilotPool === 'string') {
+          reflectChoiceGrid('m-ap-pool-grid', 'data-pool', st.autopilotPool);
+        }
+        if (typeof st.autopilotMode === 'string') {
+          reflectChoiceGrid('m-ap-mode-grid', 'data-apmode', st.autopilotMode);
+        }
+        if (typeof st.autopilotTriggerUnit === 'string') {
+          const tGrid = document.getElementById('m-ap-trigger-grid');
+          if (isIdle(tGrid)) {
+            const targetVal = st.autopilotTriggerUnit === 'SECONDS' ? st.autopilotTriggerSeconds : st.autopilotTriggerBars;
+            tGrid?.querySelectorAll('.btn-pad[data-tunit]').forEach((b) => {
+              const match = b.getAttribute('data-tunit') === st.autopilotTriggerUnit &&
+                            parseInt(b.getAttribute('data-tval'), 10) === Number(targetVal);
+              b.classList.toggle('active', match);
+            });
+          }
+        }
+
+        if (typeof st.shapeMode === 'number') reflectChoiceGrid('m-shape-grid', 'data-shape', st.shapeMode);
+        if (typeof st.styleMode === 'number') reflectChoiceGrid('m-style-grid', 'data-style', st.styleMode);
+        if (typeof st.weightMode === 'number') reflectChoiceGrid('m-weight-grid', 'data-weight', st.weightMode);
+        if (typeof st.sweepMode === 'number') reflectChoiceGrid('m-sweep-grid', 'data-sweep', st.sweepMode);
+        if (typeof st.effect3dMode === 'number') reflectChoiceGrid('m-3d-grid', 'data-3d', st.effect3dMode);
+        if (typeof st.effect3dAmount === 'number') setRangeIfIdle('m-3d-amount', st.effect3dAmount);
+        if (typeof st.paletteTarget === 'number') reflectChoiceGrid('m-palette-grid', 'data-pal', st.paletteTarget);
+        if (typeof st.bpm === 'number') setRangeIfIdle('m-bpm-slider', st.bpm);
+
+        if (st.logo && typeof st.logo.fxMode === 'number') {
+          reflectChoiceGrid('m-logo-fx-grid', 'data-fx', st.logo.fxMode);
+        }
+
+        if (st.macros && typeof st.macros === 'object') {
+          ['speed', 'scale', 'complexity', 'thickness', 'rotation', 'chaos', 'strobe', 'colorShift'].forEach((k) => {
+            if (typeof st.macros[k] === 'number') setRangeIfIdle('m-macro-' + k, st.macros[k]);
+          });
+        }
+
+        if (st.postFx && typeof st.postFx === 'object') {
+          Object.assign(postFxLocal, st.postFx);
+          renderPostFxUI();
+          if (typeof st.postFx.kaleidoWet === 'number') setRangeIfIdle('m-fx-kaleido-wet', st.postFx.kaleidoWet);
+          if (typeof st.postFx.rgbShiftWet === 'number') setRangeIfIdle('m-fx-rgb-wet', st.postFx.rgbShiftWet);
+          if (typeof st.postFx.feedbackWet === 'number') setRangeIfIdle('m-fx-feedback-wet', st.postFx.feedbackWet);
+        }
+
+        renderScenePads();
       }
 
       // Live Status Sync from Master Server

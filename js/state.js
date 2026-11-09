@@ -967,6 +967,25 @@ export function createInitialState() {
       lastBarNumber: 1,
       scenesPlayed: 1,
       historyQueue: [18]
+    },
+
+    // Mutación Automática por Vuelta de Loops ("AUTO" individual en cada familia de efectos)
+    autoMods: {
+      changeEvery: 'LAP',      // 'LAP' = Cambia al completar 1 vuelta entera de loops | 'SCENE' = Cambia en cada loop
+      lapsCompleted: 0,        // Vueltas completas de todos los loops de la familia activa
+      loopsInCurrentLap: 1,    // Posición del loop actual dentro de la vuelta (ej. 1 / 8 o 1 / 48)
+      lapTotalLoops: 8,        // Total de loops en la vuelta actual (8, 40 o 48)
+      visitedInLap: [18],      // Loops ya mostrados en la vuelta actual (evita repetir hasta dar la vuelta entera)
+      postFxStep: 0,           // Paso actual de combinación de Efectos Opcionales cuando postFx está en AUTO
+      shape: false,            // 🤖 AUTO Figura Geométrica (Automática, Cuadrados, Triángulos, Hexágonos, Rombos, Líneas)
+      style: false,            // 🤖 AUTO Acabado Visual (Normal, 100% Plano, Solo Línea Fina, Bloques Sólidos)
+      weight: false,           // 🤖 AUTO Grosor de Línea (Fijo, Respira Fino↔Grueso, Ola Izq→Der, Alternar)
+      sweep: false,            // 🤖 AUTO Barrido Lateral (Sin Barrido, Izq→Der, Der→Izq, Vaivén, Centro, Cortina)
+      effect3d: false,         // 🤖 AUTO Modo 3D en Vivo (2D Plano, Plano Flotante 3D, Relieve 3D, Cilindro 3D)
+      postFx: false,           // 🤖 AUTO Efectos Opcionales (Sin Efectos, Espejo 2X/4X, RGB, Estela Suave, Malla LED)
+      logoFx: false,           // 🤖 AUTO Efecto Dinámico del Logo DJ (Fijo, Latido, 3D, Neón, Silueta)
+      textFx: false,           // 🤖 AUTO Efecto del Texto (Limpio, Latido, Neón, Ticker, Onda, Silueta, 3D)
+      mediaFx: false           // 🤖 AUTO Efecto de Vídeo/Cámara (Normal, Bordes Neón, Duotono, Térmica, Pop-Art...)
     }
   };
 }

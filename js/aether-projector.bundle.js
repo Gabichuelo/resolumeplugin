@@ -1092,6 +1092,25 @@ function createInitialState() {
       lastBarNumber: 1,
       scenesPlayed: 1,
       historyQueue: [18]
+    },
+
+    // Mutación Automática por Vuelta de Loops ("AUTO" individual en cada familia de efectos)
+    autoMods: {
+      changeEvery: 'LAP',      // 'LAP' = Cambia al completar 1 vuelta entera de loops | 'SCENE' = Cambia en cada loop
+      lapsCompleted: 0,        // Vueltas completas de todos los loops de la familia activa
+      loopsInCurrentLap: 1,    // Posición del loop actual dentro de la vuelta (ej. 1 / 8 o 1 / 48)
+      lapTotalLoops: 8,        // Total de loops en la vuelta actual (8, 40 o 48)
+      visitedInLap: [18],      // Loops ya mostrados en la vuelta actual (evita repetir hasta dar la vuelta entera)
+      postFxStep: 0,           // Paso actual de combinación de Efectos Opcionales cuando postFx está en AUTO
+      shape: false,            // 🤖 AUTO Figura Geométrica (Automática, Cuadrados, Triángulos, Hexágonos, Rombos, Líneas)
+      style: false,            // 🤖 AUTO Acabado Visual (Normal, 100% Plano, Solo Línea Fina, Bloques Sólidos)
+      weight: false,           // 🤖 AUTO Grosor de Línea (Fijo, Respira Fino↔Grueso, Ola Izq→Der, Alternar)
+      sweep: false,            // 🤖 AUTO Barrido Lateral (Sin Barrido, Izq→Der, Der→Izq, Vaivén, Centro, Cortina)
+      effect3d: false,         // 🤖 AUTO Modo 3D en Vivo (2D Plano, Plano Flotante 3D, Relieve 3D, Cilindro 3D)
+      postFx: false,           // 🤖 AUTO Efectos Opcionales (Sin Efectos, Espejo 2X/4X, RGB, Estela Suave, Malla LED)
+      logoFx: false,           // 🤖 AUTO Efecto Dinámico del Logo DJ (Fijo, Latido, 3D, Neón, Silueta)
+      textFx: false,           // 🤖 AUTO Efecto del Texto (Limpio, Latido, Neón, Ticker, Onda, Silueta, 3D)
+      mediaFx: false           // 🤖 AUTO Efecto de Vídeo/Cámara (Normal, Bordes Neón, Duotono, Térmica, Pop-Art...)
     }
   };
 }
@@ -5882,39 +5901,242 @@ class AutopilotBrain {
   }
 
   /**
+   * Devuelve la lista de IDs de loops activos según la familia seleccionada en el Piloto Automático
+   */
+  _getAllowedGenerators() {
+    const bankPool = this.state.autopilotBankPool || 'FLT';
+    return GENERATORS.filter((g) => {
+      if (bankPool === 'FLAT_GEO_KIN') return g.bank !== 'SPC'; // 40 Loops Planos, Minimal, Escenario, Formas y Barridos (Sin 3D)
+      if (bankPool === 'FLT') return g.bank === 'FLT';
+      if (bankPool === 'MIN') return g.bank === 'MIN';
+      if (bankPool === 'MOT') return g.bank === 'MOT';
+      if (bankPool === 'KIN') return g.bank === 'KIN';
+      if (bankPool === 'GEO') return g.bank === 'GEO';
+      if (bankPool === 'SPC') return g.bank === 'SPC';
+      return true;
+    }).map((g) => g.id);
+  }
+
+  /**
+   * Comprueba si TODAS las opciones de modificadores están en modo 🤖 AUTO
+   */
+  areAllAutoModsActive() {
+    const st = this.state;
+    const am = st.autoMods;
+    if (!am) return false;
+    return Boolean(
+      st.autopilot.enabled &&
+      st.autoRotatePalette &&
+      am.shape &&
+      am.style &&
+      am.weight &&
+      am.sweep &&
+      am.effect3d &&
+      am.postFx &&
+      am.logoFx &&
+      am.textFx &&
+      am.mediaFx
+    );
+  }
+
+  /**
+   * Activa o desactiva "🤖 PONER TODO EN AUTO" con un solo clic
+   */
+  setAllAutoMods(enable) {
+    const st = this.state;
+    const on = Boolean(enable);
+    if (!st.autoMods) st.autoMods = {};
+    const am = st.autoMods;
+    if (on) {
+      st.autopilot.enabled = true;
+      st.autopilot.lfoMasterEnabled = true;
+    }
+    st.autoRotatePalette = on;
+    am.shape = on;
+    am.style = on;
+    am.weight = on;
+    am.sweep = on;
+    am.effect3d = on;
+    am.postFx = on;
+    am.logoFx = on;
+    am.textFx = on;
+    am.mediaFx = on;
+  }
+
+  /**
+   * Avanza al siguiente valor cada opción que tenga su botón "🤖 AUTO" activado.
+   * Por defecto se ejecuta automáticamente cada vez que el Piloto Automático completa
+   * una vuelta entera de todos los loops de la familia activa, haciendo que cada vuelta
+   * sea totalmente única durante horas.
+   */
+  stepAutoModifiers(forceManual = false) {
+    const st = this.state;
+    const am = st.autoMods || {};
+
+    // 1. Figura Geométrica (0..5)
+    if (am.shape) {
+      st.shapeMode = (st.shapeMode + 1) % SHAPE_MODES.length;
+    }
+
+    // 2. Acabado Visual (0..3)
+    if (am.style) {
+      st.styleMode = (st.styleMode + 1) % STYLE_MODES.length;
+      if (st.styleMode === 1 && !am.postFx) {
+        st.fx.kaleidoscope.enabled = false;
+        st.fx.rgbShift.enabled = false;
+        st.fx.feedback.enabled = false;
+        st.fx.glitch.enabled = false;
+        st.fx.pixelate.enabled = false;
+      }
+    }
+
+    // 3. Grosor Dinámico de Línea (0..3)
+    if (am.weight) {
+      st.weightMode = (st.weightMode + 1) % WEIGHT_MODES.length;
+    }
+
+    // 4. Barrido de Escenario (0..5)
+    if (am.sweep) {
+      st.sweepMode = (st.sweepMode + 1) % SWEEP_MODES.length;
+    }
+
+    // 5. Efecto 3D en Vivo (0..3)
+    if (am.effect3d) {
+      if (!st.fx.effect3d) st.fx.effect3d = { mode: 0, amount: 0.55 };
+      st.fx.effect3d.mode = (st.fx.effect3d.mode + 1) % EFFECT_3D_MODES.length;
+      if (st.fx.effect3d.mode > 0) {
+        st.fx.effect3d.amount = Math.round((0.40 + Math.random() * 0.35) * 100) / 100;
+      }
+    }
+
+    // 6. Efectos Opcionales Post-FX (ciclo limpio de 7 combinaciones)
+    if (am.postFx) {
+      am.postFxStep = ((am.postFxStep || 0) + 1) % 7;
+      const step = am.postFxStep;
+      st.fx.kaleidoscope.enabled = false;
+      st.fx.rgbShift.enabled = false;
+      st.fx.feedback.enabled = false;
+      st.fx.glitch.enabled = false;
+      st.fx.pixelate.enabled = false;
+
+      if (step === 0) {
+        // 100% Limpio sin efectos
+        st.pureFlatBypassFx = true;
+      } else {
+        st.pureFlatBypassFx = false;
+        if (step === 1) {
+          st.fx.kaleidoscope.enabled = true;
+          st.fx.kaleidoscope.axes = 2;
+          st.fx.kaleidoscope.wet = 0.55;
+        } else if (step === 2) {
+          st.fx.feedback.enabled = true;
+          st.fx.feedback.wet = 0.28;
+        } else if (step === 3) {
+          st.fx.kaleidoscope.enabled = true;
+          st.fx.kaleidoscope.axes = 4;
+          st.fx.kaleidoscope.wet = 0.65;
+        } else if (step === 4) {
+          st.fx.rgbShift.enabled = true;
+          st.fx.rgbShift.wet = 0.18;
+        } else if (step === 5) {
+          st.fx.kaleidoscope.enabled = true;
+          st.fx.kaleidoscope.axes = 2;
+          st.fx.kaleidoscope.wet = 0.45;
+          st.fx.feedback.enabled = true;
+          st.fx.feedback.wet = 0.24;
+        } else if (step === 6) {
+          st.fx.pixelate.enabled = true;
+          st.fx.pixelate.wet = 0.24;
+        }
+      }
+    }
+
+    // 7. Efecto Dinámico del Logo DJ (0..4)
+    if (am.logoFx && st.fx.logo) {
+      st.fx.logo.fxMode = (st.fx.logo.fxMode + 1) % LOGO_FX_MODES.length;
+    }
+
+    // 8. Efecto del Texto (0..6)
+    if (am.textFx && st.text) {
+      st.text.fxMode = (st.text.fxMode + 1) % TEXT_FX_MODES.length;
+    }
+
+    // 9. Efecto de Vídeo / Cámara (0..6)
+    if (am.mediaFx && st.media) {
+      st.media.fx = (st.media.fx + 1) % MEDIA_FX_MODES.length;
+    }
+
+    // 10. Paleta de Color (si se pulsa manualmente "Girar opciones Auto ahora" o al completar vuelta)
+    if (forceManual && st.autoRotatePalette) {
+      st.paletteActive = st.paletteTarget;
+      st.paletteTarget = (st.paletteActive + 1) % PALETTES.length;
+      st.paletteMix = 0.0;
+      this._lastPaletteChangeSec = st.renderTime || 0;
+    }
+  }
+
+  /**
    * Triggers a smooth A/B GPU Crossfade to the specified generator (or chooses an intelligent next generator)
    */
   triggerNextScene(forcedGeneratorId = null) {
     const st = this.state;
     const modeCfg = AUTOPILOT_MODES[st.autopilot.mode] || AUTOPILOT_MODES.CLUB_DYNAMIC;
+    if (!st.autoMods) {
+      st.autoMods = {
+        changeEvery: 'LAP',
+        lapsCompleted: 0,
+        loopsInCurrentLap: 1,
+        lapTotalLoops: 8,
+        visitedInLap: [],
+        postFxStep: 0
+      };
+    }
+    const am = st.autoMods;
 
     // Determine currently dominant deck (0 = Deck A, 1 = Deck B)
     const onDeckB = st.crossfade >= 0.5;
     const currentGen = onDeckB ? st.deckB : st.deckA;
 
+    const allowedGens = this._getAllowedGenerators();
+    am.lapTotalLoops = Math.max(1, allowedGens.length);
+    if (!Array.isArray(am.visitedInLap)) am.visitedInLap = [];
+    // Limpiar de visitedInLap los loops que no pertenezcan al banco activo actual
+    am.visitedInLap = am.visitedInLap.filter((id) => allowedGens.includes(id));
+
     let nextGen = forcedGeneratorId;
+    let lapCompletedNow = false;
+
     if (nextGen === null || nextGen === undefined) {
-      // Filter pool by active bank selection
-      const bankPool = st.autopilotBankPool || 'FLAT_GEO_KIN';
-      const allowedGens = GENERATORS.filter((g) => {
-        if (bankPool === 'FLAT_GEO_KIN') return g.bank !== 'SPC'; // 40 Loops Planos, Minimal, Escenario, Formas y Barridos (Cero túneles)
-        if (bankPool === 'FLT') return g.bank === 'FLT';
-        if (bankPool === 'MIN') return g.bank === 'MIN';
-        if (bankPool === 'MOT') return g.bank === 'MOT';
-        if (bankPool === 'KIN') return g.bank === 'KIN';
-        if (bankPool === 'GEO') return g.bank === 'GEO';
-        if (bankPool === 'SPC') return g.bank === 'SPC';
-        return true;
-      }).map((g) => g.id);
-
-      const candidates = allowedGens.filter(
-        (id) => id !== currentGen && !st.autopilot.historyQueue.includes(id)
+      // Buscar loops de la familia activa que aún NO hayan salido en esta vuelta
+      const unvisited = allowedGens.filter(
+        (id) => id !== currentGen && !am.visitedInLap.includes(id)
       );
-      const pool = candidates.length > 0
-        ? candidates
-        : allowedGens.filter((id) => id !== currentGen);
 
-      nextGen = pool[Math.floor(Math.random() * pool.length)];
+      if (unvisited.length > 0) {
+        const recentFiltered = unvisited.filter((id) => !st.autopilot.historyQueue.includes(id));
+        const pool = recentFiltered.length > 0 ? recentFiltered : unvisited;
+        nextGen = pool[Math.floor(Math.random() * pool.length)];
+      } else {
+        // ¡Se ha completado una vuelta entera de todos los loops de la familia activa!
+        lapCompletedNow = true;
+        am.lapsCompleted = (am.lapsCompleted || 0) + 1;
+        am.visitedInLap = [];
+        const freshPool = allowedGens.filter((id) => id !== currentGen);
+        nextGen = freshPool.length > 0
+          ? freshPool[Math.floor(Math.random() * freshPool.length)]
+          : allowedGens[0];
+      }
+    }
+
+    if (allowedGens.includes(nextGen) && !am.visitedInLap.includes(nextGen)) {
+      am.visitedInLap.push(nextGen);
+    }
+    am.loopsInCurrentLap = Math.max(1, am.visitedInLap.length);
+
+    // Si acabamos de completar la vuelta entera de loops (o si está configurado en cada cambio de loop),
+    // rotamos todas las opciones que tengan su botón 🤖 AUTO activado:
+    if (am.changeEvery === 'SCENE' || lapCompletedNow) {
+      this.stepAutoModifiers(false);
     }
 
     // Track in anti-repetition history queue (keep last 4 scenes)
@@ -5939,14 +6161,13 @@ class AutopilotBrain {
     st.autoCrossfading = true;
 
     // Rotate Palette if autoRotatePalette is active
-    // En modo Color Suave (anti-feria), evita cambiar de paleta si aún está fundiendo la anterior
-    // o si han pasado menos de 25 segundos desde el último cambio de paleta, y avanza de 1 en 1 sin saltos.
+    // Si changeEvery === 'LAP', puede rotar en cada vuelta o suavemente cada >=25s
     if (st.autoRotatePalette) {
       const calm = st.calmColor !== false;
       const nowSec = st.renderTime || 0;
       const sinceLastPal = nowSec - (this._lastPaletteChangeSec || -999);
       const stillBlending = st.paletteActive !== st.paletteTarget && st.paletteMix < 0.95;
-      if (!calm || (!stillBlending && sinceLastPal >= 25.0)) {
+      if (lapCompletedNow || !calm || (!stillBlending && sinceLastPal >= 25.0)) {
         st.paletteActive = st.paletteTarget;
         let nextPal = calm
           ? (st.paletteActive + 1) % PALETTES.length
@@ -5996,6 +6217,11 @@ class AutopilotBrain {
       this.macroBaseTargets.chaos = Math.min(modeCfg.chaosCeiling, 0.10 + Math.random() * 0.40);
       this.macroBaseTargets.strobe = Math.min(modeCfg.strobeCeiling, Math.random() * modeCfg.strobeCeiling * 0.5);
       this.macroBaseTargets.colorShift = st.calmColor !== false ? (0.08 + Math.random() * 0.16) : (0.20 + Math.random() * 0.45);
+    }
+
+    // Si los Efectos Opcionales tienen activado su propio modo 🤖 AUTO por vuelta, respetamos su ciclo
+    if (st.autoMods && st.autoMods.postFx) {
+      return;
     }
 
     // Si el bloqueo sin efectos está activo o estamos en el banco PLANO (16..23), mantener todos los FX apagados
@@ -6427,6 +6653,20 @@ class Persistence {
       output: st.fx.output,
       safeStrobe: st.fx.safeStrobe !== false,
       calmColor: st.calmColor !== false,
+      autoRotatePalette: Boolean(st.autoRotatePalette),
+      autopilotBankPool: st.autopilotBankPool,
+      autoMods: st.autoMods ? {
+        changeEvery: st.autoMods.changeEvery || 'LAP',
+        shape: Boolean(st.autoMods.shape),
+        style: Boolean(st.autoMods.style),
+        weight: Boolean(st.autoMods.weight),
+        sweep: Boolean(st.autoMods.sweep),
+        effect3d: Boolean(st.autoMods.effect3d),
+        postFx: Boolean(st.autoMods.postFx),
+        logoFx: Boolean(st.autoMods.logoFx),
+        textFx: Boolean(st.autoMods.textFx),
+        mediaFx: Boolean(st.autoMods.mediaFx)
+      } : null,
       presets: st.presets,
       autoQuality: st.autoQuality,
       logoSettings: {
@@ -6515,6 +6755,23 @@ class Persistence {
     }
     if (typeof cfg.calmColor === 'boolean') {
       st.calmColor = cfg.calmColor;
+    }
+    if (typeof cfg.autoRotatePalette === 'boolean') {
+      st.autoRotatePalette = cfg.autoRotatePalette;
+    }
+    if (typeof cfg.autopilotBankPool === 'string' && cfg.autopilotBankPool) {
+      st.autopilotBankPool = cfg.autopilotBankPool;
+    }
+    if (cfg.autoMods && typeof cfg.autoMods === 'object') {
+      if (!st.autoMods) st.autoMods = {};
+      if (cfg.autoMods.changeEvery === 'SCENE' || cfg.autoMods.changeEvery === 'LAP') {
+        st.autoMods.changeEvery = cfg.autoMods.changeEvery;
+      }
+      for (const k of ['shape', 'style', 'weight', 'sweep', 'effect3d', 'postFx', 'logoFx', 'textFx', 'mediaFx']) {
+        if (typeof cfg.autoMods[k] === 'boolean') {
+          st.autoMods[k] = cfg.autoMods[k];
+        }
+      }
     }
     if (typeof cfg.autoQuality === 'boolean') {
       st.autoQuality = cfg.autoQuality;
@@ -7587,12 +7844,39 @@ class SyncBridge {
     if (!this.remoteConnected) return;
     const st = this.state;
     const dominantGenIdx = st.crossfade >= 0.5 ? st.deckB : st.deckA;
+    const macrosPayload = {};
+    for (let i = 0; i < MACRO_DEFS.length; i++) {
+      const k = MACRO_DEFS[i].key;
+      if (st.macros[k]) {
+        macrosPayload[k] = Math.round(st.macros[k].base * 100) / 100;
+      }
+    }
     const payload = {
       activeGen: dominantGenIdx,
       activeBankTab: st.activeBankTab,
       autopilotPool: st.autopilotBankPool,
       autopilotEnabled: st.autopilot.enabled,
       autopilotMode: st.autopilot.mode,
+      lfoMasterEnabled: Boolean(st.autopilot.lfoMasterEnabled),
+      autoRotatePalette: Boolean(st.autoRotatePalette),
+      autopilotTriggerUnit: st.autopilot.triggerUnit || 'BARS',
+      autopilotTriggerBars: st.autopilot.triggerBars || 32,
+      autopilotTriggerSeconds: st.autopilot.triggerSeconds || 45,
+      autopilotProgress: Math.round((st.autopilot.sceneProgress || 0) * 100),
+      scenesPlayed: st.autopilot.scenesPlayed || 1,
+      autoMods: Object.assign({}, st.autoMods || {}, {
+        palette: Boolean(st.autoRotatePalette),
+        allActive: Boolean(this.autopilot && this.autopilot.areAllAutoModsActive && this.autopilot.areAllAutoModsActive())
+      }),
+      macros: macrosPayload,
+      postFx: {
+        bypass: Boolean(st.pureFlatBypassFx),
+        kaleidoscope: st.fx.kaleidoscope,
+        rgbShift: st.fx.rgbShift,
+        feedback: st.fx.feedback,
+        glitch: st.fx.glitch,
+        pixelate: st.fx.pixelate
+      },
       shapeMode: st.shapeMode,
       styleMode: st.styleMode,
       weightMode: st.weightMode,
@@ -7665,6 +7949,12 @@ class SyncBridge {
             st.activeBankTab = cmd.pool;
             if (this.onBankChanged) this.onBankChanged();
           }
+          if (st.autoMods && this.autopilot && typeof this.autopilot._getAllowedGenerators === 'function') {
+            const allowed = this.autopilot._getAllowedGenerators();
+            st.autoMods.lapTotalLoops = Math.max(1, allowed.length);
+            st.autoMods.visitedInLap = (st.autoMods.visitedInLap || []).filter((id) => allowed.includes(id));
+            st.autoMods.loopsInCurrentLap = Math.max(1, st.autoMods.visitedInLap.length);
+          }
         }
         break;
       case 'SET_SHAPE':
@@ -7672,6 +7962,13 @@ class SyncBridge {
         break;
       case 'SET_STYLE':
         st.styleMode = Number(cmd.value) || 0;
+        if (st.styleMode === 1 && !(st.autoMods && st.autoMods.postFx)) {
+          st.fx.kaleidoscope.enabled = false;
+          st.fx.rgbShift.enabled = false;
+          st.fx.feedback.enabled = false;
+          st.fx.glitch.enabled = false;
+          st.fx.pixelate.enabled = false;
+        }
         break;
       case 'SET_WEIGHT':
         st.weightMode = Number(cmd.value) || 0;
@@ -7701,6 +7998,80 @@ class SyncBridge {
         break;
       case 'SET_AUTOPILOT_MODE':
         if (cmd.value) st.autopilot.mode = cmd.value;
+        break;
+      case 'SET_LFO_MASTER':
+        st.autopilot.lfoMasterEnabled = Boolean(cmd.value);
+        break;
+      case 'SET_AUTOPILOT_TRIGGER':
+        if (cmd.unit === 'BARS' || cmd.unit === 'SECONDS') {
+          st.autopilot.triggerUnit = cmd.unit;
+        }
+        if (typeof cmd.value === 'number' && Number.isFinite(cmd.value)) {
+          if (st.autopilot.triggerUnit === 'BARS') {
+            st.autopilot.triggerBars = Math.max(1, Math.min(256, Math.round(cmd.value)));
+          } else {
+            st.autopilot.triggerSeconds = Math.max(4, Math.min(600, Math.round(cmd.value)));
+          }
+        }
+        break;
+      case 'SET_AUTO_MOD':
+        if (!st.autoMods) st.autoMods = {};
+        if (cmd.key === 'palette') {
+          st.autoRotatePalette = Boolean(cmd.value);
+        } else if (['shape', 'style', 'weight', 'sweep', 'effect3d', 'postFx', 'logoFx', 'textFx', 'mediaFx'].includes(cmd.key)) {
+          st.autoMods[cmd.key] = Boolean(cmd.value);
+        }
+        break;
+      case 'SET_ALL_AUTO':
+        if (this.autopilot && typeof this.autopilot.setAllAutoMods === 'function') {
+          this.autopilot.setAllAutoMods(Boolean(cmd.value));
+        }
+        break;
+      case 'SET_AUTO_CHANGE_EVERY':
+        if (!st.autoMods) st.autoMods = {};
+        st.autoMods.changeEvery = cmd.value === 'SCENE' ? 'SCENE' : 'LAP';
+        break;
+      case 'STEP_AUTO_MODS_NOW':
+        if (this.autopilot && typeof this.autopilot.stepAutoModifiers === 'function') {
+          this.autopilot.stepAutoModifiers(true);
+        }
+        break;
+      case 'MUTATE_MACROS':
+        if (this.autopilot && typeof this.autopilot.randomizeMacrosNow === 'function') {
+          this.autopilot.randomizeMacrosNow();
+        }
+        break;
+      case 'SET_POST_FX':
+        if (cmd.key === 'bypass') {
+          st.pureFlatBypassFx = Boolean(cmd.enabled);
+          if (st.pureFlatBypassFx) {
+            st.fx.kaleidoscope.enabled = false;
+            st.fx.rgbShift.enabled = false;
+            st.fx.feedback.enabled = false;
+            st.fx.glitch.enabled = false;
+            st.fx.pixelate.enabled = false;
+          }
+        } else if (['kaleidoscope', 'rgbShift', 'feedback', 'glitch', 'pixelate'].includes(cmd.key)) {
+          const fxSlot = st.fx[cmd.key];
+          if (fxSlot) {
+            if (typeof cmd.enabled === 'boolean') {
+              fxSlot.enabled = cmd.enabled;
+              if (cmd.enabled) st.pureFlatBypassFx = false;
+            }
+            if (typeof cmd.wet === 'number' && Number.isFinite(cmd.wet)) {
+              fxSlot.wet = clampNum(cmd.wet, 0, 1, fxSlot.wet);
+              if (fxSlot.wet > 0.02) {
+                fxSlot.enabled = true;
+                st.pureFlatBypassFx = false;
+              }
+            }
+            if (cmd.key === 'kaleidoscope' && typeof cmd.axes === 'number') {
+              fxSlot.axes = [2, 4, 8].includes(cmd.axes) ? cmd.axes : 2;
+              fxSlot.enabled = true;
+              st.pureFlatBypassFx = false;
+            }
+          }
+        }
         break;
       case 'SET_MACRO':
         if (cmd.key && st.macros[cmd.key]) {
@@ -10161,7 +10532,13 @@ class ConsoleController {
       hudSysLoad: $('hud-sys-load'),
       updateRepoUrlInput: $('update-repo-url-input'),
       btnRunInternetUpdate: $('btn-run-internet-update'),
-      updateStatusMsg: $('update-status-msg')
+      updateStatusMsg: $('update-status-msg'),
+      // Mutación Automática por Vuelta de Loops (🤖 AUTO por sección)
+      autoModBtns: Array.from(document.querySelectorAll('.btn-auto-mod')),
+      btnAllAutoToggle: $('btn-all-auto-toggle'),
+      autoEveryBtns: Array.from(document.querySelectorAll('.btn-auto-every')),
+      btnStepAutoNow: $('btn-step-auto-now'),
+      apLapReadout: $('ap-lap-readout')
     };
   }
 
@@ -10466,6 +10843,34 @@ class ConsoleController {
     this._bindCmdSlider(d.edgeOverlap, edgeCmd('overlap'), 0.15);
     this._bindCmdSlider(d.edgeGamma, edgeCmd('gamma'), 2.2);
     this._bindCmdSlider(d.edgeCurve, edgeCmd('curve'), 2.0);
+
+    // ---- Mutación Automática por Vuelta de Loops (🤖 AUTO individual y maestro) ----
+    d.autoModBtns?.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.getAttribute('data-auto-mod');
+        if (!key) return;
+        const cur = key === 'palette'
+          ? Boolean(st.autoRotatePalette)
+          : Boolean(st.autoMods && st.autoMods[key]);
+        this._cmd({ action: 'SET_AUTO_MOD', key, value: !cur });
+      });
+    });
+
+    d.btnAllAutoToggle?.addEventListener('click', () => {
+      const allOn = Boolean(this.autopilot && this.autopilot.areAllAutoModsActive && this.autopilot.areAllAutoModsActive());
+      this._cmd({ action: 'SET_ALL_AUTO', value: !allOn });
+    });
+
+    d.autoEveryBtns?.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const every = btn.getAttribute('data-every') || 'LAP';
+        this._cmd({ action: 'SET_AUTO_CHANGE_EVERY', value: every });
+      });
+    });
+
+    d.btnStepAutoNow?.addEventListener('click', () => {
+      this._cmd({ action: 'STEP_AUTO_MODS_NOW' });
+    });
   }
 
   _sendText() {
@@ -11056,6 +11461,36 @@ class ConsoleController {
     this._syncSlider(d.edgeOverlap, d.edgeOverlapVal, eo, pct(eo));
     this._syncSlider(d.edgeGamma, d.edgeGammaVal, eg, eg.toFixed(2));
     this._syncSlider(d.edgeCurve, d.edgeCurveVal, ec, ec.toFixed(2));
+
+    // ---- Mutación Automática por Vuelta de Loops (🤖 AUTO individual y maestro) ----
+    const am = st.autoMods || EMPTY;
+    d.autoModBtns?.forEach((btn) => {
+      const key = btn.getAttribute('data-auto-mod');
+      const isOn = key === 'palette' ? Boolean(st.autoRotatePalette) : Boolean(am[key]);
+      btn.classList.toggle('active', isOn);
+      btn.textContent = isOn ? '🤖 AUTO: SÍ' : '🤖 AUTO';
+    });
+
+    const allAutoOn = Boolean(this.autopilot && this.autopilot.areAllAutoModsActive && this.autopilot.areAllAutoModsActive());
+    this._syncToggle(
+      d.btnAllAutoToggle,
+      'allAutoMods',
+      allAutoOn,
+      '🟢 TODO EN AUTO: ACTIVO (CADA VUELTA ES ÚNICA)',
+      '🤖 PONER TODO EN AUTO (LOOPS ÚNICOS POR HORAS)'
+    );
+
+    const changeEvery = am.changeEvery === 'SCENE' ? 'SCENE' : 'LAP';
+    d.autoEveryBtns?.forEach((btn) => {
+      btn.classList.toggle('active', btn.getAttribute('data-every') === changeEvery);
+    });
+
+    if (d.apLapReadout) {
+      const lapNum = n(am.lapsCompleted, 0) + 1;
+      const loopIdx = n(am.loopsInCurrentLap, 1);
+      const totalLoops = n(am.lapTotalLoops, 8);
+      this._setText(d.apLapReadout, `VUELTA #${lapNum} · LOOP ${loopIdx} / ${totalLoops}`);
+    }
 
     // Editor: solo se redibuja si cambia algo y está visible
     const cv = d.cornerCanvas;
