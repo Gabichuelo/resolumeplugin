@@ -142,16 +142,16 @@ if (process.platform === 'linux' && process.env.SKIP_LUCES_SYNC !== '1') {
       const repo = 'https://github.com/Gabichuelo/resolumeplugin.git';
       const safeGit = 'git -c safe.directory="*"';
       const syncCmd = fs.existsSync(path.join(dir, '.git'))
-        ? `${safeGit} remote set-url origin "${repo}" && ${safeGit} fetch origin luces && ${safeGit} reset --hard origin/luces`
-        : `${safeGit} init -b luces && ${safeGit} remote add origin "${repo}" && ${safeGit} fetch --depth=1 origin luces && ${safeGit} reset --hard origin/luces`;
+        ? `${safeGit} remote set-url origin "${repo}" && ${safeGit} fetch --force origin luces && ${safeGit} reset --hard origin/luces && ${safeGit} clean -fd`
+        : `${safeGit} init -b luces && ${safeGit} remote add origin "${repo}" && ${safeGit} fetch --depth=1 --force origin luces && ${safeGit} reset --hard origin/luces && ${safeGit} clean -fd`;
       execSync(syncCmd, { cwd: dir, stdio: 'ignore', timeout: 90000 });
-      console.log(`[AETHER-VJ] App de Luces actualizada automáticamente en ${dir} (rama luces).`);
+      console.log(`[AETHER-VJ] App de Luces GrandDas actualizada automáticamente en ${dir} (rama luces).`);
     } catch (e) {
       console.warn(`[AETHER-VJ] Aviso al sincronizar luces en ${dir}:`, e.message);
     }
   }
   try {
-    // systemd (Restart=always) vuelve a levantar server-dmx.js en 2 segundos con el código nuevo
-    execSync('pkill -f server-dmx.js || true', { stdio: 'ignore' });
+    // systemd (Restart=always) vuelve a levantar server-dmx.js / artnetServer.cjs en 2 segundos con el código nuevo
+    execSync('pkill -f server-dmx.js || true; pkill -f artnetServer.cjs || true', { stdio: 'ignore' });
   } catch (_) {}
 }
