@@ -769,7 +769,7 @@
     <button type="button" class="tab-btn admin-only" data-tab="tab-modifiers">✨ 2. ESTILO/3D</button>
     <button type="button" class="tab-btn admin-only" data-tab="tab-faders">🎚 3. FADERS/COMP</button>
     <button type="button" class="tab-btn admin-only" data-tab="tab-color">🎨 4. COLOR/FX</button>
-    <button type="button" class="tab-btn admin-only" data-tab="tab-mapping">📐 5. MAPPING</button>
+    <button type="button" class="tab-btn admin-only" data-tab="tab-mapping">📐 5. MAPPING/PC</button>
     <button type="button" class="tab-btn" data-tab="tab-logo">📸 LOGO DJ</button>
     <button type="button" class="tab-btn" data-tab="tab-text">✍️ TEXTO</button>
     <button type="button" class="tab-btn" data-tab="tab-media">🎬 VÍDEO</button>
@@ -1337,6 +1337,9 @@
 
   <!-- ==================== PESTAÑA 4: MAPPING DE PANTALLA Y SLICES LED (SOLO TÉCNICO) ==================== -->
   <section id="tab-mapping" class="tab-pane admin-only">
+    <button type="button" id="btn-jump-minipc-console" class="btn-pad amber-active btn-full" style="margin-bottom:10px;padding:12px 10px;font-size:12px">
+      🛠️ IR ABAJO A: ACTUALIZAR / QUITAR CLAVES / TERMINAL MINI-PC ↓
+    </button>
     <div class="card">
       <div class="card-title">
         <span>📐 CALIBRACIÓN Y SLICES DE ESCENARIO</span>
@@ -1530,7 +1533,7 @@
       </button>
     </div>
 
-    <div class="card admin-only">
+    <div class="card admin-only" id="card-minipc-console">
       <div class="card-title">
         <span>📊 RECURSOS DEL MINI-PC Y ACTUALIZACIÓN ONLINE</span>
         <button type="button" id="btn-m-refresh-sys" class="btn-logout">🔄 VER</button>
@@ -1546,6 +1549,48 @@
         🔄 DESCARGAR Y ACTUALIZAR MINI-PC AHORA
       </button>
       <div id="m-update-msg" class="msg-line"></div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:14px 0" />
+
+      <div class="card-title" style="margin-bottom:6px;color:var(--cyan)">
+        <span>🛠️ TERMINAL Y REPARACIÓN REMOTA (SIN TECLADO EN EL MINI-PC)</span>
+      </div>
+      <div class="help-text" style="margin-bottom:8px">
+        Escribe aquí tu clave de Ubuntu <strong>una sola vez</strong> desde el móvil y pulsa los botones de abajo para quitar la pantalla de login, actualizar luces o ver cualquier error y copiarlo para pegármelo en el chat.
+      </div>
+      <input type="text" id="m-term-sudo-pass" class="text-input" placeholder="🔑 Clave de Ubuntu (ej. aether o tu clave sudo)" autocomplete="off" autocapitalize="none" spellcheck="false" style="margin-bottom:8px" />
+
+      <div class="grid-2" style="margin-bottom:8px">
+        <button type="button" class="btn-pad green-live" data-term-preset="quitar-claves" style="padding:13px 8px;font-size:11px">
+          🔓 1. Quitar Claves / Auto-Login
+        </button>
+        <button type="button" class="btn-pad active" data-term-preset="diag-login" style="padding:13px 8px;font-size:11px">
+          🔍 2. Ver Diagnóstico Login
+        </button>
+        <button type="button" class="btn-pad amber-active" data-term-preset="update-luces" style="padding:13px 8px;font-size:11px">
+          💡 3. Actualizar Luces SL04
+        </button>
+        <button type="button" class="btn-pad danger" data-term-preset="reboot" style="padding:13px 8px;font-size:11px">
+          🔄 4. Reiniciar Mini-PC
+        </button>
+      </div>
+
+      <div class="card-title" style="margin-top:8px;margin-bottom:4px">
+        <span>⌨️ EJECUTAR COMANDO O PEGAR TEXTO AL TERMINAL</span>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <input type="text" id="m-term-custom-cmd" class="text-input" placeholder="Ej: sudo bash quitar-claves.sh" autocomplete="off" autocapitalize="none" spellcheck="false" style="margin:0;flex:1" />
+        <button type="button" id="btn-term-run-cmd" class="btn-pad active" style="padding:0 14px;white-space:nowrap">
+          ▶ EJECUTAR
+        </button>
+      </div>
+
+      <div class="card-title" style="margin-bottom:4px">
+        <span>📋 SALIDA DEL TERMINAL / ERRORES (PARA COPIAR AL CHAT)</span>
+        <button type="button" id="btn-term-copy" class="btn-logout" style="color:var(--green);border-color:var(--green)">📋 COPIAR TEXTO</button>
+      </div>
+      <pre id="m-term-output" style="background:#05070d;border:1px solid var(--border);border-radius:10px;padding:10px;font-family:var(--mono);font-size:11px;color:#b8ffe3;max-height:240px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0;user-select:all;-webkit-user-select:all">Pulsa "🔓 1. Quitar Claves / Auto-Login" o "🔍 2. Ver Diagnóstico Login" para ver aquí toda la respuesta del Mini-PC...</pre>
+      <div id="m-term-copy-msg" class="msg-line"></div>
     </div>
   </section>
 
@@ -2639,6 +2684,10 @@
       setInterval(fetchMobileSysStats, 5000);
       setTimeout(fetchMobileSysStats, 1200);
 
+      document.getElementById('btn-jump-minipc-console')?.addEventListener('click', () => {
+        document.getElementById('card-minipc-console')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+
       document.getElementById('btn-m-internet-update')?.addEventListener('click', async () => {
         if (!msgUpdate) return;
         msgUpdate.style.color = 'var(--cyan)';
@@ -2655,14 +2704,114 @@
           const data = await res.json();
           if (data.ok) {
             msgUpdate.style.color = 'var(--green)';
-            msgUpdate.textContent = '✅ ' + (data.message || 'Mini-PC actualizado correctamente');
+            msgUpdate.textContent = '✅ ' + (data.message || 'Mini-PC actualizado. Recargando mando en 5s...');
+            if (termOutput && (data.output || data.log)) {
+              termOutput.textContent = '=== SALIDA DE ACTUALIZACIÓN ===\n' + (data.output || data.log);
+            }
+            setTimeout(() => { window.location.reload(); }, 4800);
           } else {
             msgUpdate.style.color = 'var(--red)';
             msgUpdate.textContent = '❌ ' + (data.error || 'Error al actualizar');
+            if (termOutput && (data.log || data.error)) {
+              termOutput.textContent = '=== ERROR AL ACTUALIZAR ===\n' + (data.error || '') + '\n' + (data.log || '');
+            }
           }
         } catch (err) {
           msgUpdate.style.color = 'var(--red)';
           msgUpdate.textContent = '❌ Error de conexión: ' + err.message;
+        }
+      });
+
+      // ==================== TERMINAL Y DIAGNÓSTICO REMOTO ====================
+      const inpSudoPass = document.getElementById('m-term-sudo-pass');
+      const inpCustomCmd = document.getElementById('m-term-custom-cmd');
+      const termOutput = document.getElementById('m-term-output');
+      const termCopyMsg = document.getElementById('m-term-copy-msg');
+
+      try {
+        const savedSudo = localStorage.getItem('aether_sudo_pass');
+        if (savedSudo && inpSudoPass) inpSudoPass.value = savedSudo;
+      } catch (_) {}
+
+      inpSudoPass?.addEventListener('input', () => {
+        try { localStorage.setItem('aether_sudo_pass', inpSudoPass.value); } catch (_) {}
+      });
+
+      async function runRemoteTerminal(payload, label) {
+        if (!termOutput) return;
+        const sudoPass = inpSudoPass ? inpSudoPass.value : '';
+        termOutput.style.color = 'var(--cyan)';
+        termOutput.textContent = '⏳ Ejecutando en Mini-PC: ' + label + '...\nEspera unos segundos...';
+        try {
+          const res = await fetch('/api/system-terminal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(Object.assign({
+              pin: sessionPin || '1234',
+              sudoPass: sudoPass
+            }, payload))
+          });
+          const data = await res.json();
+          termOutput.style.color = data.ok ? '#b8ffe3' : '#ff99bb';
+          const header = (data.ok ? '✅ COMPLETADO (' : '⚠️ SALIDA CON AVISO/ERROR (código ' + data.code + ' - ') + label + '):\n';
+          termOutput.textContent = header + (data.output || '(Sin salida de texto)');
+        } catch (err) {
+          termOutput.style.color = '#ff99bb';
+          termOutput.textContent = '❌ Error de red o servidor reiniciándose: ' + err.message +
+            '\n(Si acabas de pulsar Actualizar o Reiniciar, espera 5 segundos y recarga la página del móvil).';
+        }
+      }
+
+      document.querySelectorAll('[data-term-preset]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const preset = btn.getAttribute('data-term-preset');
+          if (preset === 'reboot') {
+            if (!window.confirm('¿Seguro que quieres reiniciar el Mini-PC ahora mismo?')) return;
+          }
+          runRemoteTerminal({ preset }, btn.textContent.trim());
+        });
+      });
+
+      document.getElementById('btn-term-run-cmd')?.addEventListener('click', () => {
+        const cmd = inpCustomCmd ? inpCustomCmd.value.trim() : '';
+        if (!cmd) return;
+        runRemoteTerminal({ customCmd: cmd }, cmd);
+      });
+      inpCustomCmd?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          document.getElementById('btn-term-run-cmd')?.click();
+        }
+      });
+
+      document.getElementById('btn-term-copy')?.addEventListener('click', async () => {
+        const txt = termOutput ? termOutput.textContent : '';
+        let copied = false;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          try {
+            await navigator.clipboard.writeText(txt);
+            copied = true;
+          } catch (_) {}
+        }
+        if (!copied) {
+          try {
+            const ta = document.createElement('textarea');
+            ta.value = txt;
+            ta.style.position = 'fixed';
+            ta.style.top = '-1000px';
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            copied = document.execCommand('copy');
+            document.body.removeChild(ta);
+          } catch (_) {}
+        }
+        if (termCopyMsg) {
+          termCopyMsg.style.color = copied ? 'var(--green)' : 'var(--amber)';
+          termCopyMsg.textContent = copied
+            ? '✅ ¡Copiado al portapapeles! Ya puedes pegarlo directamente en el chat.'
+            : '⚠️ Mantén pulsado sobre el recuadro negro de arriba y dale a Copiar.';
+          setTimeout(() => { termCopyMsg.textContent = ''; }, 5000);
         }
       });
 

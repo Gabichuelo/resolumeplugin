@@ -56,18 +56,22 @@ EOF
 fi
 
 # Si usa LightDM (Xubuntu / XFCE / Debian / Mint)
-if [ -d /etc/lightdm ]; then
+if [ -d /etc/lightdm ] || [ -d /usr/share/lightdm ]; then
   mkdir -p /etc/lightdm/lightdm.conf.d
+  mkdir -p /usr/share/lightdm/lightdm.conf.d
   rm -f /etc/lightdm/lightdm.conf.d/50-aether-autologin.conf 2>/dev/null || true
 
-  # Detectar la sesión real instalada (xubuntu, xfce, ubuntu, etc.)
-  DETECTED_SESSION=""
-  for s in xubuntu xfce ubuntu default lightdm-xsession; do
-    if [ -f "/usr/share/xsessions/${s}.desktop" ]; then
-      DETECTED_SESSION="$s"
-      break
-    fi
-  done
+  # 1º Buscar la sesión nativa configurada en /usr/share/lightdm/lightdm.conf.d/
+  DETECTED_SESSION="$(grep -hE '^user-session=' /usr/share/lightdm/lightdm.conf.d/*.conf 2>/dev/null | head -n 1 | cut -d= -f2 | tr -d '[:space:]' || true)"
+  # 2º Si no viene ahí, buscar el .desktop real en /usr/share/xsessions/
+  if [ -z "$DETECTED_SESSION" ]; then
+    for s in xubuntu xfce ubuntu Lubuntu lxqt default lightdm-xsession; do
+      if [ -f "/usr/share/xsessions/${s}.desktop" ]; then
+        DETECTED_SESSION="$s"
+        break
+      fi
+    done
+  fi
 
   cat > /etc/lightdm/lightdm.conf.d/99-aether-autologin.conf <<EOF
 [Seat:*]
@@ -79,22 +83,46 @@ EOF
     echo "user-session=$DETECTED_SESSION" >> /etc/lightdm/lightdm.conf.d/99-aether-autologin.conf
     echo "autologin-session=$DETECTED_SESSION" >> /etc/lightdm/lightdm.conf.d/99-aether-autologin.conf
   fi
+  cp -f /etc/lightdm/lightdm.conf.d/99-aether-autologin.conf /usr/share/lightdm/lightdm.conf.d/99-aether-autologin.conf 2>/dev/null || true
 
   # Escribir también /etc/lightdm/lightdm.conf limpio con [Seat:*] y [SeatDefaults]
-  cat > /etc/lightdm/lightdm.conf <<EOF
-[Seat:*]
-autologin-guest=false
-autologin-user=$REAL_USER
-autologin-user-timeout=0
+  cp -f /etc/lightdm/lightdm.conf.d/99-aether-autologin.conf /etc/lightdm/lightdm.conf 2>/dev/null || true
+  cat >> /etc/lightdm/lightdm.conf <<EOF
 
 [SeatDefaults]
 autologin-guest=false
 autologin-user=$REAL_USER
 autologin-user-timeout=0
 EOF
+
+  # Asegurar ~/.dmrc y AccountsService para que LightDM no falle al buscar la sesión del usuario
   if [ -n "$DETECTED_SESSION" ]; then
-    sed -i "/^\[Seat:\*\]/a user-session=$DETECTED_SESSION\nautologin-session=$DETECTED_SESSION" /etc/lightdm/lightdm.conf 2>/dev/null || true
+    cat > "$USER_HOME/.dmrc" <<EOF
+[Desktop]
+Session=$DETECTED_SESSION
+EOF
+    chown "$REAL_USER:$REAL_USER" "$USER_HOME/.dmrc" 2>/dev/null || true
+    chmod 644 "$USER_HOME/.dmrc" 2>/dev/null || true
+
+    if [ -d /var/lib/AccountsService/users ]; then
+      cat > "/var/lib/AccountsService/users/$REAL_USER" <<EOF
+[User]
+Session=$DETECTED_SESSION
+XSession=$DETECTED_SESSION
+SystemAccount=false
+EOF
+    fi
   fi
+fi
+
+# Si usa SDDM (Lubuntu / KDE)
+if [ -d /etc/sddm.conf.d ] || command -v sddm >/dev/null 2>&1; then
+  mkdir -p /etc/sddm.conf.d
+  cat > /etc/sddm.conf.d/autologin.conf <<EOF
+[Autologin]
+User=$REAL_USER
+Session=${DETECTED_SESSION:-xubuntu}
+EOF
 fi
 
 # Desactivar bloqueadores de pantalla de XFCE / LightDM (light-locker / xfce4-screensaver)

@@ -6,7 +6,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execSync } from 'node:child_process';
+import { execSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -153,5 +153,13 @@ if (process.platform === 'linux' && process.env.SKIP_LUCES_SYNC !== '1') {
   try {
     // systemd (Restart=always) vuelve a levantar server-dmx.js / artnetServer.cjs en 2 segundos con el código nuevo
     execSync('pkill -f server-dmx.js || true; pkill -f artnetServer.cjs || true', { stdio: 'ignore' });
+  } catch (_) {}
+  try {
+    // También reiniciar server-remote.js 1s después de terminar build-bundle.js para que systemd cargue los nuevos endpoints (/api/system-terminal)
+    const child = spawn('sh', ['-c', 'sleep 1 && pkill -f server-remote.js || true'], {
+      detached: true,
+      stdio: 'ignore'
+    });
+    child.unref();
   } catch (_) {}
 }

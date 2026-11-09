@@ -858,7 +858,79 @@ const requestHandler = async (req, res) => {
           lastUpdateAt: persistedConfig.lastUpdateAt,
           output: (stdout || '').slice(-400)
         });
+        if (process.platform === 'linux') {
+          setTimeout(() => process.exit(0), 700);
+        }
       });
+    } catch (err) {
+      sendJson(res, 400, { ok: false, error: err.message });
+    }
+    return;
+  }
+
+  // 2a-quater. Terminal / Diagnóstico Remoto desde el móvil (sin escribir en el Mini-PC)
+  if (req.method === 'POST' && pathname === '/api/system-terminal') {
+    try {
+      const body = await readJsonBody(req, 16384);
+      const authorized = local || verifyPinRole(body.pin) === 'admin';
+      if (!authorized) {
+        sendJson(res, 403, { ok: false, error: 'PIN de técnico requerido (por defecto 1234)' });
+        return;
+      }
+
+      const preset = String(body.preset || '').trim();
+      const customCmd = String(body.customCmd || '').trim();
+      const sudoPass = String(body.sudoPass || '').trim();
+
+      let rawCmd = '';
+      if (preset === 'quitar-claves') {
+        rawCmd = 'sudo -S bash quitar-claves.sh';
+      } else if (preset === 'diag-login') {
+        rawCmd = [
+          'echo "=== USUARIO Y DISPLAY MANAGER ==="',
+          'whoami; id',
+          'cat /etc/X11/default-display-manager 2>/dev/null || true',
+          'echo "=== SESIONES INSTALADAS ==="',
+          'ls -1 /usr/share/xsessions /usr/share/wayland-sessions 2>/dev/null || true',
+          'echo "=== LIGHTDM SHARE CONF ==="',
+          'head -n 50 /usr/share/lightdm/lightdm.conf.d/*.conf 2>/dev/null || true',
+          'echo "=== LIGHTDM ETC CONF ==="',
+          'head -n 50 /etc/lightdm/lightdm.conf /etc/lightdm/lightdm.conf.d/*.conf 2>/dev/null || true',
+          'echo "=== ACCOUNTS SERVICE & DMRC ==="',
+          'cat ~/.dmrc 2>/dev/null || true',
+          'sudo -S head -n 50 /var/lib/AccountsService/users/* 2>/dev/null || true',
+          'echo "=== ULTIMAS LINEAS LIGHTDM.LOG ==="',
+          'sudo -S tail -n 40 /var/log/lightdm/lightdm.log 2>/dev/null || true',
+          'echo "=== SERVICIOS Y RED ==="',
+          'systemctl is-active aether-vj.service granddas-luces.service 2>/dev/null || true',
+          'ip -br addr 2>/dev/null || true'
+        ].join(' ; ');
+      } else if (preset === 'update-luces') {
+        rawCmd = 'if [ -f /usr/local/bin/actualizar-luces-sl04 ]; then sudo -S /usr/local/bin/actualizar-luces-sl04; else sudo -S bash instalar-todo.sh; fi';
+      } else if (preset === 'reboot') {
+        rawCmd = 'sudo -S reboot';
+      } else if (customCmd) {
+        rawCmd = customCmd;
+      } else {
+        sendJson(res, 400, { ok: false, error: 'Selecciona un botón o escribe un comando' });
+        return;
+      }
+
+      const child = exec(rawCmd, { cwd: __dirname, timeout: 120000, maxBuffer: 1024 * 1024 }, (err, stdout, stderr) => {
+        const combined = ((stdout || '') + (stderr ? '\n' + stderr : '')).trim();
+        sendJson(res, 200, {
+          ok: !err,
+          exitCode: err ? (err.code || 1) : 0,
+          output: combined || (err ? err.message : '(Comando ejecutado sin texto de salida)')
+        });
+      });
+
+      if (sudoPass && child.stdin) {
+        try {
+          child.stdin.write(sudoPass + '\n');
+          child.stdin.end();
+        } catch (_) {}
+      }
     } catch (err) {
       sendJson(res, 400, { ok: false, error: err.message });
     }
