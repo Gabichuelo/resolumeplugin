@@ -909,7 +909,7 @@ const requestHandler = async (req, res) => {
           'systemctl is-active aether-vj.service granddas-luces.service 2>/dev/null || true'
         ].join(' ; ');
       } else if (preset === 'update-luces') {
-        rawCmd = 'if [ -f /usr/local/bin/actualizar-luces-sl04 ]; then sudo -S /usr/local/bin/actualizar-luces-sl04; else sudo -S bash instalar-todo.sh; fi';
+        rawCmd = 'sudo -S bash instalar-luces-sl04.sh';
       } else if (preset === 'reboot') {
         rawCmd = 'sudo -S reboot';
       } else if (customCmd) {

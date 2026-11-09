@@ -219,6 +219,8 @@ if command -v nmcli >/dev/null 2>&1; then
       connection.autoconnect-retries 0 \
       connection.permissions "" \
       ipv4.method auto \
+      ipv4.addresses "" \
+      ipv4.gateway "" \
       ipv6.method auto 2>/dev/null || true
   else
     nmcli connection add type ethernet con-name "Ethernet-Auto" \
@@ -226,9 +228,10 @@ if command -v nmcli >/dev/null 2>&1; then
       ipv4.method auto ipv6.method auto 2>/dev/null || true
   fi
 
-  # Conectar la tarjeta Ethernet física ahora mismo (ej. eno1)
+  # Conectar la tarjeta Ethernet física ahora mismo (ej. eno1) y limpiar IP 2.0.0.10 si estaba en eno1
   ETH_DEV="$(nmcli -t -f DEVICE,TYPE device status 2>/dev/null | awk -F: '$2=="ethernet"{print $1; exit}')"
   if [ -n "$ETH_DEV" ]; then
+    ip addr del 2.0.0.10/8 dev "$ETH_DEV" 2>/dev/null || true
     nmcli device set "$ETH_DEV" managed yes 2>/dev/null || true
     nmcli device set "$ETH_DEV" autoconnect yes 2>/dev/null || true
     nmcli connection up "Ethernet-Auto" ifname "$ETH_DEV" 2>/dev/null || nmcli device connect "$ETH_DEV" 2>/dev/null || true
