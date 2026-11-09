@@ -351,6 +351,15 @@ export interface CustomRgbwOverride {
   hex: string;
 }
 
+export type StrobeOverrideMode =
+  | 'off'
+  | 'slow'
+  | 'medium'
+  | 'fast'
+  | 'alternate'
+  | 'random_sparkle'
+  | 'uv_rave';
+
 export type SpecialFxMachineType = 'sparkular' | 'co2' | 'flame' | 'confetti';
 
 export type SpecialFxWavePattern =

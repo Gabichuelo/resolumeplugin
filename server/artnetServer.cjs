@@ -991,6 +991,8 @@ const requestHandler = (req, res) => {
             latestConsoleState.globalMaster = cmd.value;
           } else if (cmd.type === 'blinder') {
             latestConsoleState.blinderOverride = Boolean(cmd.value);
+          } else if (cmd.type === 'strobe_mode') {
+            latestConsoleState.strobeOverrideMode = cmd.value || 'off';
           } else if (cmd.type === 'freeze') {
             latestConsoleState.freezeOverride = Boolean(cmd.value);
           } else if (cmd.type === 'haze') {
@@ -1001,6 +1003,72 @@ const requestHandler = (req, res) => {
             latestConsoleState.activePosId = cmd.value;
           } else if (cmd.type === 'highlight_fixture') {
             latestConsoleState.highlightedFixtureId = cmd.fixtureId ?? null;
+          } else if (
+            cmd.type === 'update_fixture_patch' ||
+            cmd.type === 'batch_patch_group' ||
+            cmd.type === 'add_fixture' ||
+            cmd.type === 'delete_fixture'
+          ) {
+            const diskShow = getCachedShowData();
+            let curFixtures = Array.isArray(latestConsoleState.fixtures) && latestConsoleState.fixtures.length > 0
+              ? [...latestConsoleState.fixtures]
+              : Array.isArray(diskShow?.fixtures)
+                ? [...diskShow.fixtures]
+                : [];
+            const curProfiles = Array.isArray(latestConsoleState.profiles) && latestConsoleState.profiles.length > 0
+              ? latestConsoleState.profiles
+              : Array.isArray(diskShow?.profiles)
+                ? diskShow.profiles
+                : [];
+
+            if (cmd.type === 'update_fixture_patch' && cmd.fixtureId && cmd.patch) {
+              curFixtures = curFixtures.map((f) =>
+                f.id === cmd.fixtureId ? { ...f, ...cmd.patch } : f
+              );
+            } else if (
+              cmd.type === 'batch_patch_group' &&
+              cmd.groupId &&
+              typeof cmd.universe === 'number' &&
+              typeof cmd.startAddress === 'number'
+            ) {
+              const targetUni = Math.max(1, Math.min(4, Math.round(cmd.universe)));
+              let nextAddr = Math.max(1, Math.min(512, Math.round(cmd.startAddress)));
+              curFixtures = curFixtures.map((f) => {
+                if (f.groupId !== cmd.groupId) return f;
+                const nextProfId = cmd.profileId || f.profileId;
+                const prof = curProfiles.find((p) => p.id === nextProfId);
+                const chCount = prof && prof.channelCount ? prof.channelCount : 16;
+                const assignedAddr = Math.min(512, nextAddr);
+                nextAddr = Math.min(512, assignedAddr + chCount);
+                return {
+                  ...f,
+                  profileId: nextProfId,
+                  universe: targetUni,
+                  address: assignedAddr,
+                };
+              });
+            } else if (cmd.type === 'add_fixture' && cmd.fixture) {
+              curFixtures.push(cmd.fixture);
+            } else if (cmd.type === 'delete_fixture' && cmd.fixtureId) {
+              curFixtures = curFixtures.filter((f) => f.id !== cmd.fixtureId);
+            }
+
+            const counts = {};
+            curFixtures = curFixtures.map((f) => {
+              const idx = counts[f.groupId] || 0;
+              counts[f.groupId] = idx + 1;
+              return { ...f, orderInGroup: idx };
+            });
+
+            latestConsoleState.fixtures = curFixtures;
+            if (diskShow && typeof diskShow === 'object') {
+              diskShow.fixtures = curFixtures;
+              diskShow.savedAt = Date.now();
+              try {
+                fs.writeFileSync(AUTOSAVE_FILE_PATH, JSON.stringify(diskShow, null, 2), 'utf8');
+                cachedShowData = diskShow;
+              } catch {}
+            }
           }
           latestConsoleState.updatedAt = Date.now();
         }

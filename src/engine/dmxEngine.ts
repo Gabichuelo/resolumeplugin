@@ -12,6 +12,7 @@ import type {
   PositionPaletteId,
   RecipeFxConfig,
   RecipeScene,
+  StrobeOverrideMode,
 } from '../types/dmx';
 
 export interface EngineEvaluationInput {
@@ -60,6 +61,7 @@ export interface EngineEvaluationInput {
   };
   worklightActive?: boolean;
   isolateManualDmxUniverse?: number | null;
+  strobeOverrideMode?: StrobeOverrideMode;
 }
 
 export interface EngineEvaluationResult {
@@ -294,7 +296,10 @@ export function evaluateDmxEngine(input: EngineEvaluationInput): EngineEvaluatio
     globalOpticsOverride,
     worklightActive = false,
     isolateManualDmxUniverse = null,
+    strobeOverrideMode = 'off',
   } = input;
+
+  const hasStrobeOverride = Boolean(strobeOverrideMode && strobeOverrideMode !== 'off');
 
   const effMoveSpeed = moveFxSpeed ?? globalFxSpeed;
   const effChaseSpeed = chaseFxSpeed ?? globalFxSpeed;
@@ -798,6 +803,71 @@ export function evaluateDmxEngine(input: EngineEvaluationInput): EngineEvaluatio
       strobeMode = 'fast';
     }
 
+    // Live Multi-Mode Strobe Override (Mobile & Console Strobe Deck)
+    if (hasStrobeOverride) {
+      switch (strobeOverrideMode) {
+        case 'slow':
+          dimmer = 1;
+          strobeMode = 'slow';
+          break;
+        case 'medium':
+          dimmer = 1;
+          strobeMode = 'medium';
+          break;
+        case 'fast':
+          dimmer = 1;
+          strobeMode = 'fast';
+          r = 255;
+          g = 255;
+          b = 255;
+          w = 255;
+          colorPalette = 'white';
+          break;
+        case 'alternate': {
+          const altSlot = Math.floor(timeSec * 6.5) % 2;
+          const isMyTurn = fix.orderInGroup % 2 === altSlot;
+          dimmer = isMyTurn ? 1 : 0;
+          strobeMode = isMyTurn ? 'fast' : 'off';
+          break;
+        }
+        case 'random_sparkle': {
+          const slice = Math.floor(timeSec * 16 + fix.orderInGroup * 1.73);
+          const hash = Math.sin(slice * 12.9898 + fix.orderInGroup * 78.233) * 43758.5453;
+          const frac = hash - Math.floor(hash);
+          const isBurst = frac < 0.32;
+          dimmer = isBurst ? 1 : 0;
+          strobeMode = isBurst ? 'fast' : 'off';
+          if (isBurst) {
+            r = 255;
+            g = 255;
+            b = 255;
+            w = 255;
+            colorPalette = 'white';
+          }
+          break;
+        }
+        case 'uv_rave': {
+          const raveSlot = Math.floor(timeSec * 8 + fix.orderInGroup) % 2;
+          dimmer = 1;
+          strobeMode = 'fast';
+          if (raveSlot === 0) {
+            r = 160;
+            g = 0;
+            b = 255;
+            w = 0;
+            colorPalette = 'uv';
+          } else {
+            r = 0;
+            g = 240;
+            b = 255;
+            w = 0;
+            colorPalette = 'cyan';
+          }
+          break;
+        }
+      }
+    }
+
     if (
       manualXYOverride?.enabled &&
       (manualXYOverride.targetGroup === 'all' || manualXYOverride.targetGroup === fix.groupId)
@@ -889,6 +959,7 @@ export function evaluateDmxEngine(input: EngineEvaluationInput): EngineEvaluatio
       prev &&
       crossfadeSec > 0.02 &&
       !hasFlashSceneActive &&
+      !hasStrobeOverride &&
       !cal.flashActive &&
       !highlightFixtureId &&
       !globalBlackout
@@ -961,6 +1032,17 @@ export function evaluateDmxEngine(input: EngineEvaluationInput): EngineEvaluatio
       } else if (strobeMode === 'blinder') {
         setCh(chMap.strobe, rules.shutterOpen);
         strobeHz = 0;
+      }
+    }
+
+    // Software dimmer strobe gate for LED bars / PARs / fixtures without a dedicated hardware strobe channel
+    if (strobeHz > 0 && !chMap.strobe && finalDimmer > 0.001) {
+      const gateOpen = ((timeSec * strobeHz) % 1) < 0.45;
+      if (!gateOpen) {
+        finalDimmer = 0;
+      }
+      if (hasDedicatedDimmer) {
+        setCh(chMap.dimmer, finalDimmer * 255);
       }
     }
 

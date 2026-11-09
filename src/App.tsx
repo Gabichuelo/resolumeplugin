@@ -79,6 +79,7 @@ import {
   type LanIpEntry,
   type RemoteCommandPayload,
 } from './components/StageRemoteView';
+import { remoteFetch } from './utils/remotePin';
 import type {
   AutoShowStep,
   ClockScheduleEvent,
@@ -103,6 +104,7 @@ import type {
   SpecialFxDeckState,
   SpecialFxMachineType,
   SpecialFxWavePattern,
+  StrobeOverrideMode,
 } from './types/dmx';
 
 const SYNC_CHANNEL_NAME = 'granddas_live_sync_v1';
@@ -235,6 +237,7 @@ export function App() {
   const [buildUpActive, setBuildUpActive] = useState<boolean>(false);
   const [buildUpProgress, setBuildUpProgress] = useState<number>(0);
   const [dropImpactActive, setDropImpactActive] = useState<boolean>(false);
+  const [strobeOverrideMode, setStrobeOverrideMode] = useState<StrobeOverrideMode>('off');
   const [hahanSplitterMode, setHahanSplitterMode] = useState<boolean>(true);
   const [lastAutoSaveTime, setLastAutoSaveTime] = useState<string | null>(null);
   const [mainWorkspaceView, setMainWorkspaceView] = useState<
@@ -447,7 +450,7 @@ export function App() {
   // reconnects by itself if the engine starts late or is restarted, and the Hahan LED stays green.
   useEffect(() => {
     const check = () =>
-      fetch('/api/status')
+      remoteFetch('/api/status')
         .then((r) => r.json())
         .then((data) => {
           if (data.ok) {
@@ -525,6 +528,10 @@ export function App() {
         setDropImpactActive(Boolean(cmd.value));
         break;
       }
+      case 'strobe_mode': {
+        setStrobeOverrideMode((cmd.value as StrobeOverrideMode) || 'off');
+        break;
+      }
       case 'freeze': {
         setFreezeDmx(Boolean(cmd.value));
         break;
@@ -585,6 +592,77 @@ export function App() {
       }
       case 'highlight_fixture': {
         setHighlightFixtureId(cmd.fixtureId ?? null);
+        break;
+      }
+      case 'update_fixture_patch': {
+        if (cmd.fixtureId && cmd.patch) {
+          setFixtures((prev) => {
+            const updated = prev.map((f) =>
+              f.id === cmd.fixtureId ? { ...f, ...cmd.patch } : f
+            );
+            const counts: Record<string, number> = {};
+            return updated.map((f) => {
+              const idx = counts[f.groupId] || 0;
+              counts[f.groupId] = idx + 1;
+              return { ...f, orderInGroup: idx };
+            });
+          });
+        }
+        break;
+      }
+      case 'batch_patch_group': {
+        if (cmd.groupId && typeof cmd.universe === 'number' && typeof cmd.startAddress === 'number') {
+          const targetUni = Math.max(1, Math.min(4, Math.round(cmd.universe)));
+          let nextAddr = Math.max(1, Math.min(512, Math.round(cmd.startAddress)));
+          setFixtures((prev) =>
+            prev.map((f) => {
+              if (f.groupId !== cmd.groupId) return f;
+              const nextProfId = cmd.profileId || f.profileId;
+              const prof =
+                profiles.find((p) => p.id === nextProfId) ||
+                FIXTURE_PROFILES.find((p) => p.id === nextProfId) ||
+                profiles[0];
+              const chCount = prof ? prof.channelCount : 16;
+              const assignedAddr = Math.min(512, nextAddr);
+              nextAddr = Math.min(512, assignedAddr + chCount);
+              return {
+                ...f,
+                profileId: nextProfId,
+                universe: targetUni,
+                address: assignedAddr,
+              };
+            })
+          );
+        }
+        break;
+      }
+      case 'add_fixture': {
+        if (cmd.fixture) {
+          setFixtures((prev) => {
+            const updated = [...prev, cmd.fixture!];
+            const counts: Record<string, number> = {};
+            return updated.map((f) => {
+              const idx = counts[f.groupId] || 0;
+              counts[f.groupId] = idx + 1;
+              return { ...f, orderInGroup: idx };
+            });
+          });
+        }
+        break;
+      }
+      case 'delete_fixture': {
+        if (cmd.fixtureId) {
+          setFixtures((prev) => {
+            const filtered = prev.filter((f) => f.id !== cmd.fixtureId);
+            const counts: Record<string, number> = {};
+            return filtered.map((f) => {
+              const idx = counts[f.groupId] || 0;
+              counts[f.groupId] = idx + 1;
+              return { ...f, orderInGroup: idx };
+            });
+          });
+          setHighlightFixtureId((prevId) => (prevId === cmd.fixtureId ? null : prevId));
+        }
         break;
       }
     }
@@ -705,7 +783,7 @@ export function App() {
       autoSaveLoadedRef.current = true;
     };
 
-    fetch('/api/show/autosave')
+    remoteFetch('/api/show/autosave')
       .then((r) => r.json())
       .then((data) => pickAndApply(data?.ok && data.show ? data.show : null))
       .catch(() => pickAndApply(null));
@@ -713,7 +791,7 @@ export function App() {
 
   // Persistent Real-Time Auto-Save to LocalStorage + Physical Hard Drive (shows/ultimo_show.granddas.json)
   useEffect(() => {
-    if (windowMode !== 'console' || !autoSaveLoadedRef.current) return;
+    if ((windowMode !== 'console' && windowMode !== 'remote') || !autoSaveLoadedRef.current) return;
     const timer = window.setTimeout(() => {
       try {
         const payload = {
@@ -736,7 +814,7 @@ export function App() {
         };
         const jsonStr = JSON.stringify(payload);
         localStorage.setItem(AUTOSAVE_STORAGE_KEY, jsonStr);
-        fetch('/api/show/autosave', {
+        remoteFetch('/api/show/autosave', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: jsonStr,
@@ -1304,6 +1382,7 @@ export function App() {
           globalOpticsOverride: globalOptics,
           worklightActive,
           isolateManualDmxUniverse: isolateDmxUniverse,
+          strobeOverrideMode,
         });
 
         // Evaluate Special FX & Pyro (Sparkular, CO2, Flame, Confetti) Sine & PWM Waveforms + Manual Triggers
@@ -1473,7 +1552,7 @@ export function App() {
         // Send UDP Art-Net frame at ~35Hz if backend bridge is running
         if (artnetConnected && nowMs - lastArtnetPostRef.current >= 22) {
           lastArtnetPostRef.current = nowMs;
-          fetch('/api/artnet/frame', {
+          remoteFetch('/api/artnet/frame', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1492,12 +1571,14 @@ export function App() {
                 globalBlackout,
                 worklightActive,
                 blinderOverride: dropImpactActive,
+                strobeOverrideMode,
                 freezeOverride: freezeDmx,
                 hazeBlastActive,
                 autoShowRunning,
                 highlightedFixtureId: highlightFixtureId,
                 groupCalibrations,
                 fixtures,
+                profiles,
               },
             }),
           })
@@ -1558,6 +1639,7 @@ export function App() {
     buildUpActive,
     buildUpProgress,
     dropImpactActive,
+    strobeOverrideMode,
     activeColorThemeId,
     followspotWhiteActive,
     hahanSplitterMode,
@@ -2071,12 +2153,14 @@ export function App() {
         globalBlackout={globalBlackout}
         worklightActive={worklightActive}
         blinderOverride={dropImpactActive}
+        strobeOverrideMode={strobeOverrideMode}
         freezeOverride={freezeDmx}
         hazeBlastActive={hazeBlastActive}
         autoShowRunning={autoShowRunning}
         highlightedFixtureId={highlightFixtureId}
         groupCalibrations={groupCalibrations}
         fixtures={fixtures}
+        profiles={profiles}
         onExecuteCommand={handleExecuteRemoteCommand}
       />
     );
@@ -4364,12 +4448,14 @@ export function App() {
           globalBlackout={globalBlackout}
           worklightActive={worklightActive}
           blinderOverride={dropImpactActive}
+          strobeOverrideMode={strobeOverrideMode}
           freezeOverride={freezeDmx}
           hazeBlastActive={hazeBlastActive}
           autoShowRunning={autoShowRunning}
           highlightedFixtureId={highlightFixtureId}
           groupCalibrations={groupCalibrations}
           fixtures={fixtures}
+          profiles={profiles}
           onExecuteCommand={handleExecuteRemoteCommand}
         />
       )}
