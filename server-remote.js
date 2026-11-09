@@ -1321,3 +1321,28 @@ server.on('error', (err) => {
 server.listen(PORT, '0.0.0.0', () => {
   startFriendlyPort80(printBanner);
 });
+
+// Watchdog de arranque en Linux (Mini-PC):
+// 1) Si LightDM se queda en el botón azul "Iniciar sesión" (lightdm-gtk-greeter), pulsa Enter automáticamente.
+// 2) Si eno1 tiene el cable conectado pero una regla vieja le puso 2.0.0.10/8 sin DHCP, limpia 2.0.0.10 y levanta Ethernet-Auto.
+if (process.platform === 'linux') {
+  const runLinuxBootWatchdog = () => {
+    const watchdogCmd = [
+      'if pgrep -f lightdm-gtk-greeter >/dev/null 2>&1; then',
+      '  sudo -n DISPLAY=:0 XAUTHORITY=/var/run/lightdm/root/:0 xdotool key Return 2>/dev/null || true;',
+      '  sudo -n /usr/local/bin/aether-greeter-autoclick.sh 2>/dev/null || true;',
+      'fi;',
+      'if [ -d /sys/class/net/eno1 ]; then',
+      '  if ip -4 addr show dev eno1 2>/dev/null | grep -q "2.0.0.10"; then',
+      '    sudo -n ip addr del 2.0.0.10/8 dev eno1 2>/dev/null || true;',
+      '  fi;',
+      '  if [ "$(cat /sys/class/net/eno1/carrier 2>/dev/null)" = "1" ] && ! ip -4 addr show dev eno1 2>/dev/null | grep -qE "inet (192|10|172)\\."; then',
+      '    sudo -n nmcli connection up "Ethernet-Auto" ifname eno1 2>/dev/null || sudo -n nmcli device connect eno1 2>/dev/null || true;',
+      '  fi;',
+      'fi'
+    ].join(' ');
+    exec(watchdogCmd, { timeout: 8000 }, () => {});
+  };
+  setTimeout(runLinuxBootWatchdog, 2000);
+  setInterval(runLinuxBootWatchdog, 5000);
+}

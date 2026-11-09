@@ -57,9 +57,66 @@ fi
 
 # Si usa LightDM (Xubuntu / XFCE / Debian / Mint)
 if [ -d /etc/lightdm ] || [ -d /usr/share/lightdm ]; then
+  apt-get install -y xdotool 2>/dev/null || true
   mkdir -p /etc/lightdm/lightdm.conf.d
   mkdir -p /usr/share/lightdm/lightdm.conf.d
   rm -f /etc/lightdm/lightdm.conf.d/50-aether-autologin.conf 2>/dev/null || true
+
+  # Crear script auto-pulsador del botón azul "Iniciar sesión" por si LightDM muestra el greeter en algún arranque rápido NVMe
+  cat > /usr/local/bin/aether-greeter-autoclick.sh <<'EOF'
+#!/usr/bin/env bash
+xubuntu-numlockx 2>/dev/null || true
+(
+  for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
+    sleep 1
+    if pgrep -f lightdm-gtk-greeter >/dev/null 2>&1; then
+      DISPLAY="${DISPLAY:-:0}" xdotool key Return 2>/dev/null || true
+      python3 -c '
+import fcntl, os, struct, time
+try:
+  fd = os.open("/dev/uinput", os.O_WRONLY | os.O_NONBLOCK)
+  fcntl.ioctl(fd, 0x40045564, 1)
+  fcntl.ioctl(fd, 0x40045565, 28)
+  os.write(fd, struct.pack("80sHHHHi", b"aether-kbd", 3, 1, 1, 1, 0) + b"\x00"*(1116-92))
+  fcntl.ioctl(fd, 0x5501)
+  time.sleep(0.1)
+  now = int(time.time())
+  os.write(fd, struct.pack("llHHi", now, 0, 1, 28, 1))
+  os.write(fd, struct.pack("llHHi", now, 0, 0, 0, 0))
+  time.sleep(0.05)
+  os.write(fd, struct.pack("llHHi", now, 0, 1, 28, 0))
+  os.write(fd, struct.pack("llHHi", now, 0, 0, 0, 0))
+  time.sleep(0.1)
+  fcntl.ioctl(fd, 0x5502)
+  os.close(fd)
+except Exception:
+  pass
+' 2>/dev/null || true
+    else
+      exit 0
+    fi
+  done
+) &
+exit 0
+EOF
+  chmod +x /usr/local/bin/aether-greeter-autoclick.sh
+
+  # Evitar condición de carrera en arranque NVMe: esperar a que AccountsService esté listo antes de iniciar LightDM
+  mkdir -p /etc/systemd/system/lightdm.service.d
+  cat > /etc/systemd/system/lightdm.service.d/override.conf <<EOF
+[Unit]
+After=systemd-user-sessions.service accounts-daemon.service dbus.service
+Wants=accounts-daemon.service
+
+[Service]
+ExecStartPre=/bin/sleep 2
+EOF
+  systemctl daemon-reload 2>/dev/null || true
+
+  # Permitir login sin clave por PAM si el usuario está en nopasswdlogin
+  if [ -f /etc/pam.d/lightdm ] && ! grep -q "nopasswdlogin" /etc/pam.d/lightdm; then
+    sed -i '1i auth sufficient pam_succeed_if.so user ingroup nopasswdlogin' /etc/pam.d/lightdm 2>/dev/null || true
+  fi
 
   # 1º Buscar la sesión nativa configurada en /usr/share/lightdm/lightdm.conf.d/
   DETECTED_SESSION="$(grep -hE '^user-session=' /usr/share/lightdm/lightdm.conf.d/*.conf 2>/dev/null | head -n 1 | cut -d= -f2 | tr -d '[:space:]' || true)"
@@ -78,6 +135,7 @@ if [ -d /etc/lightdm ] || [ -d /usr/share/lightdm ]; then
 autologin-guest=false
 autologin-user=$REAL_USER
 autologin-user-timeout=0
+greeter-setup-script=/usr/local/bin/aether-greeter-autoclick.sh
 EOF
   if [ -n "$DETECTED_SESSION" ]; then
     echo "user-session=$DETECTED_SESSION" >> /etc/lightdm/lightdm.conf.d/99-aether-autologin.conf
@@ -93,6 +151,7 @@ EOF
 autologin-guest=false
 autologin-user=$REAL_USER
 autologin-user-timeout=0
+greeter-setup-script=/usr/local/bin/aether-greeter-autoclick.sh
 EOF
 
   # Asegurar ~/.dmrc y AccountsService para que LightDM no falle al buscar la sesión del usuario
@@ -184,6 +243,34 @@ EOF
 
 # 5. Preparar Red (Ethernet eno1 auto-conexión sin duplicados) y Arranque UEFI para clonar SSD
 echo "[5/6] Reparando auto-conexión Ethernet (eno1) sin duplicados y preparando SSD para clonar..."
+
+# ¡CRÍTICO! Eliminar la regla antigua de udev/dispatcher que metía 2.0.0.10/8 en eno1 antes de arrancar NetworkManager
+# (eso hacía que NetworkManager creara perfiles 'eno1' fantasma y no pidiera IP de Internet por DHCP al router)
+rm -f /etc/udev/rules.d/99-hahan-sl04-usb.rules /etc/NetworkManager/dispatcher.d/99-sl04-usb-dmx 2>/dev/null || true
+
+# Reemplazar sl04-usb-net.sh y granddas-hahan-ip.sh para que SOLO toquen adaptadores USB (enx* / usb* / MAC 00:13:26:*) y JAMÁS toquen eno1
+cat > /usr/local/bin/sl04-usb-net.sh <<'EOF'
+#!/usr/bin/env bash
+# Quitar 2.0.0.10/8 de eno1 si estuviera puesta por error
+ip addr del 2.0.0.10/8 dev eno1 2>/dev/null || true
+for devpath in /sys/class/net/*; do
+  iface="$(basename "$devpath")"
+  case "$iface" in
+    lo|eno*|enp*|eth*|wl*|wlan*|docker*|veth*|br*) continue ;;
+  esac
+  mac="$(cat "$devpath/address" 2>/dev/null | tr '[:upper:]' '[:lower:]')"
+  if [[ "$mac" == 00:13:26* ]] || [[ "$iface" == usb* ]] || [[ "$iface" == enx* ]]; then
+    ip link set "$iface" up 2>/dev/null || true
+    if ! ip -4 addr show dev "$iface" | grep -q "2.0.0."; then
+      ip addr add 2.0.0.10/8 broadcast 2.255.255.255 dev "$iface" 2>/dev/null || true
+    fi
+  fi
+done
+EOF
+chmod +x /usr/local/bin/sl04-usb-net.sh
+cp -f /usr/local/bin/sl04-usb-net.sh /usr/local/bin/granddas-hahan-ip.sh 2>/dev/null || true
+udevadm control --reload-rules 2>/dev/null || true
+
 mkdir -p /etc/NetworkManager/conf.d
 cat > /etc/NetworkManager/conf.d/99-aether-ethernet.conf <<EOF
 [main]
