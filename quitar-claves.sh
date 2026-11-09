@@ -58,7 +58,9 @@ fi
 # Si usa LightDM (Xubuntu / XFCE / Debian / Mint)
 if [ -d /etc/lightdm ]; then
   mkdir -p /etc/lightdm/lightdm.conf.d
-  # Detectar la sesión real instalada (xubuntu, xfce, ubuntu, etc.) sin forzar una inexistente
+  rm -f /etc/lightdm/lightdm.conf.d/50-aether-autologin.conf 2>/dev/null || true
+
+  # Detectar la sesión real instalada (xubuntu, xfce, ubuntu, etc.)
   DETECTED_SESSION=""
   for s in xubuntu xfce ubuntu default lightdm-xsession; do
     if [ -f "/usr/share/xsessions/${s}.desktop" ]; then
@@ -66,34 +68,37 @@ if [ -d /etc/lightdm ]; then
       break
     fi
   done
-  if [ -z "$DETECTED_SESSION" ]; then
-    FIRST_DESKTOP="$(ls -1 /usr/share/xsessions/*.desktop 2>/dev/null | head -n 1 || true)"
-    if [ -n "$FIRST_DESKTOP" ]; then
-      DETECTED_SESSION="$(basename "$FIRST_DESKTOP" .desktop)"
-    fi
-  fi
 
   cat > /etc/lightdm/lightdm.conf.d/99-aether-autologin.conf <<EOF
 [Seat:*]
+autologin-guest=false
 autologin-user=$REAL_USER
 autologin-user-timeout=0
-autologin-guest=false
 EOF
   if [ -n "$DETECTED_SESSION" ]; then
     echo "user-session=$DETECTED_SESSION" >> /etc/lightdm/lightdm.conf.d/99-aether-autologin.conf
+    echo "autologin-session=$DETECTED_SESSION" >> /etc/lightdm/lightdm.conf.d/99-aether-autologin.conf
   fi
-  rm -f /etc/lightdm/lightdm.conf.d/50-aether-autologin.conf 2>/dev/null || true
 
-  # También asegurarlo en /etc/lightdm/lightdm.conf si existe
-  if [ -f /etc/lightdm/lightdm.conf ]; then
-    sed -i -E "s/^#?autologin-user=.*/autologin-user=$REAL_USER/" /etc/lightdm/lightdm.conf 2>/dev/null || true
-    sed -i -E "s/^#?autologin-user-timeout=.*/autologin-user-timeout=0/" /etc/lightdm/lightdm.conf 2>/dev/null || true
+  # Escribir también /etc/lightdm/lightdm.conf limpio con [Seat:*] y [SeatDefaults]
+  cat > /etc/lightdm/lightdm.conf <<EOF
+[Seat:*]
+autologin-guest=false
+autologin-user=$REAL_USER
+autologin-user-timeout=0
+
+[SeatDefaults]
+autologin-guest=false
+autologin-user=$REAL_USER
+autologin-user-timeout=0
+EOF
+  if [ -n "$DETECTED_SESSION" ]; then
+    sed -i "/^\[Seat:\*\]/a user-session=$DETECTED_SESSION\nautologin-session=$DETECTED_SESSION" /etc/lightdm/lightdm.conf 2>/dev/null || true
   fi
 fi
 
 # Desactivar bloqueadores de pantalla de XFCE / LightDM (light-locker / xfce4-screensaver)
 rm -f /etc/xdg/autostart/light-locker.desktop /etc/xdg/autostart/xfce4-screensaver.desktop 2>/dev/null || true
-apt-get remove -y light-locker xfce4-screensaver 2>/dev/null || true
 
 # 3. Quitar cartel de contraseña del "Depósito de claves" (Keyring) al abrir Chrome / AETHER-VJ
 echo "[3/6] Eliminando bloqueo del depósito de claves (Keyring) en Chrome / AETHER-VJ..."

@@ -831,11 +831,12 @@ const requestHandler = async (req, res) => {
       }
 
       const safeGit = 'git -c safe.directory="*"';
+      const postUpdateCmd = 'node build-bundle.js && (sudo -n bash quitar-claves.sh 2>/dev/null || true)';
       const cmd = hasGitDir
         ? (repoUrl
-          ? `${safeGit} remote set-url origin "${repoUrl}" && ${safeGit} fetch origin main && ${safeGit} reset --hard origin/main && node build-bundle.js`
-          : `${safeGit} fetch origin main && ${safeGit} reset --hard origin/main && node build-bundle.js`)
-        : `${safeGit} init && ${safeGit} remote add origin "${repoUrl}" && ${safeGit} fetch --depth=1 origin main && ${safeGit} reset --hard origin/main && node build-bundle.js`;
+          ? `${safeGit} remote set-url origin "${repoUrl}" && ${safeGit} fetch origin main && ${safeGit} reset --hard origin/main && ${postUpdateCmd}`
+          : `${safeGit} fetch origin main && ${safeGit} reset --hard origin/main && ${postUpdateCmd}`)
+        : `${safeGit} init && ${safeGit} remote add origin "${repoUrl}" && ${safeGit} fetch --depth=1 origin main && ${safeGit} reset --hard origin/main && ${postUpdateCmd}`;
 
       exec(cmd, { cwd: __dirname, timeout: 120000 }, (err, stdout, stderr) => {
         if (err) {
