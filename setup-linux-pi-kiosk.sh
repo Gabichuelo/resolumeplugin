@@ -124,6 +124,11 @@ sudo systemctl enable --now avahi-daemon 2>/dev/null || true
 sudo systemctl restart avahi-daemon 2>/dev/null || true
 sudo setcap 'cap_net_bind_service=+ep' "$NODE_REAL" 2>/dev/null || true
 
+# Asegurar que el usuario sea propietario de la carpeta y que Git permita actualizar sin error "dubious ownership"
+sudo chown -R "$USER_NAME:$USER_NAME" "$APP_DIR" 2>/dev/null || true
+git config --global --add safe.directory "$APP_DIR" 2>/dev/null || true
+sudo git config --system --add safe.directory "*" 2>/dev/null || true
+
 # 3. Crear servicio systemd para el Servidor Wi-Fi Remoto (Puerto 8080 + puerto 80 si hay permiso)
 SERVICE_FILE="/etc/systemd/system/aether-vj.service"
 sudo bash -c "cat > $SERVICE_FILE" <<EOF
