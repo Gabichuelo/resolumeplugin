@@ -164,7 +164,7 @@ cat > "/home/$USER_NAME/.config/autostart/aether-kiosk.desktop" <<EOF
 Type=Application
 Name=AETHER-VJ Kiosk Projector
 Comment=Arranca AETHER-VJ a pantalla completa limpia sin bordes
-Exec=bash -c "xset s off; xset -dpms; xset s noblank; unclutter -idle 0.5 -root & sleep 3 && while true; do $CHROMIUM_BIN --kiosk --password-store=basic --noerrdialogs --disable-infobars --no-first-run --disable-session-crashed-bubble --enable-gpu-rasterization --ignore-gpu-blocklist --disable-background-timer-throttling --disable-renderer-backgrounding --disable-backgrounding-occluded-windows --autoplay-policy=no-user-gesture-required --use-fake-ui-for-media-stream '$KIOSK_URL'; sleep 2; done"
+Exec=bash -c "xset s off; xset -dpms; xset s noblank; pactl set-source-mute @DEFAULT_SOURCE@ 0 2>/dev/null || true; pactl set-source-volume @DEFAULT_SOURCE@ 100% 2>/dev/null || true; unclutter -idle 0.5 -root & sleep 3 && while true; do sed -i 's/\"exit_type\":\"Crashed\"/\"exit_type\":\"Normal\"/g; s/\"exited_cleanly\":false/\"exited_cleanly\":true/g' ~/.config/google-chrome/Default/Preferences ~/.config/chromium/Default/Preferences 2>/dev/null || true; $CHROMIUM_BIN --kiosk --password-store=basic --noerrdialogs --disable-infobars --no-first-run --disable-session-crashed-bubble --enable-gpu-rasterization --ignore-gpu-blocklist --disable-background-timer-throttling --disable-renderer-backgrounding --disable-backgrounding-occluded-windows --autoplay-policy=no-user-gesture-required --use-fake-ui-for-media-stream '$KIOSK_URL'; sleep 2; done"
 Terminal=false
 X-GNOME-Autostart-enabled=true
 EOF

@@ -910,6 +910,10 @@ const requestHandler = async (req, res) => {
         ].join(' ; ');
       } else if (preset === 'update-luces') {
         rawCmd = 'sudo -S bash instalar-luces-sl04.sh';
+      } else if (preset === 'disk-list') {
+        rawCmd = 'sudo -S bash clonar-m2.sh --list';
+      } else if (preset === 'clone-m2') {
+        rawCmd = 'sudo -S bash clonar-m2.sh --clone';
       } else if (preset === 'reboot') {
         rawCmd = 'sudo -S reboot';
       } else if (customCmd) {
@@ -919,7 +923,8 @@ const requestHandler = async (req, res) => {
         return;
       }
 
-      const child = exec(rawCmd, { cwd: __dirname, timeout: 120000, maxBuffer: 1024 * 1024 }, (err, stdout, stderr) => {
+      const cmdTimeoutMs = preset === 'clone-m2' ? 900000 : 120000;
+      const child = exec(rawCmd, { cwd: __dirname, timeout: cmdTimeoutMs, maxBuffer: 4 * 1024 * 1024 }, (err, stdout, stderr) => {
         const combined = ((stdout || '') + (stderr ? '\n' + stderr : '')).trim();
         const outText = combined || (err ? err.message : '(Comando ejecutado sin texto de salida)');
         persistedConfig.sharedNotes = outText.slice(-12000);
@@ -1326,6 +1331,9 @@ server.listen(PORT, '0.0.0.0', () => {
 // 1) Si LightDM se queda en el botón azul "Iniciar sesión" (lightdm-gtk-greeter), pulsa Enter automáticamente.
 // 2) Si eno1 tiene el cable conectado pero una regla vieja le puso 2.0.0.10/8 sin DHCP, limpia 2.0.0.10 y levanta Ethernet-Auto.
 if (process.platform === 'linux') {
+  // Si el M.2 fue clonado con clonadora física externa a otro Mini-PC, regenerar machine-id y expandir partición al arrancar
+  exec('sudo -n /usr/local/bin/aether-clone-hwcheck.sh 2>/dev/null || true', { timeout: 20000 }, () => {});
+
   const runLinuxBootWatchdog = () => {
     const watchdogCmd = [
       'if pgrep -f lightdm-gtk-greeter >/dev/null 2>&1; then',

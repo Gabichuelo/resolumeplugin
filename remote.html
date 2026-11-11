@@ -760,6 +760,7 @@
     <button type="button" id="btn-hero-mapping" class="btn-hero map-jump">📐 MAPEAR PANTALLA / LED</button>
     <button type="button" id="btn-calm" class="btn-hero calm">🌿 CALMAR VISUAL</button>
     <button type="button" id="btn-next" class="btn-hero next">⏭ SIGUIENTE LOOP</button>
+    <button type="button" id="btn-open-luces-remote" class="btn-hero map-jump" style="grid-column: span 2;border-color:var(--amber);color:var(--amber)">💡 ABRIR MANDO DE LUCES (GRANDDAS + SL04)</button>
     <button type="button" id="btn-panic" class="btn-hero panic" style="grid-column: span 2">🆘 PÁNICO: VOLVER A VISUAL SEGURO</button>
   </div>
 
@@ -1572,6 +1573,12 @@
         </button>
         <button type="button" class="btn-pad danger" data-term-preset="reboot" style="padding:13px 8px;font-size:11px">
           🔄 4. Reiniciar Mini-PC
+        </button>
+        <button type="button" class="btn-pad active" data-term-preset="disk-list" style="padding:13px 8px;font-size:11px">
+          💿 5. Ver Discos M.2 / USB
+        </button>
+        <button type="button" class="btn-pad green-live" data-term-preset="clone-m2" style="padding:13px 8px;font-size:11px">
+          🚀 6. Clonar M.2 al Disco USB/M.2
         </button>
       </div>
 
@@ -2808,11 +2815,19 @@
         }
       }
 
+      document.getElementById('btn-open-luces-remote')?.addEventListener('click', () => {
+        const host = window.location.hostname || 'localhost';
+        window.open('http://' + host + ':5175/?remote=1&pin=1234', '_blank');
+      });
+
       document.querySelectorAll('[data-term-preset]').forEach((btn) => {
         btn.addEventListener('click', () => {
           const preset = btn.getAttribute('data-term-preset');
           if (preset === 'reboot') {
             if (!window.confirm('¿Seguro que quieres reiniciar el Mini-PC ahora mismo?')) return;
+          }
+          if (preset === 'clone-m2') {
+            if (!window.confirm('⚠️ ¿Clonar este Mini-PC Maestro sobre el disco M.2 / USB secundario conectado?\n\nTODOS los datos del disco nuevo se borrarán y quedará clonado listo para otro Mini-PC (tarda ~1-2 min).')) return;
           }
           runRemoteTerminal({ preset }, btn.textContent.trim());
         });

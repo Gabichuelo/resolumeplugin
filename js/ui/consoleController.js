@@ -2355,11 +2355,17 @@ export class ConsoleController {
       }
     });
 
+    document.getElementById('btn-desk-open-luces')?.addEventListener('click', () => {
+      const host = window.location.hostname || 'localhost';
+      window.open(`http://${host}:5175`, '_blank');
+    });
+
     document.querySelectorAll('[data-desk-preset]').forEach((btn) => {
       btn.addEventListener('click', async () => {
         if (!this._isHttp) return;
         const preset = btn.getAttribute('data-desk-preset');
         if (preset === 'reboot' && !window.confirm('¿Seguro que quieres reiniciar el Mini-PC ahora?')) return;
+        if (preset === 'clone-m2' && !window.confirm('⚠️ ¿Clonar este Mini-PC Maestro sobre el disco M.2 / USB secundario conectado?\n\nSe borrará el disco nuevo y quedará clonado en ~1-2 min listo para otro Mini-PC.')) return;
         if (deskSharedNotes) {
           deskSharedNotes.value = `⏳ Ejecutando: ${btn.textContent.trim()}...\nEspera unos segundos...`;
         }

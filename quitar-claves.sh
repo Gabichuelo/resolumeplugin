@@ -205,11 +205,14 @@ lock-after=false
 EOF
 chown -R "$REAL_USER:$REAL_USER" "$USER_HOME/.local/share/keyrings" 2>/dev/null || true
 
-# Asegurar que el autostart de Chrome lleve --password-store=basic
+# Asegurar que el autostart de Chrome lleve --password-store=basic, limpie el aviso "¿Restaurar páginas?" tras corte de luz y active entrada de audio
 AUTOSTART_FILE="$USER_HOME/.config/autostart/aether-kiosk.desktop"
 if [ -f "$AUTOSTART_FILE" ]; then
   if ! grep -q -- "--password-store=basic" "$AUTOSTART_FILE"; then
     sed -i 's/--kiosk/--kiosk --password-store=basic/g' "$AUTOSTART_FILE"
+  fi
+  if ! grep -q "exit_type" "$AUTOSTART_FILE"; then
+    sed -i 's/while true; do /while true; do sed -i '\''s\/"exit_type":"Crashed"\/"exit_type":"Normal"\/g; s\/"exited_cleanly":false\/"exited_cleanly":true\/g'\'' ~\/.config\/google-chrome\/Default\/Preferences ~\/.config\/chromium\/Default\/Preferences 2>\/dev\/null || true; pactl set-source-mute @DEFAULT_SOURCE@ 0 2>\/dev\/null || true; pactl set-source-volume @DEFAULT_SOURCE@ 100% 2>\/dev\/null || true; /g' "$AUTOSTART_FILE" 2>/dev/null || true
   fi
   chown "$REAL_USER:$REAL_USER" "$AUTOSTART_FILE" 2>/dev/null || true
 fi
@@ -276,10 +279,42 @@ cat > /etc/NetworkManager/conf.d/99-aether-ethernet.conf <<EOF
 [main]
 no-auto-default=*
 
+[connection]
+# Usar siempre la MAC física de cada Mini-PC para pedir IP al router (evita IPs duplicadas al clonar M.2)
+ipv4.dhcp-client-id=mac
+
 [device]
 match-device=type:ethernet
 managed=1
 EOF
+
+# Auto-detección de cambio de Mini-PC al clonar con clonadora externa:
+# Si este M.2 arranca en otra placa distinta, regenera /etc/machine-id y expande partición si el nuevo M.2 es más grande
+cat > /usr/local/bin/aether-clone-hwcheck.sh <<'EOF'
+#!/usr/bin/env bash
+STAMP_FILE="/var/lib/aether-hw-signature"
+CUR_SIG="$(cat /sys/class/dmi/id/product_uuid 2>/dev/null || true)-$(cat /sys/class/net/eno1/address /sys/class/net/en*/address 2>/dev/null | head -n 1 || true)"
+OLD_SIG="$(cat "$STAMP_FILE" 2>/dev/null || true)"
+if [ -n "$CUR_SIG" ] && [ "$CUR_SIG" != "-" ] && [ "$CUR_SIG" != "$OLD_SIG" ]; then
+  echo "$CUR_SIG" > "$STAMP_FILE"
+  if [ -n "$OLD_SIG" ]; then
+    rm -f /etc/machine-id /var/lib/dbus/machine-id 2>/dev/null || true
+    systemd-machine-id-setup 2>/dev/null || true
+    ln -sf /etc/machine-id /var/lib/dbus/machine-id 2>/dev/null || true
+    systemctl restart avahi-daemon NetworkManager 2>/dev/null || true
+  fi
+  # Si se clonó por bloques (dd / clonadora física) a un M.2 más grande, expandir partición raíz automáticamente
+  ROOT_SRC="$(findmnt -n -o SOURCE / 2>/dev/null || true)"
+  ROOT_PK="$(lsblk -no PKNAME "$ROOT_SRC" 2>/dev/null | head -n 1 || true)"
+  ROOT_PN="$(echo "$ROOT_SRC" | grep -oE '[0-9]+$' || true)"
+  if [ -n "$ROOT_PK" ] && [ -n "$ROOT_PN" ]; then
+    sgdisk -e "/dev/$ROOT_PK" 2>/dev/null || true
+    growpart "/dev/$ROOT_PK" "$ROOT_PN" 2>/dev/null && resize2fs "$ROOT_SRC" 2>/dev/null || true
+  fi
+fi
+EOF
+chmod +x /usr/local/bin/aether-clone-hwcheck.sh
+/usr/local/bin/aether-clone-hwcheck.sh 2>/dev/null || true
 
 if command -v nmcli >/dev/null 2>&1; then
   nmcli general reload 2>/dev/null || true
