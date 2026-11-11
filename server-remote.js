@@ -912,6 +912,10 @@ const requestHandler = async (req, res) => {
         rawCmd = 'sudo -S bash instalar-luces-sl04.sh';
       } else if (preset === 'disk-list') {
         rawCmd = 'sudo -S bash clonar-m2.sh --list';
+      } else if (preset === 'usb-kit') {
+        rawCmd = 'sudo -S bash clonar-m2.sh --usb-kit';
+      } else if (preset === 'usb-backup') {
+        rawCmd = 'sudo -S bash clonar-m2.sh --usb-backup';
       } else if (preset === 'clone-m2') {
         rawCmd = 'sudo -S bash clonar-m2.sh --clone';
       } else if (preset === 'reboot') {
@@ -923,7 +927,7 @@ const requestHandler = async (req, res) => {
         return;
       }
 
-      const cmdTimeoutMs = preset === 'clone-m2' ? 900000 : 120000;
+      const cmdTimeoutMs = (preset === 'clone-m2' || preset === 'usb-backup') ? 1200000 : 120000;
       const child = exec(rawCmd, { cwd: __dirname, timeout: cmdTimeoutMs, maxBuffer: 4 * 1024 * 1024 }, (err, stdout, stderr) => {
         const combined = ((stdout || '') + (stderr ? '\n' + stderr : '')).trim();
         const outText = combined || (err ? err.message : '(Comando ejecutado sin texto de salida)');

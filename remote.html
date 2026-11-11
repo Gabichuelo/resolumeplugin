@@ -1575,10 +1575,16 @@
           🔄 4. Reiniciar Mini-PC
         </button>
         <button type="button" class="btn-pad active" data-term-preset="disk-list" style="padding:13px 8px;font-size:11px">
-          💿 5. Ver Discos M.2 / USB
+          💿 5. Ver Pendrive USB / Discos
         </button>
-        <button type="button" class="btn-pad green-live" data-term-preset="clone-m2" style="padding:13px 8px;font-size:11px">
-          🚀 6. Clonar M.2 al Disco USB/M.2
+        <button type="button" class="btn-pad amber-active" data-term-preset="usb-kit" style="padding:13px 8px;font-size:11px">
+          ⚡ 6. Crear Kit Instalador en USB (5s)
+        </button>
+        <button type="button" class="btn-pad green-live" data-term-preset="usb-backup" style="padding:13px 8px;font-size:11px">
+          💾 7. Guardar CLON COMPLETO en USB
+        </button>
+        <button type="button" class="btn-pad active" data-term-preset="clone-m2" style="padding:13px 8px;font-size:11px">
+          🚀 8. Clonar M.2 Directo (2º M.2)
         </button>
       </div>
 
@@ -2825,6 +2831,9 @@
           const preset = btn.getAttribute('data-term-preset');
           if (preset === 'reboot') {
             if (!window.confirm('¿Seguro que quieres reiniciar el Mini-PC ahora mismo?')) return;
+          }
+          if (preset === 'usb-backup') {
+            if (!window.confirm('💾 ¿Guardar un CLON COMPLETO EXACTO de este Mini-PC dentro de tu Pendrive USB (16 GB+)?\n\nNo borra las demás cosas de tu Pendrive (crea la carpeta AETHER_CLON_COMPLETO con RESTAURAR_AQUI.sh). Tarda unos 3-5 minutos.')) return;
           }
           if (preset === 'clone-m2') {
             if (!window.confirm('⚠️ ¿Clonar este Mini-PC Maestro sobre el disco M.2 / USB secundario conectado?\n\nTODOS los datos del disco nuevo se borrarán y quedará clonado listo para otro Mini-PC (tarda ~1-2 min).')) return;

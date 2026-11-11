@@ -2365,6 +2365,7 @@ export class ConsoleController {
         if (!this._isHttp) return;
         const preset = btn.getAttribute('data-desk-preset');
         if (preset === 'reboot' && !window.confirm('¿Seguro que quieres reiniciar el Mini-PC ahora?')) return;
+        if (preset === 'usb-backup' && !window.confirm('💾 ¿Guardar un CLON COMPLETO EXACTO de este Mini-PC dentro de tu Pendrive USB (16 GB+)?\n\nNo formatea tu Pendrive (guarda todo en la carpeta AETHER_CLON_COMPLETO con RESTAURAR_AQUI.sh). Tarda unos 3-5 minutos.')) return;
         if (preset === 'clone-m2' && !window.confirm('⚠️ ¿Clonar este Mini-PC Maestro sobre el disco M.2 / USB secundario conectado?\n\nSe borrará el disco nuevo y quedará clonado en ~1-2 min listo para otro Mini-PC.')) return;
         if (deskSharedNotes) {
           deskSharedNotes.value = `⏳ Ejecutando: ${btn.textContent.trim()}...\nEspera unos segundos...`;
