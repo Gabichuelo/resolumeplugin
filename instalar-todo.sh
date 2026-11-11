@@ -6,11 +6,16 @@
 #   2) GrandDas DMX512 Studio + Hahan SL04 4-XLR (Luces puerto 5175/3031/3000)
 #   3) Quita todas las contraseñas (Auto-login Ubuntu + Chrome Keyring + Sudoers)
 #
-# Uso en un Mini-PC con Ubuntu recién instalado:
-#   curl -fsSL https://raw.githubusercontent.com/Gabichuelo/resolumeplugin/main/instalar-todo.sh | sudo bash
+# Uso en un Mini-PC con Xubuntu/Ubuntu recién instalado (wget ya viene instalado de serie):
+#   wget -qO- https://raw.githubusercontent.com/Gabichuelo/resolumeplugin/main/instalar-todo.sh | sudo bash
 # ==============================================================================
 
 set -e
+export DEBIAN_FRONTEND=noninteractive
+
+if [ "$EUID" -ne 0 ]; then
+  exec sudo DEBIAN_FRONTEND=noninteractive bash "$0" "$@"
+fi
 
 REAL_USER="${SUDO_USER:-$(logname 2>/dev/null || echo "")}"
 if [ -z "$REAL_USER" ] || [ "$REAL_USER" = "root" ]; then
@@ -27,8 +32,8 @@ echo "  🚀 INSTALANDO SISTEMA COMPLETO (AETHER-VJ + GRANDDAS SL04 + SIN CLAVES
 echo "  👤 Usuario: $REAL_USER ($USER_HOME)"
 echo "===================================================================="
 
-apt-get update -y
-apt-get install -y git curl wget nodejs network-manager unclutter xdotool rsync parted gdisk dosfstools e2fsprogs x11-xserver-utils avahi-daemon libnss-mdns libcap2-bin dnsmasq-base
+apt-get -o DPkg::Lock::Timeout=120 update -y
+apt-get -o DPkg::Lock::Timeout=120 install -y git curl wget nodejs network-manager unclutter xdotool rsync parted gdisk dosfstools e2fsprogs x11-xserver-utils avahi-daemon libnss-mdns libcap2-bin dnsmasq-base
 
 # 1.Activar sudo sin clave antes de lanzar sub-scripts
 mkdir -p /etc/sudoers.d

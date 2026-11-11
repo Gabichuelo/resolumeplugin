@@ -43,8 +43,9 @@ echo "===================================================================="
 
 # 1. Instalar todas las dependencias mientras hay conexión a Internet
 # (antes de encender el Hotspot, por si usamos la misma tarjeta Wi-Fi)
-sudo apt-get update -y
-sudo apt-get install -y nodejs network-manager unclutter x11-xserver-utils avahi-daemon libnss-mdns libcap2-bin dnsmasq-base wget curl git htop
+export DEBIAN_FRONTEND=noninteractive
+sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 update -y
+sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y nodejs network-manager unclutter x11-xserver-utils avahi-daemon libnss-mdns libcap2-bin dnsmasq-base wget curl git htop
 
 # 1.5 Instalar navegador con aceleración GPU y soporte completo de vídeo MP4 (H.264)
 ARCH="$(dpkg --print-architecture 2>/dev/null || uname -m)"
@@ -54,7 +55,7 @@ if command -v google-chrome-stable >/dev/null 2>&1; then
 elif [ "$ARCH" = "amd64" ] || [ "$ARCH" = "x86_64" ]; then
   echo "[AETHER-VJ] Instalando Google Chrome (.deb oficial) para soporte MP4 H.264 y GPU Intel..."
   TMP_DEB="/tmp/google-chrome-stable_current_amd64.deb"
-  if wget -q -O "$TMP_DEB" "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" && sudo apt-get install -y "$TMP_DEB"; then
+  if wget -q -O "$TMP_DEB" "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" && sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y "$TMP_DEB"; then
     CHROMIUM_BIN="google-chrome-stable"
   fi
   rm -f "$TMP_DEB"

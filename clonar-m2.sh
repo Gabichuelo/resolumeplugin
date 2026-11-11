@@ -171,7 +171,15 @@ USER_HOME="$(eval echo "~$REAL_USER")"
 echo "===================================================================="
 echo "  🚀 INSTALANDO TODO EN ESTE MINI-PC NUEVO + COPIANDO TUS SHOWS"
 echo "===================================================================="
-curl -fsSL https://raw.githubusercontent.com/Gabichuelo/resolumeplugin/main/instalar-todo.sh | bash
+export DEBIAN_FRONTEND=noninteractive
+if command -v wget >/dev/null 2>&1; then
+  wget -qO- https://raw.githubusercontent.com/Gabichuelo/resolumeplugin/main/instalar-todo.sh | bash
+elif command -v curl >/dev/null 2>&1; then
+  curl -fsSL https://raw.githubusercontent.com/Gabichuelo/resolumeplugin/main/instalar-todo.sh | bash
+else
+  apt-get -o DPkg::Lock::Timeout=120 update -y && apt-get -o DPkg::Lock::Timeout=120 install -y wget curl
+  wget -qO- https://raw.githubusercontent.com/Gabichuelo/resolumeplugin/main/instalar-todo.sh | bash
+fi
 
 # Restaurar tus ajustes exactos, logos, vídeos, patch DMX, direcciones y shows del Mini-PC Maestro
 if [ -f "$SCRIPT_DIR/backup_datos/aether-config.json" ]; then

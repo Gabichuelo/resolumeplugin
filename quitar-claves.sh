@@ -184,8 +184,22 @@ Session=${DETECTED_SESSION:-xubuntu}
 EOF
 fi
 
-# Desactivar bloqueadores de pantalla de XFCE / LightDM (light-locker / xfce4-screensaver)
+# Desactivar bloqueadores de pantalla de XFCE / LightDM (light-locker / xfce4-screensaver) y apagado HDMI/suspensión 24/7
 rm -f /etc/xdg/autostart/light-locker.desktop /etc/xdg/autostart/xfce4-screensaver.desktop 2>/dev/null || true
+systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target >/dev/null 2>&1 || true
+mkdir -p /etc/X11/xorg.conf.d
+cat > /etc/X11/xorg.conf.d/10-aether-nodpms.conf <<'EOF'
+Section "ServerFlags"
+    Option "BlankTime" "0"
+    Option "StandbyTime" "0"
+    Option "SuspendTime" "0"
+    Option "OffTime" "0"
+EndSection
+
+Section "Extensions"
+    Option "DPMS" "Disable"
+EndSection
+EOF
 
 # 3. Quitar cartel de contraseña del "Depósito de claves" (Keyring) al abrir Chrome / AETHER-VJ
 echo "[3/6] Eliminando bloqueo del depósito de claves (Keyring) en Chrome / AETHER-VJ..."
