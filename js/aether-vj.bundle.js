@@ -8478,7 +8478,7 @@ class SyncBridge {
         break;
       case 'RELOAD_ENGINE':
         if (typeof window !== 'undefined') {
-          setTimeout(() => window.location.reload(), 500);
+          setTimeout(() => window.location.reload(), 5500);
         }
         break;
       case 'KILL_ACTION':
@@ -11126,16 +11126,33 @@ class ConsoleController {
             d.updateStatusMsg.style.color = '#00e676';
             d.updateStatusMsg.textContent = '✅ ' + (data.message || 'Actualizado con éxito. Recargando en 5s...');
           }
-          setTimeout(() => window.location.reload(), 4800);
+          setTimeout(() => window.location.reload(), 5500);
         } else if (d.updateStatusMsg) {
           d.updateStatusMsg.style.color = '#ff5252';
           d.updateStatusMsg.textContent = '❌ ' + (data.error || 'No se pudo actualizar');
         }
       } catch (err) {
         if (d.updateStatusMsg) {
-          d.updateStatusMsg.style.color = '#ff5252';
-          d.updateStatusMsg.textContent = '❌ Error de red al actualizar: ' + err.message;
+          d.updateStatusMsg.style.color = '#00e5ff';
+          d.updateStatusMsg.textContent = '⏳ El servidor se está reiniciando tras actualizar... reconectando en 5s...';
         }
+        setTimeout(async () => {
+          try {
+            const probe = await fetch('/api/network-info');
+            if (probe.ok) {
+              if (d.updateStatusMsg) {
+                d.updateStatusMsg.style.color = '#00e676';
+                d.updateStatusMsg.textContent = '✅ Servidor reconectado. Recargando...';
+              }
+              window.location.reload();
+              return;
+            }
+          } catch (_) {}
+          if (d.updateStatusMsg) {
+            d.updateStatusMsg.style.color = '#ff5252';
+            d.updateStatusMsg.textContent = '❌ Error de red al actualizar: ' + err.message;
+          }
+        }, 5000);
       }
     });
 

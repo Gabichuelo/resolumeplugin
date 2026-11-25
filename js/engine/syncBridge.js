@@ -834,7 +834,7 @@ export class SyncBridge {
         break;
       case 'RELOAD_ENGINE':
         if (typeof window !== 'undefined') {
-          setTimeout(() => window.location.reload(), 500);
+          setTimeout(() => window.location.reload(), 5500);
         }
         break;
       case 'KILL_ACTION':

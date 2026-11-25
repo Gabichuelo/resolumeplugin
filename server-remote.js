@@ -839,7 +839,7 @@ const requestHandler = async (req, res) => {
           : `${fetchMain} && ${safeGit} reset --hard origin/main && ${postUpdateCmd}`)
         : `${safeGit} init && ${safeGit} remote add origin "${repoUrl}" && (${safeGit} fetch -4 --depth=1 origin main || ${safeGit} fetch --depth=1 origin main) && ${safeGit} reset --hard origin/main && ${postUpdateCmd}`;
 
-      exec(cmd, { cwd: __dirname, timeout: 180000 }, (err, stdout, stderr) => {
+      exec(cmd, { cwd: __dirname, timeout: 180000, maxBuffer: 4 * 1024 * 1024 }, (err, stdout, stderr) => {
         if (err) {
           sendJson(res, 500, {
             ok: false,
@@ -851,17 +851,23 @@ const requestHandler = async (req, res) => {
         persistedConfig.lastUpdateAt = new Date().toISOString();
         scheduleConfigSave();
         applyLinuxKioskKeyringFix();
-        // Avisar al kiosco y a los mandos para que recarguen el nuevo bundle automáticamente
-        writeSse(masterClients, { type: 'REMOTE_COMMAND', action: 'RELOAD_ENGINE' });
+        // Esperar a que termine de enviarse la respuesta HTTP antes de reiniciar el servicio
+        const scheduleRestart = () => {
+          if (scheduleRestart._done) return;
+          scheduleRestart._done = true;
+          writeSse(masterClients, { type: 'REMOTE_COMMAND', action: 'RELOAD_ENGINE' });
+          if (process.platform === 'linux') {
+            setTimeout(() => process.exit(0), 1500);
+          }
+        };
+        res.once('finish', scheduleRestart);
         sendJson(res, 200, {
           ok: true,
           message: 'Actualizado correctamente. Recargando motor visual...',
           lastUpdateAt: persistedConfig.lastUpdateAt,
           output: (stdout || '').slice(-400)
         });
-        if (process.platform === 'linux') {
-          setTimeout(() => process.exit(0), 700);
-        }
+        setTimeout(scheduleRestart, 1500);
       });
     } catch (err) {
       sendJson(res, 400, { ok: false, error: err.message });
