@@ -34,18 +34,38 @@ echo "===================================================================="
 
 timedatectl set-ntp true 2>/dev/null || true
 
-apt-get -o DPkg::Lock::Timeout=120 update -y
-apt-get -o DPkg::Lock::Timeout=120 install -y ca-certificates git curl wget nodejs network-manager unclutter xdotool rsync parted gdisk dosfstools e2fsprogs x11-xserver-utils avahi-daemon libnss-mdns libcap2-bin dnsmasq-base
+wait_for_internet() {
+  for i in $(seq 1 30); do
+    if getent hosts github.com >/dev/null 2>&1 || ping -c 1 -W 1 8.8.8.8 >/dev/null 2>&1; then
+      return 0
+    fi
+    echo "⏳ Esperando a que vuelva la conexión de red ($i/30)..."
+    sleep 2
+  done
+}
 
-# 1.Activar sudo sin clave antes de lanzar sub-scripts
+wait_for_internet
+apt-get -o DPkg::Lock::Timeout=120 update -y
+# IMPORTANTE: --no-upgrade evita que apt reinicie NetworkManager y corte Internet a mitad de instalación
+apt-get -o DPkg::Lock::Timeout=120 install -y --no-upgrade ca-certificates git curl wget nodejs unclutter xdotool rsync parted gdisk dosfstools e2fsprogs x11-xserver-utils avahi-daemon libnss-mdns libcap2-bin dnsmasq-base
+
+# 1. Activar sudo sin clave antes de lanzar sub-scripts
 mkdir -p /etc/sudoers.d
 echo "$REAL_USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/90-aether-nopasswd
 chmod 0440 /etc/sudoers.d/90-aether-nopasswd
 
-# 2. Descargar AETHER-VJ (rama main, forzando IPv4 por si el router falla en IPv6)
+# 2. Descargar AETHER-VJ (rama main, con espera de red y reintento automático)
+wait_for_internet
 if [ ! -d "$AETHER_DIR/.git" ]; then
   rm -rf "$AETHER_DIR"
-  sudo -u "$REAL_USER" git clone -4 -b main "$REPO_URL" "$AETHER_DIR" || sudo -u "$REAL_USER" git clone -b main "$REPO_URL" "$AETHER_DIR"
+  for attempt in 1 2 3; do
+    if sudo -u "$REAL_USER" git clone -4 -b main "$REPO_URL" "$AETHER_DIR" || sudo -u "$REAL_USER" git clone -b main "$REPO_URL" "$AETHER_DIR"; then
+      break
+    fi
+    echo "⚠️ Reintentando descarga de AETHER-VJ ($attempt/3)..."
+    sleep 4
+    wait_for_internet
+  done
 else
   cd "$AETHER_DIR"
   git -c safe.directory="*" fetch -4 origin main || git -c safe.directory="*" fetch origin main
@@ -53,14 +73,15 @@ else
 fi
 chown -R "$REAL_USER:$REAL_USER" "$AETHER_DIR"
 
-# 3. Ejecutar instalador de AETHER-VJ
+# 3. Ejecutar instalador de AETHER-VJ (dejando quitar-claves para el final del todo para no tocar la red aún)
 cd "$AETHER_DIR"
-sudo -u "$REAL_USER" bash "$AETHER_DIR/setup-linux-pi-kiosk.sh" --no-hotspot
+sudo -u "$REAL_USER" SKIP_QUITAR_CLAVES=1 bash "$AETHER_DIR/setup-linux-pi-kiosk.sh" --no-hotspot
 
 # 4. Instalar GrandDas DMX512 + Hahan SL04 unificado en /opt/planecreator
+wait_for_internet
 bash "$AETHER_DIR/instalar-luces-sl04.sh"
 
-# 5. Quitar todas las contraseñas y preparar UEFI/Red para clonación
+# 5. Quitar todas las contraseñas y preparar UEFI/Red para clonación (al final, cuando ya se descargó todo)
 bash "$AETHER_DIR/quitar-claves.sh"
 
 echo "===================================================================="

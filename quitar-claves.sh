@@ -364,13 +364,16 @@ if command -v nmcli >/dev/null 2>&1; then
       ipv4.method auto ipv6.method auto 2>/dev/null || true
   fi
 
-  # Conectar la tarjeta Ethernet física ahora mismo (ej. eno1) y limpiar IP 2.0.0.10 si estaba en eno1
+  # Conectar la tarjeta Ethernet física solo si aún no está conectada (para no cortar una descarga activa)
   ETH_DEV="$(nmcli -t -f DEVICE,TYPE device status 2>/dev/null | awk -F: '$2=="ethernet"{print $1; exit}')"
   if [ -n "$ETH_DEV" ]; then
     ip addr del 2.0.0.10/8 dev "$ETH_DEV" 2>/dev/null || true
     nmcli device set "$ETH_DEV" managed yes 2>/dev/null || true
     nmcli device set "$ETH_DEV" autoconnect yes 2>/dev/null || true
-    nmcli connection up "Ethernet-Auto" ifname "$ETH_DEV" 2>/dev/null || nmcli device connect "$ETH_DEV" 2>/dev/null || true
+    ETH_STATE="$(nmcli -t -f DEVICE,STATE device status 2>/dev/null | awk -F: -v d="$ETH_DEV" '$1==d{print $2; exit}')"
+    if [ "$ETH_STATE" != "connected" ] && [ "$(cat "/sys/class/net/$ETH_DEV/carrier" 2>/dev/null || echo 0)" = "1" ]; then
+      nmcli connection up "Ethernet-Auto" ifname "$ETH_DEV" 2>/dev/null || nmcli device connect "$ETH_DEV" 2>/dev/null || true
+    fi
   fi
 
   # Para perfiles Wi-Fi (sin tocar loopback 'lo'): limpiar MAC fijada y permitir conexión antes del login

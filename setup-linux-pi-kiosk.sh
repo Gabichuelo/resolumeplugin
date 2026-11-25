@@ -42,10 +42,10 @@ echo "  Directorio: $APP_DIR"
 echo "===================================================================="
 
 # 1. Instalar todas las dependencias mientras hay conexión a Internet
-# (antes de encender el Hotspot, por si usamos la misma tarjeta Wi-Fi)
+# (--no-upgrade evita que apt reinicie NetworkManager y corte la red a mitad de instalación)
 export DEBIAN_FRONTEND=noninteractive
 sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 update -y
-sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y nodejs network-manager unclutter x11-xserver-utils avahi-daemon libnss-mdns libcap2-bin dnsmasq-base wget curl git htop
+sudo DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=120 install -y --no-upgrade nodejs unclutter x11-xserver-utils avahi-daemon libnss-mdns libcap2-bin dnsmasq-base wget curl git htop
 
 # 1.5 Instalar navegador con aceleración GPU y soporte completo de vídeo MP4 (H.264)
 ARCH="$(dpkg --print-architecture 2>/dev/null || uname -m)"
@@ -171,7 +171,7 @@ X-GNOME-Autostart-enabled=true
 EOF
 
 # 5. Quitar peticiones de contraseña (Auto-Login GDM3/LightDM, Llavero Chrome y Sudoers) + preparar SSD para clonación
-if [ -f "$APP_DIR/quitar-claves.sh" ]; then
+if [ "${SKIP_QUITAR_CLAVES:-0}" != "1" ] && [ -f "$APP_DIR/quitar-claves.sh" ]; then
   sudo bash "$APP_DIR/quitar-claves.sh" || true
 fi
 
