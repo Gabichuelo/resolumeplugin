@@ -662,7 +662,7 @@ function applyLinuxKioskKeyringFix() {
         } catch (_) {}
       }
     }
-    exec('chmod +x quitar-claves.sh instalar-luces.sh 2>/dev/null; sudo -n bash quitar-claves.sh 2>/dev/null || true', { cwd: __dirname }, () => {});
+    exec('chmod +x quitar-claves.sh instalar-luces-sl04.sh instalar-todo.sh clonar-m2.sh 2>/dev/null || true', { cwd: __dirname }, () => {});
   } catch (_) {}
 }
 applyLinuxKioskKeyringFix();
@@ -831,14 +831,15 @@ const requestHandler = async (req, res) => {
       }
 
       const safeGit = 'git -c safe.directory="*"';
-      const postUpdateCmd = 'node build-bundle.js && (sudo -n bash quitar-claves.sh 2>/dev/null || true)';
+      const fetchMain = `(${safeGit} fetch -4 origin main || ${safeGit} fetch origin main)`;
+      const postUpdateCmd = 'node build-bundle.js && ( [ ! -d /opt/planecreator ] || sudo -n bash instalar-luces-sl04.sh 2>/dev/null || true ) && (sudo -n bash quitar-claves.sh 2>/dev/null || true)';
       const cmd = hasGitDir
         ? (repoUrl
-          ? `${safeGit} remote set-url origin "${repoUrl}" && ${safeGit} fetch origin main && ${safeGit} reset --hard origin/main && ${postUpdateCmd}`
-          : `${safeGit} fetch origin main && ${safeGit} reset --hard origin/main && ${postUpdateCmd}`)
-        : `${safeGit} init && ${safeGit} remote add origin "${repoUrl}" && ${safeGit} fetch --depth=1 origin main && ${safeGit} reset --hard origin/main && ${postUpdateCmd}`;
+          ? `${safeGit} remote set-url origin "${repoUrl}" && ${fetchMain} && ${safeGit} reset --hard origin/main && ${postUpdateCmd}`
+          : `${fetchMain} && ${safeGit} reset --hard origin/main && ${postUpdateCmd}`)
+        : `${safeGit} init && ${safeGit} remote add origin "${repoUrl}" && (${safeGit} fetch -4 --depth=1 origin main || ${safeGit} fetch --depth=1 origin main) && ${safeGit} reset --hard origin/main && ${postUpdateCmd}`;
 
-      exec(cmd, { cwd: __dirname, timeout: 120000 }, (err, stdout, stderr) => {
+      exec(cmd, { cwd: __dirname, timeout: 180000 }, (err, stdout, stderr) => {
         if (err) {
           sendJson(res, 500, {
             ok: false,
@@ -1344,14 +1345,16 @@ if (process.platform === 'linux') {
       '  sudo -n DISPLAY=:0 XAUTHORITY=/var/run/lightdm/root/:0 xdotool key Return 2>/dev/null || true;',
       '  sudo -n /usr/local/bin/aether-greeter-autoclick.sh 2>/dev/null || true;',
       'fi;',
-      'if [ -d /sys/class/net/eno1 ]; then',
-      '  if ip -4 addr show dev eno1 2>/dev/null | grep -q "2.0.0.10"; then',
-      '    sudo -n ip addr del 2.0.0.10/8 dev eno1 2>/dev/null || true;',
+      'for eth_path in /sys/class/net/eno* /sys/class/net/enp* /sys/class/net/eth*; do',
+      '  [ -d "$eth_path" ] || continue;',
+      '  eth_if="$(basename "$eth_path")";',
+      '  if ip -4 addr show dev "$eth_if" 2>/dev/null | grep -q "2.0.0.10"; then',
+      '    sudo -n ip addr del 2.0.0.10/8 dev "$eth_if" 2>/dev/null || true;',
       '  fi;',
-      '  if [ "$(cat /sys/class/net/eno1/carrier 2>/dev/null)" = "1" ] && ! ip -4 addr show dev eno1 2>/dev/null | grep -qE "inet (192|10|172)\\."; then',
-      '    sudo -n nmcli connection up "Ethernet-Auto" ifname eno1 2>/dev/null || sudo -n nmcli device connect eno1 2>/dev/null || true;',
+      '  if [ "$(cat "$eth_path/carrier" 2>/dev/null)" = "1" ] && ! ip -4 addr show dev "$eth_if" 2>/dev/null | grep -qE "inet (192|10|172)\\."; then',
+      '    sudo -n nmcli connection up "Ethernet-Auto" ifname "$eth_if" 2>/dev/null || sudo -n nmcli device connect "$eth_if" 2>/dev/null || true;',
       '  fi;',
-      'fi'
+      'done'
     ].join(' ');
     exec(watchdogCmd, { timeout: 8000 }, () => {});
   };

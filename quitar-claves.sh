@@ -57,7 +57,7 @@ fi
 
 # Si usa LightDM (Xubuntu / XFCE / Debian / Mint)
 if [ -d /etc/lightdm ] || [ -d /usr/share/lightdm ]; then
-  apt-get install -y xdotool 2>/dev/null || true
+  command -v xdotool >/dev/null 2>&1 || DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=60 install -y xdotool 2>/dev/null || true
   mkdir -p /etc/lightdm/lightdm.conf.d
   mkdir -p /usr/share/lightdm/lightdm.conf.d
   rm -f /etc/lightdm/lightdm.conf.d/50-aether-autologin.conf 2>/dev/null || true
@@ -329,6 +329,25 @@ fi
 EOF
 chmod +x /usr/local/bin/aether-clone-hwcheck.sh
 /usr/local/bin/aether-clone-hwcheck.sh 2>/dev/null || true
+
+# Activar servicio de arranque temprano para que cualquier M.2 clonado regenere su machine-id ANTES de arrancar red/Avahi
+cat > /etc/systemd/system/aether-clone-hwcheck.service <<'EOF'
+[Unit]
+Description=AETHER-VJ Cloned M.2 Hardware ID & Partition Check
+DefaultDependencies=no
+After=local-fs.target
+Before=NetworkManager.service avahi-daemon.service systemd-networkd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/aether-clone-hwcheck.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+systemctl daemon-reload 2>/dev/null || true
+systemctl enable aether-clone-hwcheck.service 2>/dev/null || true
 
 if command -v nmcli >/dev/null 2>&1; then
   nmcli general reload 2>/dev/null || true

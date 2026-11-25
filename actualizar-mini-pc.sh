@@ -21,7 +21,7 @@ else
   git remote set-url origin "$REPO_URL"
 fi
 
-git fetch --all
+git fetch -4 --all || git fetch --all
 git reset --hard origin/main
 node build-bundle.js 2>/dev/null || true
 
@@ -30,6 +30,9 @@ NODE_REAL="$(readlink -f "$NODE_BIN" 2>/dev/null || echo "$NODE_BIN")"
 sudo setcap 'cap_net_bind_service=+ep' "$NODE_REAL" 2>/dev/null || true
 sudo hostnamectl set-hostname aether 2>/dev/null || true
 sudo systemctl restart avahi-daemon 2>/dev/null || true
+if [ -d "/opt/planecreator" ] && [ -f "$SCRIPT_DIR/instalar-luces-sl04.sh" ]; then
+  sudo bash "$SCRIPT_DIR/instalar-luces-sl04.sh" || true
+fi
 if [ -f "$SCRIPT_DIR/quitar-claves.sh" ]; then
   sudo bash "$SCRIPT_DIR/quitar-claves.sh" || true
 fi

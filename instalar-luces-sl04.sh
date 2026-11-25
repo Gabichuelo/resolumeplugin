@@ -25,6 +25,15 @@ echo "===================================================================="
 mkdir -p "$LUCES_DIR"
 git config --global --add safe.directory "*" 2>/dev/null || true
 
+# Proteger todos los shows guardados localmente, ultimo_show y PIN antes de actualizar desde GitHub
+SHOWS_BKP=""
+if [ -d "$LUCES_DIR/shows" ]; then
+  SHOWS_BKP="/tmp/granddas_shows_bkp_$$"
+  rm -rf "$SHOWS_BKP"
+  mkdir -p "$SHOWS_BKP"
+  cp -a "$LUCES_DIR/shows/." "$SHOWS_BKP/" 2>/dev/null || true
+fi
+
 for attempt in 1 2 3; do
   if [ -d "$LUCES_DIR/.git" ]; then
     cd "$LUCES_DIR"
@@ -44,8 +53,14 @@ for attempt in 1 2 3; do
   sleep 4
 done
 
-# Asegurar PIN 1234 para el mando móvil de luces
+# Restaurar shows locales, backups y PIN del usuario (sin perder shows nuevos de GitHub)
 mkdir -p "$LUCES_DIR/shows"
+if [ -n "$SHOWS_BKP" ] && [ -d "$SHOWS_BKP" ]; then
+  cp -a "$SHOWS_BKP/." "$LUCES_DIR/shows/" 2>/dev/null || true
+  rm -rf "$SHOWS_BKP"
+fi
+
+# Asegurar PIN 1234 para el mando móvil de luces si no existía uno previo
 if [ ! -f "$LUCES_DIR/shows/remote_pin.txt" ]; then
   echo "1234" > "$LUCES_DIR/shows/remote_pin.txt"
 fi
