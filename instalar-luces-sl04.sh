@@ -28,12 +28,12 @@ git config --global --add safe.directory "*" 2>/dev/null || true
 if [ -d "$LUCES_DIR/.git" ]; then
   cd "$LUCES_DIR"
   git -c safe.directory="*" remote set-url origin "$REPO_URL" || true
-  git -c safe.directory="*" fetch --force origin luces
+  git -c safe.directory="*" fetch -4 --force origin luces || git -c safe.directory="*" fetch --force origin luces
   git -c safe.directory="*" reset --hard origin/luces
   git -c safe.directory="*" clean -fd
 else
   rm -rf "$LUCES_DIR"
-  git clone -b luces --single-branch "$REPO_URL" "$LUCES_DIR"
+  git clone -4 -b luces --single-branch "$REPO_URL" "$LUCES_DIR" || git clone -b luces --single-branch "$REPO_URL" "$LUCES_DIR"
 fi
 
 # Asegurar PIN 1234 para el mando móvil de luces

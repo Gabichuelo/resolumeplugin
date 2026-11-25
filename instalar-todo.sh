@@ -32,21 +32,23 @@ echo "  🚀 INSTALANDO SISTEMA COMPLETO (AETHER-VJ + GRANDDAS SL04 + SIN CLAVES
 echo "  👤 Usuario: $REAL_USER ($USER_HOME)"
 echo "===================================================================="
 
+timedatectl set-ntp true 2>/dev/null || true
+
 apt-get -o DPkg::Lock::Timeout=120 update -y
-apt-get -o DPkg::Lock::Timeout=120 install -y git curl wget nodejs network-manager unclutter xdotool rsync parted gdisk dosfstools e2fsprogs x11-xserver-utils avahi-daemon libnss-mdns libcap2-bin dnsmasq-base
+apt-get -o DPkg::Lock::Timeout=120 install -y ca-certificates git curl wget nodejs network-manager unclutter xdotool rsync parted gdisk dosfstools e2fsprogs x11-xserver-utils avahi-daemon libnss-mdns libcap2-bin dnsmasq-base
 
 # 1.Activar sudo sin clave antes de lanzar sub-scripts
 mkdir -p /etc/sudoers.d
 echo "$REAL_USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/90-aether-nopasswd
 chmod 0440 /etc/sudoers.d/90-aether-nopasswd
 
-# 2. Descargar AETHER-VJ (rama main)
+# 2. Descargar AETHER-VJ (rama main, forzando IPv4 por si el router falla en IPv6)
 if [ ! -d "$AETHER_DIR/.git" ]; then
   rm -rf "$AETHER_DIR"
-  sudo -u "$REAL_USER" git clone -b main "$REPO_URL" "$AETHER_DIR"
+  sudo -u "$REAL_USER" git clone -4 -b main "$REPO_URL" "$AETHER_DIR" || sudo -u "$REAL_USER" git clone -b main "$REPO_URL" "$AETHER_DIR"
 else
   cd "$AETHER_DIR"
-  git -c safe.directory="*" fetch origin main
+  git -c safe.directory="*" fetch -4 origin main || git -c safe.directory="*" fetch origin main
   git -c safe.directory="*" reset --hard origin/main
 fi
 chown -R "$REAL_USER:$REAL_USER" "$AETHER_DIR"
