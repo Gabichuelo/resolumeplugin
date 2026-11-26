@@ -15,6 +15,7 @@ export class SignagePlayer {
     this.fadePhase = 'idle'; // 'idle' | 'out' | 'in'
     this.fadeElapsed = 0;
     this.pendingIndex = -1;
+    this._lastRandomMode = 1;
     this._refreshing = false;
   }
 
@@ -135,6 +136,8 @@ export class SignagePlayer {
     this.fadeElapsed = 0;
     this.slideElapsed = 0;
     this.loadingElapsed = 0;
+    sg.transProgress = 0.0;
+    sg.transDir = 0.0;
 
     if (sg.enabled) {
       sg.paused = false;
@@ -198,14 +201,30 @@ export class SignagePlayer {
       return;
     }
 
-    const fadeSec = Math.max(0, Math.min(3, Number(sg.fadeSeconds) || 0));
-    if (immediate || fadeSec <= 0.02 || items.length <= 1) {
+    const trans = Number.isFinite(Number(sg.transition))
+      ? Math.max(0, Math.min(6, Math.round(Number(sg.transition))))
+      : ((Number(sg.fadeSeconds) || 0) > 0.02 ? 1 : 0);
+    const fadeSec = Math.max(0, Math.min(3, Number(sg.fadeSeconds) || 0.7));
+    if (immediate || trans === 0 || fadeSec <= 0.02 || items.length <= 1) {
       this.fadePhase = 'idle';
+      sg.transProgress = 0.0;
+      sg.transDir = 0.0;
       if (this.state.media) this.state.media.opacity = 1.0;
       this._commitItem(index, items);
       return;
     }
 
+    let activeMode = trans;
+    if (trans === 6) {
+      const pool = [1, 2, 3, 4, 5].filter((m) => m !== this._lastRandomMode);
+      activeMode = pool[Math.floor(Math.random() * pool.length)] || 1;
+      this._lastRandomMode = activeMode;
+    } else {
+      activeMode = Math.max(1, Math.min(5, trans));
+    }
+    sg.transModeActive = activeMode;
+    sg.transProgress = 0.0;
+    sg.transDir = -1.0;
     this.pendingIndex = index;
     this.fadePhase = 'out';
     this.fadeElapsed = 0;
@@ -260,29 +279,35 @@ export class SignagePlayer {
       this.media.singleLoop = (items.length === 1 && curItem.kind === 'video');
     }
 
-    // Gestión de transición suave (fade out -> swap -> fade in)
-    const halfFade = Math.max(0.05, (Math.max(0, Math.min(3, Number(sg.fadeSeconds) || 0))) * 0.5);
+    // Gestión de transición GPU (out -> swap -> in)
+    const halfFade = Math.max(0.05, (Math.max(0, Math.min(3, Number(sg.fadeSeconds) || 0.7))) * 0.5);
+    m.opacity = 1.0;
     if (this.fadePhase === 'out') {
       this.fadeElapsed += dt;
       const t = Math.min(1, this.fadeElapsed / halfFade);
-      m.opacity = 1.0 - t;
+      sg.transProgress = t;
+      sg.transDir = -1.0;
       if (t >= 1) {
         this._commitItem(this.pendingIndex, items);
         this.fadePhase = 'in';
         this.fadeElapsed = 0;
-        m.opacity = 0.0;
+        sg.transProgress = 1.0;
+        sg.transDir = 1.0;
       }
       return;
     } else if (this.fadePhase === 'in') {
       this.fadeElapsed += dt;
       const t = Math.min(1, this.fadeElapsed / halfFade);
-      m.opacity = t;
+      sg.transProgress = 1.0 - t;
+      sg.transDir = 1.0;
       if (t >= 1) {
         this.fadePhase = 'idle';
-        m.opacity = 1.0;
+        sg.transProgress = 0.0;
+        sg.transDir = 0.0;
       }
     } else {
-      m.opacity = 1.0;
+      sg.transProgress = 0.0;
+      sg.transDir = 0.0;
     }
 
     if (sg.paused) return;

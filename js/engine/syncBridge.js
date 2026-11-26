@@ -804,7 +804,14 @@ export class SyncBridge {
             sg.fit = clampNum(cmd.value, 0, 2, 0) | 0;
             if (sg.enabled && st.media) st.media.fit = sg.fit;
           } else if (cmd.prop === 'fadeSeconds') {
-            sg.fadeSeconds = clampNum(cmd.value, 0, 3, 0.4);
+            sg.fadeSeconds = clampNum(cmd.value, 0, 3, 0.7);
+            if (sg.fadeSeconds <= 0.02) sg.transition = 0;
+            else if (sg.transition === 0) sg.transition = 1;
+          } else if (cmd.prop === 'transition') {
+            sg.transition = Math.max(0, Math.min(6, Math.round(Number(cmd.value) || 0)));
+            if (sg.transition > 0 && (Number(sg.fadeSeconds) || 0) < 0.05) {
+              sg.fadeSeconds = 0.7;
+            }
           } else if (cmd.prop === 'paused') {
             sg.paused = Boolean(cmd.value);
           } else if (cmd.prop === 'useAllMedia') {
@@ -1020,6 +1027,9 @@ export class SyncBridge {
     p.text = st.text;
     p.media = st.media;
     p.signageEnabled = Boolean(st.signage && st.signage.enabled);
+    p.signageTransMode = st.signage ? (st.signage.transModeActive || 0) : 0;
+    p.signageTransProg = st.signage ? (st.signage.transProgress || 0.0) : 0.0;
+    p.signageTransDir = st.signage ? (st.signage.transDir || 0.0) : 0.0;
 
     p.fx.kaleidoEnabled = st.fx.kaleidoscope.enabled;
     p.fx.kaleidoWet = st.fx.kaleidoscope.wet;
@@ -1135,6 +1145,9 @@ export class SyncBridge {
     }
     if (st.signage && typeof p.signageEnabled === 'boolean') {
       st.signage.enabled = p.signageEnabled;
+      st.signage.transModeActive = p.signageTransMode || 0;
+      st.signage.transProgress = p.signageTransProg || 0.0;
+      st.signage.transDir = p.signageTransDir || 0.0;
     }
 
     st.fx.kaleidoscope.enabled = p.fx.kaleidoEnabled;

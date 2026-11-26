@@ -28,6 +28,8 @@ uniform int uMediaMirror;        // 1 = espejo horizontal
 uniform float uMediaZoom;        // >1.0 = golpe de zoom con el bombo
 uniform vec2 uMediaTexel;        // 1 / tamaño del vídeo en píxeles
 uniform float uMediaAspect;      // ancho / alto del vídeo
+uniform int uSignageTransMode;   // 0 Off, 1 Fade, 2 Zoom, 3 Slide, 4 Wipe L->R, 5 Iris
+uniform vec2 uSignageTrans;      // x = progreso (0=visible .. 1=oculto), y = dir (-1=sale, +1=entra)
 uniform vec3 uAudioFFT;
 uniform vec3 uPalA;
 uniform vec3 uPalB;
@@ -72,7 +74,44 @@ vec3 heatRamp(float t) {
 vec4 sampleMediaFx(vec2 uv) {
   vec2 muv = (uv - 0.5) * uMediaUvScale / max(uMediaZoom, 0.5) + 0.5;
   if (uMediaMirror == 1) muv.x = 1.0 - muv.x;
-  if (muv.x < 0.0 || muv.x > 1.0 || muv.y < 0.0 || muv.y > 1.0) return vec4(0.0);
+
+  float transAlpha = 1.0;
+  float tp = clamp(uSignageTrans.x, 0.0, 1.0);
+  float tdir = uSignageTrans.y;
+  float te = smoothstep(0.0, 1.0, tp);
+  if (uSignageTransMode > 0 && tp > 0.001) {
+    if (uSignageTransMode == 1) {
+      // Fundido clásico S-curve
+      transAlpha = 1.0 - te;
+    } else if (uSignageTransMode == 2) {
+      // Zoom suave (sale ampliando, entra acercándose desde lejos)
+      float z = (tdir < 0.0) ? (1.0 + 0.14 * te) : (1.0 - 0.14 * te);
+      muv = (muv - 0.5) / max(z, 0.2) + 0.5;
+      transAlpha = 1.0 - te;
+    } else if (uSignageTransMode == 3) {
+      // Deslizar horizontal (sale hacia la izquierda, entra desde la derecha)
+      muv.x += (tdir < 0.0) ? (te * 0.55) : (-te * 0.55);
+      transAlpha = 1.0 - te * 0.85;
+    } else if (uSignageTransMode == 4) {
+      // Cortina / barrido lateral suave de izquierda a derecha
+      float fe = 0.09;
+      if (tdir < 0.0) {
+        float edge = te * (1.0 + fe);
+        transAlpha = smoothstep(edge - fe, edge, uv.x);
+      } else {
+        float rev = 1.0 - te;
+        float edge = rev * (1.0 + fe);
+        transAlpha = 1.0 - smoothstep(edge - fe, edge, uv.x);
+      }
+    } else if (uSignageTransMode == 5) {
+      // Iris / apertura circular desde el centro
+      float distC = length((uv - 0.5) * vec2(1.0, 0.72));
+      float rad = (1.0 - te) * 0.72;
+      transAlpha = 1.0 - smoothstep(rad - 0.09, rad + 0.02, distC);
+    }
+  }
+
+  if (muv.x < 0.0 || muv.x > 1.0 || muv.y < 0.0 || muv.y > 1.0 || transAlpha <= 0.001) return vec4(0.0);
 
   if (uMediaFx == 6) {
     // PIXEL LED: rejilla de diodos redondos
@@ -82,12 +121,12 @@ vec4 sampleMediaFx(vec2 uv) {
     vec2 f = fract(muv * grid) - 0.5;
     float diode = smoothstep(0.5, 0.32, length(f));
     vec4 raw = sampleMediaRaw(q);
-    return vec4(raw.rgb * 1.25 * diode, raw.a);
+    return vec4(raw.rgb * 1.25 * diode, raw.a * transAlpha);
   }
 
   vec4 raw = sampleMediaRaw(muv);
   vec3 c = raw.rgb;
-  float srcA = raw.a;
+  float srcA = raw.a * transAlpha;
   float l = lumaOf(c);
 
   if (uMediaFx == 1) {
@@ -105,7 +144,7 @@ vec4 sampleMediaFx(vec2 uv) {
     float gy = -bl - 2.0 * bc - br + tl + 2.0 * tc + tr;
     float edge = smoothstep(0.08, 0.45, length(vec2(gx, gy)));
     vec3 neon = cosPalette(muv.y * 0.6 + uTime * 0.08) * (1.2 + uBeatPulse * 0.8);
-    return vec4(neon * edge, edge);
+    return vec4(neon * edge, edge * transAlpha);
   } else if (uMediaFx == 2) {
     // DUOTONO con la paleta activa
     vec3 dark = cosPalette(0.05 + uTime * 0.02) * 0.18;

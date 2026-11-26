@@ -191,7 +191,7 @@ export class WebGLRenderer {
       'uTexDeckA', 'uTexDeckB', 'uTexPrevFeedback',
       'uCrossfade', 'uFeedbackWet', 'uTime', 'uBeatPulse',
       'uTexMedia', 'uMediaMix', 'uMediaBlend', 'uMediaFx', 'uMediaUvScale', 'uMediaMirror',
-      'uMediaZoom', 'uMediaTexel', 'uMediaAspect', 'uAudioFFT',
+      'uMediaZoom', 'uMediaTexel', 'uMediaAspect', 'uSignageTransMode', 'uSignageTrans', 'uAudioFFT',
       'uPalA', 'uPalB', 'uPalC', 'uPalD'
     ];
     const fbProg = this._createProgram(VERTEX_SHADER_SRC, FEEDBACK_COMPOSITE_SHADER_SRC, 'FeedbackComposite');
@@ -716,6 +716,10 @@ export class WebGLRenderer {
       gl.uniform1f(fbU.uMediaZoom, 1.0 + bz * (0.16 * state.bpm.syncPulse + 0.08 * state.audio.bass));
       gl.uniform2f(fbU.uMediaTexel, 1.0 / this._mediaW, 1.0 / this._mediaH);
       gl.uniform1f(fbU.uMediaAspect, mediaAspect);
+      const sgState = state.signage;
+      const sgMode = (isSignage && sgState && sgState.transProgress > 0.001) ? (sgState.transModeActive || 0) : 0;
+      gl.uniform1i(fbU.uSignageTransMode, sgMode);
+      gl.uniform2f(fbU.uSignageTrans, sgMode ? (sgState.transProgress || 0.0) : 0.0, sgMode ? (sgState.transDir || 0.0) : 0.0);
       gl.uniform3f(fbU.uAudioFFT, state.audio.bass, state.audio.mid, state.audio.high);
       gl.uniform3fv(fbU.uPalA, this.palA);
       gl.uniform3fv(fbU.uPalB, this.palB);

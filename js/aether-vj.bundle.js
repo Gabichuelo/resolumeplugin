@@ -242,6 +242,17 @@ const MEDIA_FX_MODES = [
   { id: 6, name: '▦ Pixel LED' }
 ];
 
+// ---- Transiciones del Modo Kiosco / Publicidad ----
+const SIGNAGE_TRANSITIONS = [
+  { id: 0, name: '✂️ Corte directo' },
+  { id: 1, name: '✨ Fundido' },
+  { id: 2, name: '🔍 Zoom suave' },
+  { id: 3, name: '➡️ Deslizar' },
+  { id: 4, name: '🪟 Cortina' },
+  { id: 5, name: '💥 Iris' },
+  { id: 6, name: '🎲 Aleatorio' }
+];
+
 // ---- Transiciones entre Looks guardados (en compases, sincronizadas al BPM) ----
 const TRANSITION_BARS = [0, 1, 2, 4, 8, 16];
 
@@ -953,7 +964,11 @@ function createInitialState() {
       playlist: [],           // [{ url, kind, name }] cuando useAllMedia=false o para ordenar elementos
       slideSeconds: 8,        // segundos por foto/GIF en el carrusel (2..300)
       fit: 0,                 // 0: Llenar (Cover) | 1: Encajar (Contain) | 2: Estirar exacto X×Y
-      fadeSeconds: 0.4,       // duración de transición suave (0 = corte seco, 0.4 = fundido)
+      transition: 1,          // 0: Corte | 1: Fundido | 2: Zoom | 3: Deslizar | 4: Cortina | 5: Iris | 6: Aleatorio
+      fadeSeconds: 0.7,       // duración total de la transición (0.4 = rápido, 0.8 = suave, 1.5 = lento)
+      transModeActive: 1,     // modo efectivo durante la transición (1..5)
+      transProgress: 0.0,     // progreso GPU (0 = visible, 1 = oculto)
+      transDir: 0.0,          // -1 = saliendo, +1 = entrando
       paused: false,
       currentIndex: 0,
       totalItems: 0,
@@ -3605,6 +3620,8 @@ uniform int uMediaMirror;        // 1 = espejo horizontal
 uniform float uMediaZoom;        // >1.0 = golpe de zoom con el bombo
 uniform vec2 uMediaTexel;        // 1 / tamaño del vídeo en píxeles
 uniform float uMediaAspect;      // ancho / alto del vídeo
+uniform int uSignageTransMode;   // 0 Off, 1 Fade, 2 Zoom, 3 Slide, 4 Wipe L->R, 5 Iris
+uniform vec2 uSignageTrans;      // x = progreso (0=visible .. 1=oculto), y = dir (-1=sale, +1=entra)
 uniform vec3 uAudioFFT;
 uniform vec3 uPalA;
 uniform vec3 uPalB;
@@ -3649,7 +3666,44 @@ vec3 heatRamp(float t) {
 vec4 sampleMediaFx(vec2 uv) {
   vec2 muv = (uv - 0.5) * uMediaUvScale / max(uMediaZoom, 0.5) + 0.5;
   if (uMediaMirror == 1) muv.x = 1.0 - muv.x;
-  if (muv.x < 0.0 || muv.x > 1.0 || muv.y < 0.0 || muv.y > 1.0) return vec4(0.0);
+
+  float transAlpha = 1.0;
+  float tp = clamp(uSignageTrans.x, 0.0, 1.0);
+  float tdir = uSignageTrans.y;
+  float te = smoothstep(0.0, 1.0, tp);
+  if (uSignageTransMode > 0 && tp > 0.001) {
+    if (uSignageTransMode == 1) {
+      // Fundido clásico S-curve
+      transAlpha = 1.0 - te;
+    } else if (uSignageTransMode == 2) {
+      // Zoom suave (sale ampliando, entra acercándose desde lejos)
+      float z = (tdir < 0.0) ? (1.0 + 0.14 * te) : (1.0 - 0.14 * te);
+      muv = (muv - 0.5) / max(z, 0.2) + 0.5;
+      transAlpha = 1.0 - te;
+    } else if (uSignageTransMode == 3) {
+      // Deslizar horizontal (sale hacia la izquierda, entra desde la derecha)
+      muv.x += (tdir < 0.0) ? (te * 0.55) : (-te * 0.55);
+      transAlpha = 1.0 - te * 0.85;
+    } else if (uSignageTransMode == 4) {
+      // Cortina / barrido lateral suave de izquierda a derecha
+      float fe = 0.09;
+      if (tdir < 0.0) {
+        float edge = te * (1.0 + fe);
+        transAlpha = smoothstep(edge - fe, edge, uv.x);
+      } else {
+        float rev = 1.0 - te;
+        float edge = rev * (1.0 + fe);
+        transAlpha = 1.0 - smoothstep(edge - fe, edge, uv.x);
+      }
+    } else if (uSignageTransMode == 5) {
+      // Iris / apertura circular desde el centro
+      float distC = length((uv - 0.5) * vec2(1.0, 0.72));
+      float rad = (1.0 - te) * 0.72;
+      transAlpha = 1.0 - smoothstep(rad - 0.09, rad + 0.02, distC);
+    }
+  }
+
+  if (muv.x < 0.0 || muv.x > 1.0 || muv.y < 0.0 || muv.y > 1.0 || transAlpha <= 0.001) return vec4(0.0);
 
   if (uMediaFx == 6) {
     // PIXEL LED: rejilla de diodos redondos
@@ -3659,12 +3713,12 @@ vec4 sampleMediaFx(vec2 uv) {
     vec2 f = fract(muv * grid) - 0.5;
     float diode = smoothstep(0.5, 0.32, length(f));
     vec4 raw = sampleMediaRaw(q);
-    return vec4(raw.rgb * 1.25 * diode, raw.a);
+    return vec4(raw.rgb * 1.25 * diode, raw.a * transAlpha);
   }
 
   vec4 raw = sampleMediaRaw(muv);
   vec3 c = raw.rgb;
-  float srcA = raw.a;
+  float srcA = raw.a * transAlpha;
   float l = lumaOf(c);
 
   if (uMediaFx == 1) {
@@ -3682,7 +3736,7 @@ vec4 sampleMediaFx(vec2 uv) {
     float gy = -bl - 2.0 * bc - br + tl + 2.0 * tc + tr;
     float edge = smoothstep(0.08, 0.45, length(vec2(gx, gy)));
     vec3 neon = cosPalette(muv.y * 0.6 + uTime * 0.08) * (1.2 + uBeatPulse * 0.8);
-    return vec4(neon * edge, edge);
+    return vec4(neon * edge, edge * transAlpha);
   } else if (uMediaFx == 2) {
     // DUOTONO con la paleta activa
     vec3 dark = cosPalette(0.05 + uTime * 0.02) * 0.18;
@@ -4863,7 +4917,7 @@ class WebGLRenderer {
       'uTexDeckA', 'uTexDeckB', 'uTexPrevFeedback',
       'uCrossfade', 'uFeedbackWet', 'uTime', 'uBeatPulse',
       'uTexMedia', 'uMediaMix', 'uMediaBlend', 'uMediaFx', 'uMediaUvScale', 'uMediaMirror',
-      'uMediaZoom', 'uMediaTexel', 'uMediaAspect', 'uAudioFFT',
+      'uMediaZoom', 'uMediaTexel', 'uMediaAspect', 'uSignageTransMode', 'uSignageTrans', 'uAudioFFT',
       'uPalA', 'uPalB', 'uPalC', 'uPalD'
     ];
     const fbProg = this._createProgram(VERTEX_SHADER_SRC, FEEDBACK_COMPOSITE_SHADER_SRC, 'FeedbackComposite');
@@ -5388,6 +5442,10 @@ class WebGLRenderer {
       gl.uniform1f(fbU.uMediaZoom, 1.0 + bz * (0.16 * state.bpm.syncPulse + 0.08 * state.audio.bass));
       gl.uniform2f(fbU.uMediaTexel, 1.0 / this._mediaW, 1.0 / this._mediaH);
       gl.uniform1f(fbU.uMediaAspect, mediaAspect);
+      const sgState = state.signage;
+      const sgMode = (isSignage && sgState && sgState.transProgress > 0.001) ? (sgState.transModeActive || 0) : 0;
+      gl.uniform1i(fbU.uSignageTransMode, sgMode);
+      gl.uniform2f(fbU.uSignageTrans, sgMode ? (sgState.transProgress || 0.0) : 0.0, sgMode ? (sgState.transDir || 0.0) : 0.0);
       gl.uniform3f(fbU.uAudioFFT, state.audio.bass, state.audio.mid, state.audio.high);
       gl.uniform3fv(fbU.uPalA, this.palA);
       gl.uniform3fv(fbU.uPalB, this.palB);
@@ -6866,6 +6924,7 @@ class Persistence {
         playlist: Array.isArray(st.signage.playlist) ? st.signage.playlist.slice(0, 200) : [],
         slideSeconds: Math.max(2, Math.min(300, Number(st.signage.slideSeconds) || 8)),
         fit: [0, 1, 2].includes(Number(st.signage.fit)) ? Number(st.signage.fit) : 0,
+        transition: Math.max(0, Math.min(6, Math.round(Number(st.signage.transition ?? 1)))),
         fadeSeconds: Math.max(0, Math.min(3, Number(st.signage.fadeSeconds) || 0))
       } : null
     };
@@ -6915,6 +6974,9 @@ class Persistence {
       st.signage.slideSeconds = Math.max(2, Math.min(300, Number(sg.slideSeconds) || 8));
       st.signage.fit = [0, 1, 2].includes(Number(sg.fit)) ? Number(sg.fit) : 0;
       st.signage.fadeSeconds = Math.max(0, Math.min(3, Number(sg.fadeSeconds) || 0));
+      st.signage.transition = (sg.transition !== undefined)
+        ? Math.max(0, Math.min(6, Math.round(Number(sg.transition) || 0)))
+        : (st.signage.fadeSeconds > 0.02 ? 1 : 0);
       if (Array.isArray(sg.playlist)) {
         st.signage.playlist = sg.playlist
           .filter((it) => it && typeof it.url === 'string' && /^\/media\/[^/\\]+$/.test(it.url))
@@ -7641,6 +7703,7 @@ class SignagePlayer {
     this.fadePhase = 'idle'; // 'idle' | 'out' | 'in'
     this.fadeElapsed = 0;
     this.pendingIndex = -1;
+    this._lastRandomMode = 1;
     this._refreshing = false;
   }
 
@@ -7761,6 +7824,8 @@ class SignagePlayer {
     this.fadeElapsed = 0;
     this.slideElapsed = 0;
     this.loadingElapsed = 0;
+    sg.transProgress = 0.0;
+    sg.transDir = 0.0;
 
     if (sg.enabled) {
       sg.paused = false;
@@ -7824,14 +7889,30 @@ class SignagePlayer {
       return;
     }
 
-    const fadeSec = Math.max(0, Math.min(3, Number(sg.fadeSeconds) || 0));
-    if (immediate || fadeSec <= 0.02 || items.length <= 1) {
+    const trans = Number.isFinite(Number(sg.transition))
+      ? Math.max(0, Math.min(6, Math.round(Number(sg.transition))))
+      : ((Number(sg.fadeSeconds) || 0) > 0.02 ? 1 : 0);
+    const fadeSec = Math.max(0, Math.min(3, Number(sg.fadeSeconds) || 0.7));
+    if (immediate || trans === 0 || fadeSec <= 0.02 || items.length <= 1) {
       this.fadePhase = 'idle';
+      sg.transProgress = 0.0;
+      sg.transDir = 0.0;
       if (this.state.media) this.state.media.opacity = 1.0;
       this._commitItem(index, items);
       return;
     }
 
+    let activeMode = trans;
+    if (trans === 6) {
+      const pool = [1, 2, 3, 4, 5].filter((m) => m !== this._lastRandomMode);
+      activeMode = pool[Math.floor(Math.random() * pool.length)] || 1;
+      this._lastRandomMode = activeMode;
+    } else {
+      activeMode = Math.max(1, Math.min(5, trans));
+    }
+    sg.transModeActive = activeMode;
+    sg.transProgress = 0.0;
+    sg.transDir = -1.0;
     this.pendingIndex = index;
     this.fadePhase = 'out';
     this.fadeElapsed = 0;
@@ -7886,29 +7967,35 @@ class SignagePlayer {
       this.media.singleLoop = (items.length === 1 && curItem.kind === 'video');
     }
 
-    // Gestión de transición suave (fade out -> swap -> fade in)
-    const halfFade = Math.max(0.05, (Math.max(0, Math.min(3, Number(sg.fadeSeconds) || 0))) * 0.5);
+    // Gestión de transición GPU (out -> swap -> in)
+    const halfFade = Math.max(0.05, (Math.max(0, Math.min(3, Number(sg.fadeSeconds) || 0.7))) * 0.5);
+    m.opacity = 1.0;
     if (this.fadePhase === 'out') {
       this.fadeElapsed += dt;
       const t = Math.min(1, this.fadeElapsed / halfFade);
-      m.opacity = 1.0 - t;
+      sg.transProgress = t;
+      sg.transDir = -1.0;
       if (t >= 1) {
         this._commitItem(this.pendingIndex, items);
         this.fadePhase = 'in';
         this.fadeElapsed = 0;
-        m.opacity = 0.0;
+        sg.transProgress = 1.0;
+        sg.transDir = 1.0;
       }
       return;
     } else if (this.fadePhase === 'in') {
       this.fadeElapsed += dt;
       const t = Math.min(1, this.fadeElapsed / halfFade);
-      m.opacity = t;
+      sg.transProgress = 1.0 - t;
+      sg.transDir = 1.0;
       if (t >= 1) {
         this.fadePhase = 'idle';
-        m.opacity = 1.0;
+        sg.transProgress = 0.0;
+        sg.transDir = 0.0;
       }
     } else {
-      m.opacity = 1.0;
+      sg.transProgress = 0.0;
+      sg.transDir = 0.0;
     }
 
     if (sg.paused) return;
@@ -8918,7 +9005,14 @@ class SyncBridge {
             sg.fit = clampNum(cmd.value, 0, 2, 0) | 0;
             if (sg.enabled && st.media) st.media.fit = sg.fit;
           } else if (cmd.prop === 'fadeSeconds') {
-            sg.fadeSeconds = clampNum(cmd.value, 0, 3, 0.4);
+            sg.fadeSeconds = clampNum(cmd.value, 0, 3, 0.7);
+            if (sg.fadeSeconds <= 0.02) sg.transition = 0;
+            else if (sg.transition === 0) sg.transition = 1;
+          } else if (cmd.prop === 'transition') {
+            sg.transition = Math.max(0, Math.min(6, Math.round(Number(cmd.value) || 0)));
+            if (sg.transition > 0 && (Number(sg.fadeSeconds) || 0) < 0.05) {
+              sg.fadeSeconds = 0.7;
+            }
           } else if (cmd.prop === 'paused') {
             sg.paused = Boolean(cmd.value);
           } else if (cmd.prop === 'useAllMedia') {
@@ -9134,6 +9228,9 @@ class SyncBridge {
     p.text = st.text;
     p.media = st.media;
     p.signageEnabled = Boolean(st.signage && st.signage.enabled);
+    p.signageTransMode = st.signage ? (st.signage.transModeActive || 0) : 0;
+    p.signageTransProg = st.signage ? (st.signage.transProgress || 0.0) : 0.0;
+    p.signageTransDir = st.signage ? (st.signage.transDir || 0.0) : 0.0;
 
     p.fx.kaleidoEnabled = st.fx.kaleidoscope.enabled;
     p.fx.kaleidoWet = st.fx.kaleidoscope.wet;
@@ -9249,6 +9346,9 @@ class SyncBridge {
     }
     if (st.signage && typeof p.signageEnabled === 'boolean') {
       st.signage.enabled = p.signageEnabled;
+      st.signage.transModeActive = p.signageTransMode || 0;
+      st.signage.transProgress = p.signageTransProg || 0.0;
+      st.signage.transDir = p.signageTransDir || 0.0;
     }
 
     st.fx.kaleidoscope.enabled = p.fx.kaleidoEnabled;
@@ -11308,6 +11408,7 @@ class ConsoleController {
       deskSignageMsg: $('desk-signage-msg'),
       deskSignageSecInput: $('desk-signage-sec-input'),
       deskSignageSecBtns: toBtns('#desk-signage-sec-grid [data-dssec]', 'data-dssec', (s) => parseInt(s, 10) || 8),
+      deskSignageTransBtns: toBtns('#desk-signage-trans-grid [data-dstrans]', 'data-dstrans', (s) => parseInt(s, 10) || 0),
       deskSignageFadeBtns: toBtns('#desk-signage-fade-grid [data-dsfade]', 'data-dsfade', (s) => parseFloat(s) || 0),
       deskSignageBannerPresets: Array.from(document.querySelectorAll('#desk-signage-banner-presets [data-bw]')),
       deskSignageLedW: $('desk-signage-led-w'),
@@ -11954,6 +12055,11 @@ class ConsoleController {
     };
     d.deskSignageSecInput?.addEventListener('input', applyDeskSlideSec);
     d.deskSignageSecInput?.addEventListener('change', applyDeskSlideSec);
+    d.deskSignageTransBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => {
+        this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'transition', value: b.id });
+      });
+    });
     d.deskSignageFadeBtns?.forEach((b) => {
       b.el.addEventListener('click', () => {
         this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'fadeSeconds', value: b.id });
@@ -12654,7 +12760,11 @@ class ConsoleController {
       d.deskSignageSecInput.value = sg.slideSeconds || 8;
     }
     d.deskSignageSecBtns?.forEach((b) => b.el.classList.toggle('primary', b.id === (sg.slideSeconds || 8)));
-    d.deskSignageFadeBtns?.forEach((b) => b.el.classList.toggle('primary', (b.id > 0.05) === ((Number(sg.fadeSeconds) || 0) > 0.05)));
+    const curTrans = sg.transition !== undefined ? Number(sg.transition) : ((Number(sg.fadeSeconds) || 0) > 0.05 ? 1 : 0);
+    const curFade = Number(sg.fadeSeconds) || 0.7;
+    const nearestFade = [0.4, 0.8, 1.5].reduce((a, b) => (Math.abs(b - curFade) < Math.abs(a - curFade) ? b : a), 0.8);
+    d.deskSignageTransBtns?.forEach((b) => b.el.classList.toggle('primary', b.id === curTrans));
+    d.deskSignageFadeBtns?.forEach((b) => b.el.classList.toggle('primary', curTrans > 0 && Math.abs(b.id - nearestFade) < 0.05));
     d.deskSignageFitBtns?.forEach((b) => b.el.classList.toggle('primary', b.id === (sg.fit || 0)));
     d.deskSignageScopeBtns?.forEach((b) => b.el.classList.toggle('primary', (b.id === 1) === (sg.useAllMedia !== false)));
     d.deskSignageBannerPresets?.forEach((btn) => {

@@ -2060,6 +2060,7 @@ export class ConsoleController {
       deskSignageMsg: $('desk-signage-msg'),
       deskSignageSecInput: $('desk-signage-sec-input'),
       deskSignageSecBtns: toBtns('#desk-signage-sec-grid [data-dssec]', 'data-dssec', (s) => parseInt(s, 10) || 8),
+      deskSignageTransBtns: toBtns('#desk-signage-trans-grid [data-dstrans]', 'data-dstrans', (s) => parseInt(s, 10) || 0),
       deskSignageFadeBtns: toBtns('#desk-signage-fade-grid [data-dsfade]', 'data-dsfade', (s) => parseFloat(s) || 0),
       deskSignageBannerPresets: Array.from(document.querySelectorAll('#desk-signage-banner-presets [data-bw]')),
       deskSignageLedW: $('desk-signage-led-w'),
@@ -2706,6 +2707,11 @@ export class ConsoleController {
     };
     d.deskSignageSecInput?.addEventListener('input', applyDeskSlideSec);
     d.deskSignageSecInput?.addEventListener('change', applyDeskSlideSec);
+    d.deskSignageTransBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => {
+        this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'transition', value: b.id });
+      });
+    });
     d.deskSignageFadeBtns?.forEach((b) => {
       b.el.addEventListener('click', () => {
         this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'fadeSeconds', value: b.id });
@@ -3406,7 +3412,11 @@ export class ConsoleController {
       d.deskSignageSecInput.value = sg.slideSeconds || 8;
     }
     d.deskSignageSecBtns?.forEach((b) => b.el.classList.toggle('primary', b.id === (sg.slideSeconds || 8)));
-    d.deskSignageFadeBtns?.forEach((b) => b.el.classList.toggle('primary', (b.id > 0.05) === ((Number(sg.fadeSeconds) || 0) > 0.05)));
+    const curTrans = sg.transition !== undefined ? Number(sg.transition) : ((Number(sg.fadeSeconds) || 0) > 0.05 ? 1 : 0);
+    const curFade = Number(sg.fadeSeconds) || 0.7;
+    const nearestFade = [0.4, 0.8, 1.5].reduce((a, b) => (Math.abs(b - curFade) < Math.abs(a - curFade) ? b : a), 0.8);
+    d.deskSignageTransBtns?.forEach((b) => b.el.classList.toggle('primary', b.id === curTrans));
+    d.deskSignageFadeBtns?.forEach((b) => b.el.classList.toggle('primary', curTrans > 0 && Math.abs(b.id - nearestFade) < 0.05));
     d.deskSignageFitBtns?.forEach((b) => b.el.classList.toggle('primary', b.id === (sg.fit || 0)));
     d.deskSignageScopeBtns?.forEach((b) => b.el.classList.toggle('primary', (b.id === 1) === (sg.useAllMedia !== false)));
     d.deskSignageBannerPresets?.forEach((btn) => {

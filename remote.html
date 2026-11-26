@@ -1097,9 +1097,19 @@
         <button type="button" class="btn-pad" data-ssec="60">60 seg</button>
         <input type="number" id="s-slide-sec" class="text-input" min="2" max="300" step="1" value="8" style="margin:0;text-align:center;font-weight:800" title="Segundos personalizados por foto" />
       </div>
-      <div class="grid-2" id="s-fade-grid">
-        <button type="button" class="btn-pad active" data-sfade="0.4">✨ Fundido suave</button>
-        <button type="button" class="btn-pad" data-sfade="0">✂️ Corte directo</button>
+      <div class="grid-3" id="s-trans-grid" style="margin-bottom:6px">
+        <button type="button" class="btn-pad" data-strans="0">✂️ Corte</button>
+        <button type="button" class="btn-pad active" data-strans="1">✨ Fundido</button>
+        <button type="button" class="btn-pad" data-strans="2">🔍 Zoom</button>
+        <button type="button" class="btn-pad" data-strans="3">➡️ Deslizar</button>
+        <button type="button" class="btn-pad" data-strans="4">🪟 Cortina</button>
+        <button type="button" class="btn-pad" data-strans="5">💥 Iris</button>
+        <button type="button" class="btn-pad" data-strans="6" style="grid-column:span 3">🎲 Aleatorio (cambia en cada foto)</button>
+      </div>
+      <div class="grid-3" id="s-fade-grid">
+        <button type="button" class="btn-pad" data-sfade="0.4">⚡ Rápido 0.4s</button>
+        <button type="button" class="btn-pad active" data-sfade="0.8">✨ Suave 0.8s</button>
+        <button type="button" class="btn-pad" data-sfade="1.5">🐢 Lento 1.5s</button>
       </div>
       <div class="help-text">
         Los <strong>vídeos</strong> se reproducen enteros y pasan al siguiente al terminar (o hacen bucle infinito si solo hay 1 vídeo). Las <strong>fotos</strong> cambian cada los segundos que elijas arriba.
@@ -3998,7 +4008,8 @@
         playlist: [],
         slideSeconds: 8,
         fit: 0,
-        fadeSeconds: 0.4,
+        transition: 1,
+        fadeSeconds: 0.7,
         paused: false,
         currentIndex: 0,
         totalItems: 0,
@@ -4071,7 +4082,11 @@
           inpSignageSlideSec.value = sg.slideSeconds || 8;
         }
         reflectChoiceGrid('s-slide-presets', 'data-ssec', sg.slideSeconds || 8);
-        reflectChoiceGrid('s-fade-grid', 'data-sfade', (Number(sg.fadeSeconds) || 0) > 0.05 ? '0.4' : '0');
+        const curTrans = sg.transition !== undefined ? Number(sg.transition) : ((Number(sg.fadeSeconds) || 0) > 0.05 ? 1 : 0);
+        const curFade = Number(sg.fadeSeconds) || 0.7;
+        const nearFade = [0.4, 0.8, 1.5].reduce((a, b) => (Math.abs(b - curFade) < Math.abs(a - curFade) ? b : a), 0.8);
+        reflectChoiceGrid('s-trans-grid', 'data-strans', String(curTrans));
+        reflectChoiceGrid('s-fade-grid', 'data-sfade', curTrans > 0 ? String(nearFade) : '');
         reflectChoiceGrid('s-fit-grid', 'data-sfit', sg.fit || 0);
         reflectChoiceGrid('s-scope-grid', 'data-sall', sg.useAllMedia !== false ? '1' : '0');
         if (btnSTestGrid) {
@@ -4323,9 +4338,20 @@
       inpSignageSlideSec?.addEventListener('input', handleCustomSlideSec);
       inpSignageSlideSec?.addEventListener('change', handleCustomSlideSec);
 
+      bindChoiceGrid('s-trans-grid', 'data-strans', (v) => {
+        const mode = Math.max(0, Math.min(6, parseInt(v, 10) || 0));
+        signageLocal.transition = mode;
+        if (mode > 0 && (Number(signageLocal.fadeSeconds) || 0) < 0.05) {
+          signageLocal.fadeSeconds = 0.7;
+        }
+        renderSignageUI();
+        sendCommand({ action: 'SET_SIGNAGE_PROP', prop: 'transition', value: mode });
+      });
+
       bindChoiceGrid('s-fade-grid', 'data-sfade', (v) => {
-        const fade = parseFloat(v) || 0;
+        const fade = parseFloat(v) || 0.8;
         signageLocal.fadeSeconds = fade;
+        if ((signageLocal.transition || 0) === 0) signageLocal.transition = 1;
         renderSignageUI();
         sendCommand({ action: 'SET_SIGNAGE_PROP', prop: 'fadeSeconds', value: fade });
       });

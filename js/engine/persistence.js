@@ -106,6 +106,7 @@ export class Persistence {
         playlist: Array.isArray(st.signage.playlist) ? st.signage.playlist.slice(0, 200) : [],
         slideSeconds: Math.max(2, Math.min(300, Number(st.signage.slideSeconds) || 8)),
         fit: [0, 1, 2].includes(Number(st.signage.fit)) ? Number(st.signage.fit) : 0,
+        transition: Math.max(0, Math.min(6, Math.round(Number(st.signage.transition ?? 1)))),
         fadeSeconds: Math.max(0, Math.min(3, Number(st.signage.fadeSeconds) || 0))
       } : null
     };
@@ -155,6 +156,9 @@ export class Persistence {
       st.signage.slideSeconds = Math.max(2, Math.min(300, Number(sg.slideSeconds) || 8));
       st.signage.fit = [0, 1, 2].includes(Number(sg.fit)) ? Number(sg.fit) : 0;
       st.signage.fadeSeconds = Math.max(0, Math.min(3, Number(sg.fadeSeconds) || 0));
+      st.signage.transition = (sg.transition !== undefined)
+        ? Math.max(0, Math.min(6, Math.round(Number(sg.transition) || 0)))
+        : (st.signage.fadeSeconds > 0.02 ? 1 : 0);
       if (Array.isArray(sg.playlist)) {
         st.signage.playlist = sg.playlist
           .filter((it) => it && typeof it.url === 'string' && /^\/media\/[^/\\]+$/.test(it.url))

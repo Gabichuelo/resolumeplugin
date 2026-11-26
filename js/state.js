@@ -109,6 +109,17 @@ export const MEDIA_FX_MODES = [
   { id: 6, name: '▦ Pixel LED' }
 ];
 
+// ---- Transiciones del Modo Kiosco / Publicidad ----
+export const SIGNAGE_TRANSITIONS = [
+  { id: 0, name: '✂️ Corte directo' },
+  { id: 1, name: '✨ Fundido' },
+  { id: 2, name: '🔍 Zoom suave' },
+  { id: 3, name: '➡️ Deslizar' },
+  { id: 4, name: '🪟 Cortina' },
+  { id: 5, name: '💥 Iris' },
+  { id: 6, name: '🎲 Aleatorio' }
+];
+
 // ---- Transiciones entre Looks guardados (en compases, sincronizadas al BPM) ----
 export const TRANSITION_BARS = [0, 1, 2, 4, 8, 16];
 
@@ -830,7 +841,11 @@ export function createInitialState() {
       playlist: [],           // [{ url, kind, name }] cuando useAllMedia=false o para ordenar elementos
       slideSeconds: 8,        // segundos por foto/GIF en el carrusel (2..300)
       fit: 0,                 // 0: Llenar (Cover) | 1: Encajar (Contain) | 2: Estirar exacto X×Y
-      fadeSeconds: 0.4,       // duración de transición suave (0 = corte seco, 0.4 = fundido)
+      transition: 1,          // 0: Corte | 1: Fundido | 2: Zoom | 3: Deslizar | 4: Cortina | 5: Iris | 6: Aleatorio
+      fadeSeconds: 0.7,       // duración total de la transición (0.4 = rápido, 0.8 = suave, 1.5 = lento)
+      transModeActive: 1,     // modo efectivo durante la transición (1..5)
+      transProgress: 0.0,     // progreso GPU (0 = visible, 1 = oculto)
+      transDir: 0.0,          // -1 = saliendo, +1 = entrando
       paused: false,
       currentIndex: 0,
       totalItems: 0,
