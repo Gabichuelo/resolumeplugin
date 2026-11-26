@@ -5,8 +5,8 @@
  * - Recorta automáticamente el espacio vacío alrededor y limita a 1024 px para que la GPU vaya fluida.
  */
 
-const MAX_SIDE = 1024;
-const MIN_SVG_SIDE = 1024;
+const MAX_SIDE = 2048;
+const MIN_SVG_SIDE = 2048;
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -124,6 +124,8 @@ export async function processLogoDataUrl(dataUrl, mode = 'auto') {
   canvas.height = h;
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
   ctx.clearRect(0, 0, w, h);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(img, 0, 0, w, h);
 
   const imgData = ctx.getImageData(0, 0, w, h);

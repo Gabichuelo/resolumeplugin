@@ -95,6 +95,13 @@ class AetherVJApplication {
   _updateAutoQuality(dt) {
     const st = this.state;
     if (!st.autoQuality) return;
+    // En modo Publicidad/Kiosco el gasto GPU es mínimo: mantener siempre 100% de resolución nativa para logos nítidos
+    if (st.signage && st.signage.enabled) {
+      if (st.resolutionScale !== 1.0) st.resolutionScale = 1.0;
+      this.autoQualityStepIdx = 0;
+      this.lowFpsSeconds = 0;
+      return;
+    }
     // Keep the governor in step with the current scale (e.g. after the user re-enables AUTO)
     const currentIdx = AUTO_QUALITY_STEPS.indexOf(st.resolutionScale);
     this.autoQualityStepIdx = currentIdx >= 0 ? currentIdx : 0;

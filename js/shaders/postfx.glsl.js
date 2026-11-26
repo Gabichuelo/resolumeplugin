@@ -47,9 +47,16 @@ float lumaOf(vec3 c) {
   return dot(c, vec3(0.299, 0.587, 0.114));
 }
 
-vec3 sampleMediaRaw(vec2 muv) {
-  // Vídeo/HTML subido sin voltear: la fila 0 del vídeo es la parte de arriba
-  return texture(uTexMedia, vec2(muv.x, 1.0 - muv.y)).rgb;
+vec4 sampleMediaRaw(vec2 muv) {
+  // Vídeo/HTML subido sin voltear y con alfa premultiplicado (sin halos ni fondo blanco en PNG transparentes)
+  vec4 p = texture(uTexMedia, vec2(muv.x, 1.0 - muv.y));
+  vec3 straight = (p.a > 0.002) ? clamp(p.rgb / p.a, 0.0, 1.0) : vec3(0.0);
+  return vec4(straight, p.a);
+}
+
+float sampleMediaLuma(vec2 muv) {
+  vec4 s = sampleMediaRaw(muv);
+  return lumaOf(s.rgb) * s.a;
 }
 
 vec3 heatRamp(float t) {
@@ -61,7 +68,7 @@ vec3 heatRamp(float t) {
   return c;
 }
 
-// Devuelve rgb del vídeo con su efecto + alfa (0 fuera del encuadre en modo Encajar / zonas oscuras en Fantasma)
+// Devuelve rgb del vídeo/imagen con su efecto + alfa real (0 en transparencia PNG, fuera de encuadre o zonas oscuras en Fantasma)
 vec4 sampleMediaFx(vec2 uv) {
   vec2 muv = (uv - 0.5) * uMediaUvScale / max(uMediaZoom, 0.5) + 0.5;
   if (uMediaMirror == 1) muv.x = 1.0 - muv.x;
@@ -74,24 +81,26 @@ vec4 sampleMediaFx(vec2 uv) {
     vec2 q = (floor(muv * grid) + 0.5) / grid;
     vec2 f = fract(muv * grid) - 0.5;
     float diode = smoothstep(0.5, 0.32, length(f));
-    vec3 c = sampleMediaRaw(q) * 1.25;
-    return vec4(c * diode, 1.0);
+    vec4 raw = sampleMediaRaw(q);
+    return vec4(raw.rgb * 1.25 * diode, raw.a);
   }
 
-  vec3 c = sampleMediaRaw(muv);
+  vec4 raw = sampleMediaRaw(muv);
+  vec3 c = raw.rgb;
+  float srcA = raw.a;
   float l = lumaOf(c);
 
   if (uMediaFx == 1) {
     // BORDES NEÓN (Sobel) con el color de la paleta
     vec2 t = uMediaTexel * 1.5;
-    float tl = lumaOf(sampleMediaRaw(muv + vec2(-t.x, t.y)));
-    float tc = lumaOf(sampleMediaRaw(muv + vec2(0.0, t.y)));
-    float tr = lumaOf(sampleMediaRaw(muv + vec2(t.x, t.y)));
-    float ml = lumaOf(sampleMediaRaw(muv + vec2(-t.x, 0.0)));
-    float mr = lumaOf(sampleMediaRaw(muv + vec2(t.x, 0.0)));
-    float bl = lumaOf(sampleMediaRaw(muv + vec2(-t.x, -t.y)));
-    float bc = lumaOf(sampleMediaRaw(muv + vec2(0.0, -t.y)));
-    float br = lumaOf(sampleMediaRaw(muv + vec2(t.x, -t.y)));
+    float tl = sampleMediaLuma(muv + vec2(-t.x, t.y));
+    float tc = sampleMediaLuma(muv + vec2(0.0, t.y));
+    float tr = sampleMediaLuma(muv + vec2(t.x, t.y));
+    float ml = sampleMediaLuma(muv + vec2(-t.x, 0.0));
+    float mr = sampleMediaLuma(muv + vec2(t.x, 0.0));
+    float bl = sampleMediaLuma(muv + vec2(-t.x, -t.y));
+    float bc = sampleMediaLuma(muv + vec2(0.0, -t.y));
+    float br = sampleMediaLuma(muv + vec2(t.x, -t.y));
     float gx = -tl - 2.0 * ml - bl + tr + 2.0 * mr + br;
     float gy = -bl - 2.0 * bc - br + tl + 2.0 * tc + tr;
     float edge = smoothstep(0.08, 0.45, length(vec2(gx, gy)));
@@ -101,24 +110,24 @@ vec4 sampleMediaFx(vec2 uv) {
     // DUOTONO con la paleta activa
     vec3 dark = cosPalette(0.05 + uTime * 0.02) * 0.18;
     vec3 bright = cosPalette(0.55 + uTime * 0.02);
-    return vec4(mix(dark, bright, smoothstep(0.06, 0.9, l)), 1.0);
+    return vec4(mix(dark, bright, smoothstep(0.06, 0.9, l)), srcA);
   } else if (uMediaFx == 3) {
     // CÁMARA TÉRMICA
-    return vec4(heatRamp(l * (1.05 + uAudioFFT.x * 0.25)), 1.0);
+    return vec4(heatRamp(l * (1.05 + uAudioFFT.x * 0.25)), srcA);
   } else if (uMediaFx == 4) {
     // POP-ART: posterizado + trama de puntos
     vec3 sat = mix(vec3(l), c, 1.8);
     vec3 post = floor(clamp(sat, 0.0, 1.0) * 4.0 + 0.5) / 4.0;
     vec2 dotGrid = fract(uv * vec2(90.0 * uMediaAspect, 90.0)) - 0.5;
     float dotMask = smoothstep(0.48, 0.30, length(dotGrid) / max(0.25, 1.15 - l));
-    return vec4(mix(post * 0.55, post * 1.1, dotMask), 1.0);
+    return vec4(mix(post * 0.55, post * 1.1, dotMask), srcA);
   } else if (uMediaFx == 5) {
     // FANTASMA: solo lo iluminado, teñido con la paleta y semitransparente
     float key = smoothstep(0.18, 0.75, l);
     vec3 ghost = cosPalette(0.35 + l * 0.4 + uTime * 0.05) * (0.6 + l);
-    return vec4(ghost * key, key * 0.85);
+    return vec4(ghost * key, key * 0.85 * srcA);
   }
-  return vec4(c, 1.0);
+  return vec4(c, srcA);
 }
 
 void main() {
@@ -310,8 +319,9 @@ vec4 sampleLogoRGBA(vec2 luv) {
   if (luv.x < 0.002 || luv.x > 0.998 || luv.y < 0.002 || luv.y > 0.998) {
     return vec4(0.0);
   }
-  // Flip Y so HTML Image top-left matches screen top-left
+  // Flip Y so HTML Image top-left matches screen top-left (unpremultiply for clean halo-free mipmaps)
   vec4 raw = texture(uTexLogo, vec2(luv.x, 1.0 - luv.y));
+  raw.rgb = (raw.a > 0.002) ? clamp(raw.rgb / raw.a, 0.0, 1.0) : vec3(0.0);
   if (uLogoTint == 1) {
     float luma = dot(raw.rgb, vec3(0.299, 0.587, 0.114));
     raw.rgb = mix(uLogoAccentCol * 0.85, vec3(1.0), smoothstep(0.3, 0.95, luma));

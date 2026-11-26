@@ -3624,9 +3624,16 @@ float lumaOf(vec3 c) {
   return dot(c, vec3(0.299, 0.587, 0.114));
 }
 
-vec3 sampleMediaRaw(vec2 muv) {
-  // Vídeo/HTML subido sin voltear: la fila 0 del vídeo es la parte de arriba
-  return texture(uTexMedia, vec2(muv.x, 1.0 - muv.y)).rgb;
+vec4 sampleMediaRaw(vec2 muv) {
+  // Vídeo/HTML subido sin voltear y con alfa premultiplicado (sin halos ni fondo blanco en PNG transparentes)
+  vec4 p = texture(uTexMedia, vec2(muv.x, 1.0 - muv.y));
+  vec3 straight = (p.a > 0.002) ? clamp(p.rgb / p.a, 0.0, 1.0) : vec3(0.0);
+  return vec4(straight, p.a);
+}
+
+float sampleMediaLuma(vec2 muv) {
+  vec4 s = sampleMediaRaw(muv);
+  return lumaOf(s.rgb) * s.a;
 }
 
 vec3 heatRamp(float t) {
@@ -3638,7 +3645,7 @@ vec3 heatRamp(float t) {
   return c;
 }
 
-// Devuelve rgb del vídeo con su efecto + alfa (0 fuera del encuadre en modo Encajar / zonas oscuras en Fantasma)
+// Devuelve rgb del vídeo/imagen con su efecto + alfa real (0 en transparencia PNG, fuera de encuadre o zonas oscuras en Fantasma)
 vec4 sampleMediaFx(vec2 uv) {
   vec2 muv = (uv - 0.5) * uMediaUvScale / max(uMediaZoom, 0.5) + 0.5;
   if (uMediaMirror == 1) muv.x = 1.0 - muv.x;
@@ -3651,24 +3658,26 @@ vec4 sampleMediaFx(vec2 uv) {
     vec2 q = (floor(muv * grid) + 0.5) / grid;
     vec2 f = fract(muv * grid) - 0.5;
     float diode = smoothstep(0.5, 0.32, length(f));
-    vec3 c = sampleMediaRaw(q) * 1.25;
-    return vec4(c * diode, 1.0);
+    vec4 raw = sampleMediaRaw(q);
+    return vec4(raw.rgb * 1.25 * diode, raw.a);
   }
 
-  vec3 c = sampleMediaRaw(muv);
+  vec4 raw = sampleMediaRaw(muv);
+  vec3 c = raw.rgb;
+  float srcA = raw.a;
   float l = lumaOf(c);
 
   if (uMediaFx == 1) {
     // BORDES NEÓN (Sobel) con el color de la paleta
     vec2 t = uMediaTexel * 1.5;
-    float tl = lumaOf(sampleMediaRaw(muv + vec2(-t.x, t.y)));
-    float tc = lumaOf(sampleMediaRaw(muv + vec2(0.0, t.y)));
-    float tr = lumaOf(sampleMediaRaw(muv + vec2(t.x, t.y)));
-    float ml = lumaOf(sampleMediaRaw(muv + vec2(-t.x, 0.0)));
-    float mr = lumaOf(sampleMediaRaw(muv + vec2(t.x, 0.0)));
-    float bl = lumaOf(sampleMediaRaw(muv + vec2(-t.x, -t.y)));
-    float bc = lumaOf(sampleMediaRaw(muv + vec2(0.0, -t.y)));
-    float br = lumaOf(sampleMediaRaw(muv + vec2(t.x, -t.y)));
+    float tl = sampleMediaLuma(muv + vec2(-t.x, t.y));
+    float tc = sampleMediaLuma(muv + vec2(0.0, t.y));
+    float tr = sampleMediaLuma(muv + vec2(t.x, t.y));
+    float ml = sampleMediaLuma(muv + vec2(-t.x, 0.0));
+    float mr = sampleMediaLuma(muv + vec2(t.x, 0.0));
+    float bl = sampleMediaLuma(muv + vec2(-t.x, -t.y));
+    float bc = sampleMediaLuma(muv + vec2(0.0, -t.y));
+    float br = sampleMediaLuma(muv + vec2(t.x, -t.y));
     float gx = -tl - 2.0 * ml - bl + tr + 2.0 * mr + br;
     float gy = -bl - 2.0 * bc - br + tl + 2.0 * tc + tr;
     float edge = smoothstep(0.08, 0.45, length(vec2(gx, gy)));
@@ -3678,24 +3687,24 @@ vec4 sampleMediaFx(vec2 uv) {
     // DUOTONO con la paleta activa
     vec3 dark = cosPalette(0.05 + uTime * 0.02) * 0.18;
     vec3 bright = cosPalette(0.55 + uTime * 0.02);
-    return vec4(mix(dark, bright, smoothstep(0.06, 0.9, l)), 1.0);
+    return vec4(mix(dark, bright, smoothstep(0.06, 0.9, l)), srcA);
   } else if (uMediaFx == 3) {
     // CÁMARA TÉRMICA
-    return vec4(heatRamp(l * (1.05 + uAudioFFT.x * 0.25)), 1.0);
+    return vec4(heatRamp(l * (1.05 + uAudioFFT.x * 0.25)), srcA);
   } else if (uMediaFx == 4) {
     // POP-ART: posterizado + trama de puntos
     vec3 sat = mix(vec3(l), c, 1.8);
     vec3 post = floor(clamp(sat, 0.0, 1.0) * 4.0 + 0.5) / 4.0;
     vec2 dotGrid = fract(uv * vec2(90.0 * uMediaAspect, 90.0)) - 0.5;
     float dotMask = smoothstep(0.48, 0.30, length(dotGrid) / max(0.25, 1.15 - l));
-    return vec4(mix(post * 0.55, post * 1.1, dotMask), 1.0);
+    return vec4(mix(post * 0.55, post * 1.1, dotMask), srcA);
   } else if (uMediaFx == 5) {
     // FANTASMA: solo lo iluminado, teñido con la paleta y semitransparente
     float key = smoothstep(0.18, 0.75, l);
     vec3 ghost = cosPalette(0.35 + l * 0.4 + uTime * 0.05) * (0.6 + l);
-    return vec4(ghost * key, key * 0.85);
+    return vec4(ghost * key, key * 0.85 * srcA);
   }
-  return vec4(c, 1.0);
+  return vec4(c, srcA);
 }
 
 void main() {
@@ -3886,8 +3895,9 @@ vec4 sampleLogoRGBA(vec2 luv) {
   if (luv.x < 0.002 || luv.x > 0.998 || luv.y < 0.002 || luv.y > 0.998) {
     return vec4(0.0);
   }
-  // Flip Y so HTML Image top-left matches screen top-left
+  // Flip Y so HTML Image top-left matches screen top-left (unpremultiply for clean halo-free mipmaps)
   vec4 raw = texture(uTexLogo, vec2(luv.x, 1.0 - luv.y));
+  raw.rgb = (raw.a > 0.002) ? clamp(raw.rgb / raw.a, 0.0, 1.0) : vec3(0.0);
   if (uLogoTint == 1) {
     float luma = dot(raw.rgb, vec3(0.299, 0.587, 0.114));
     raw.rgb = mix(uLogoAccentCol * 0.85, vec3(1.0), smoothstep(0.3, 0.95, luma));
@@ -4799,6 +4809,16 @@ class WebGLRenderer {
 
   _buildResources() {
     const gl = this.gl;
+    this._maxTexSize = Math.min(4096, gl.getParameter(gl.MAX_TEXTURE_SIZE) || 4096);
+    this._anisoExt =
+      gl.getExtension('EXT_texture_filter_anisotropic') ||
+      gl.getExtension('MOZ_EXT_texture_filter_anisotropic') ||
+      gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic') ||
+      null;
+    this._maxAniso = this._anisoExt
+      ? Math.min(16, gl.getParameter(this._anisoExt.MAX_TEXTURE_MAX_ANISOTROPY_EXT) || 4)
+      : 1;
+    this._resizeCanvas = null;
 
     // 1. Fullscreen Quad VAO
     const positions = new Float32Array([
@@ -4907,6 +4927,36 @@ class WebGLRenderer {
     return tex;
   }
 
+  _applyHighQualityTextureParams(gl, withMipmap = true) {
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, withMipmap ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR);
+    if (withMipmap && this._anisoExt) {
+      gl.texParameterf(gl.TEXTURE_2D, this._anisoExt.TEXTURE_MAX_ANISOTROPY_EXT, this._maxAniso);
+    }
+  }
+
+  _prepareUploadSource(src) {
+    if (!src) return src;
+    const w = src.naturalWidth || src.videoWidth || src.width || 0;
+    const h = src.naturalHeight || src.videoHeight || src.height || 0;
+    const maxDim = Math.max(w, h);
+    if (!maxDim || maxDim <= this._maxTexSize) return src;
+    const s = this._maxTexSize / maxDim;
+    const tw = Math.max(1, Math.round(w * s));
+    const th = Math.max(1, Math.round(h * s));
+    if (!this._resizeCanvas) this._resizeCanvas = document.createElement('canvas');
+    this._resizeCanvas.width = tw;
+    this._resizeCanvas.height = th;
+    const ctx = this._resizeCanvas.getContext('2d');
+    ctx.clearRect(0, 0, tw, th);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(src, 0, 0, tw, th);
+    return this._resizeCanvas;
+  }
+
   /** Sube el fotograma nuevo del vídeo / GIF / cámara a la GPU (solo si hay uno nuevo). */
   _syncMediaTexture() {
     const media = this.media;
@@ -4915,15 +4965,22 @@ class WebGLRenderer {
     const src = media.pollFrame(performance.now());
     if (!src) return;
     const gl = this.gl;
+    const isVideo = typeof HTMLVideoElement !== 'undefined' && src instanceof HTMLVideoElement;
+    const uploadSrc = isVideo ? src : this._prepareUploadSource(src);
     try {
       gl.bindTexture(gl.TEXTURE_2D, this.texMedia);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, !isVideo);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, uploadSrc);
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      this._applyHighQualityTextureParams(gl, true);
       gl.bindTexture(gl.TEXTURE_2D, null);
       this._mediaW = Math.max(1, media.width);
       this._mediaH = Math.max(1, media.height);
     } catch (err) {
       // Vídeo de otro origen sin CORS o fotograma no listo: se ignora este fotograma
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
       gl.bindTexture(gl.TEXTURE_2D, null);
     }
   }
@@ -5010,11 +5067,11 @@ class WebGLRenderer {
     ctx.fillText('◈ AUTONOMOUS VISUAL ENGINE ◈', c.width / 2, c.height / 2 + 54);
 
     gl.bindTexture(gl.TEXTURE_2D, this.texLogo);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, c);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    this._applyHighQualityTextureParams(gl, true);
     gl.bindTexture(gl.TEXTURE_2D, null);
   }
 
@@ -5037,8 +5094,13 @@ class WebGLRenderer {
       this._lastLogoDataUrl = targetUrl;
       if (this.contextLost || !this.gl || !this.texLogo) return;
       const gl = this.gl;
+      const uploadImg = this._prepareUploadSource(img);
       gl.bindTexture(gl.TEXTURE_2D, this.texLogo);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, uploadImg);
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      this._applyHighQualityTextureParams(gl, true);
       gl.bindTexture(gl.TEXTURE_2D, null);
       if (state.fx && state.fx.logo && img.width > 0 && img.height > 0) {
         state.fx.logo.aspect = Math.max(0.25, Math.min(4.5, img.width / img.height));
@@ -5277,6 +5339,7 @@ class WebGLRenderer {
 
     gl.activeTexture(gl.TEXTURE2);
     gl.bindTexture(gl.TEXTURE_2D, fbRead.texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.uniform1i(fbU.uTexPrevFeedback, 2);
 
     gl.uniform1f(fbU.uCrossfade, isSignage ? 0.0 : state.crossfade);
@@ -5394,6 +5457,24 @@ class WebGLRenderer {
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, fbWrite.texture);
+    const needCompositeMip = Boolean(
+      isSignage ||
+      (mapCfg && (
+        mapCfg.ledScalerEnabled ||
+        mapCfg.cornerPin ||
+        (mapCfg.scaleX ?? 1.0) < 0.99 ||
+        (mapCfg.scaleY ?? 1.0) < 0.99 ||
+        Math.abs(mapCfg.keystoneX || 0) > 0.005 ||
+        Math.abs(mapCfg.keystoneY || 0) > 0.005 ||
+        (mapCfg.sliceMode || 0) > 0
+      ))
+    );
+    if (needCompositeMip) {
+      gl.generateMipmap(gl.TEXTURE_2D);
+      this._applyHighQualityTextureParams(gl, true);
+    } else {
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    }
     gl.uniform1i(postU.uTexComposite, 0);
 
     gl.activeTexture(gl.TEXTURE1);
@@ -7872,8 +7953,8 @@ class SignagePlayer {
  * - Recorta automáticamente el espacio vacío alrededor y limita a 1024 px para que la GPU vaya fluida.
  */
 
-const MAX_SIDE = 1024;
-const MIN_SVG_SIDE = 1024;
+const MAX_SIDE = 2048;
+const MIN_SVG_SIDE = 2048;
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -7991,6 +8072,8 @@ async function processLogoDataUrl(dataUrl, mode = 'auto') {
   canvas.height = h;
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
   ctx.clearRect(0, 0, w, h);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(img, 0, 0, w, h);
 
   const imgData = ctx.getImageData(0, 0, w, h);
@@ -12707,6 +12790,13 @@ class AetherVJApplication {
   _updateAutoQuality(dt) {
     const st = this.state;
     if (!st.autoQuality) return;
+    // En modo Publicidad/Kiosco el gasto GPU es mínimo: mantener siempre 100% de resolución nativa para logos nítidos
+    if (st.signage && st.signage.enabled) {
+      if (st.resolutionScale !== 1.0) st.resolutionScale = 1.0;
+      this.autoQualityStepIdx = 0;
+      this.lowFpsSeconds = 0;
+      return;
+    }
     // Keep the governor in step with the current scale (e.g. after the user re-enables AUTO)
     const currentIdx = AUTO_QUALITY_STEPS.indexOf(st.resolutionScale);
     this.autoQualityStepIdx = currentIdx >= 0 ? currentIdx : 0;

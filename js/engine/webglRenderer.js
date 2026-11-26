@@ -137,6 +137,16 @@ export class WebGLRenderer {
 
   _buildResources() {
     const gl = this.gl;
+    this._maxTexSize = Math.min(4096, gl.getParameter(gl.MAX_TEXTURE_SIZE) || 4096);
+    this._anisoExt =
+      gl.getExtension('EXT_texture_filter_anisotropic') ||
+      gl.getExtension('MOZ_EXT_texture_filter_anisotropic') ||
+      gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic') ||
+      null;
+    this._maxAniso = this._anisoExt
+      ? Math.min(16, gl.getParameter(this._anisoExt.MAX_TEXTURE_MAX_ANISOTROPY_EXT) || 4)
+      : 1;
+    this._resizeCanvas = null;
 
     // 1. Fullscreen Quad VAO
     const positions = new Float32Array([
@@ -245,6 +255,36 @@ export class WebGLRenderer {
     return tex;
   }
 
+  _applyHighQualityTextureParams(gl, withMipmap = true) {
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, withMipmap ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR);
+    if (withMipmap && this._anisoExt) {
+      gl.texParameterf(gl.TEXTURE_2D, this._anisoExt.TEXTURE_MAX_ANISOTROPY_EXT, this._maxAniso);
+    }
+  }
+
+  _prepareUploadSource(src) {
+    if (!src) return src;
+    const w = src.naturalWidth || src.videoWidth || src.width || 0;
+    const h = src.naturalHeight || src.videoHeight || src.height || 0;
+    const maxDim = Math.max(w, h);
+    if (!maxDim || maxDim <= this._maxTexSize) return src;
+    const s = this._maxTexSize / maxDim;
+    const tw = Math.max(1, Math.round(w * s));
+    const th = Math.max(1, Math.round(h * s));
+    if (!this._resizeCanvas) this._resizeCanvas = document.createElement('canvas');
+    this._resizeCanvas.width = tw;
+    this._resizeCanvas.height = th;
+    const ctx = this._resizeCanvas.getContext('2d');
+    ctx.clearRect(0, 0, tw, th);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(src, 0, 0, tw, th);
+    return this._resizeCanvas;
+  }
+
   /** Sube el fotograma nuevo del vídeo / GIF / cámara a la GPU (solo si hay uno nuevo). */
   _syncMediaTexture() {
     const media = this.media;
@@ -253,15 +293,22 @@ export class WebGLRenderer {
     const src = media.pollFrame(performance.now());
     if (!src) return;
     const gl = this.gl;
+    const isVideo = typeof HTMLVideoElement !== 'undefined' && src instanceof HTMLVideoElement;
+    const uploadSrc = isVideo ? src : this._prepareUploadSource(src);
     try {
       gl.bindTexture(gl.TEXTURE_2D, this.texMedia);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, !isVideo);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, uploadSrc);
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      this._applyHighQualityTextureParams(gl, true);
       gl.bindTexture(gl.TEXTURE_2D, null);
       this._mediaW = Math.max(1, media.width);
       this._mediaH = Math.max(1, media.height);
     } catch (err) {
       // Vídeo de otro origen sin CORS o fotograma no listo: se ignora este fotograma
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
       gl.bindTexture(gl.TEXTURE_2D, null);
     }
   }
@@ -348,11 +395,11 @@ export class WebGLRenderer {
     ctx.fillText('◈ AUTONOMOUS VISUAL ENGINE ◈', c.width / 2, c.height / 2 + 54);
 
     gl.bindTexture(gl.TEXTURE_2D, this.texLogo);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, c);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    this._applyHighQualityTextureParams(gl, true);
     gl.bindTexture(gl.TEXTURE_2D, null);
   }
 
@@ -375,8 +422,13 @@ export class WebGLRenderer {
       this._lastLogoDataUrl = targetUrl;
       if (this.contextLost || !this.gl || !this.texLogo) return;
       const gl = this.gl;
+      const uploadImg = this._prepareUploadSource(img);
       gl.bindTexture(gl.TEXTURE_2D, this.texLogo);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, uploadImg);
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      this._applyHighQualityTextureParams(gl, true);
       gl.bindTexture(gl.TEXTURE_2D, null);
       if (state.fx && state.fx.logo && img.width > 0 && img.height > 0) {
         state.fx.logo.aspect = Math.max(0.25, Math.min(4.5, img.width / img.height));
@@ -615,6 +667,7 @@ export class WebGLRenderer {
 
     gl.activeTexture(gl.TEXTURE2);
     gl.bindTexture(gl.TEXTURE_2D, fbRead.texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.uniform1i(fbU.uTexPrevFeedback, 2);
 
     gl.uniform1f(fbU.uCrossfade, isSignage ? 0.0 : state.crossfade);
@@ -732,6 +785,24 @@ export class WebGLRenderer {
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, fbWrite.texture);
+    const needCompositeMip = Boolean(
+      isSignage ||
+      (mapCfg && (
+        mapCfg.ledScalerEnabled ||
+        mapCfg.cornerPin ||
+        (mapCfg.scaleX ?? 1.0) < 0.99 ||
+        (mapCfg.scaleY ?? 1.0) < 0.99 ||
+        Math.abs(mapCfg.keystoneX || 0) > 0.005 ||
+        Math.abs(mapCfg.keystoneY || 0) > 0.005 ||
+        (mapCfg.sliceMode || 0) > 0
+      ))
+    );
+    if (needCompositeMip) {
+      gl.generateMipmap(gl.TEXTURE_2D);
+      this._applyHighQualityTextureParams(gl, true);
+    } else {
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    }
     gl.uniform1i(postU.uTexComposite, 0);
 
     gl.activeTexture(gl.TEXTURE1);
