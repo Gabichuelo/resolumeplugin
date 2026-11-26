@@ -99,6 +99,14 @@ export class Persistence {
         beatZoom: st.media.beatZoom,
         speed: st.media.speed,
         cameraId: st.media.cameraId
+      } : null,
+      signage: st.signage ? {
+        enabled: Boolean(st.signage.enabled),
+        useAllMedia: st.signage.useAllMedia !== false,
+        playlist: Array.isArray(st.signage.playlist) ? st.signage.playlist.slice(0, 200) : [],
+        slideSeconds: Math.max(2, Math.min(300, Number(st.signage.slideSeconds) || 8)),
+        fit: [0, 1, 2].includes(Number(st.signage.fit)) ? Number(st.signage.fit) : 0,
+        fadeSeconds: Math.max(0, Math.min(3, Number(st.signage.fadeSeconds) || 0))
       } : null
     };
   }
@@ -139,6 +147,25 @@ export class Persistence {
       if (st.media.source === 'file' && !st.media.url) st.media.source = 'none';
       if (st.media.source === 'none') st.media.enabled = false;
       st.media.version = (st.media.version || 0) + 1;
+    }
+    if (cfg.signage && typeof cfg.signage === 'object' && st.signage) {
+      const sg = cfg.signage;
+      st.signage.enabled = Boolean(sg.enabled);
+      st.signage.useAllMedia = sg.useAllMedia !== false;
+      st.signage.slideSeconds = Math.max(2, Math.min(300, Number(sg.slideSeconds) || 8));
+      st.signage.fit = [0, 1, 2].includes(Number(sg.fit)) ? Number(sg.fit) : 0;
+      st.signage.fadeSeconds = Math.max(0, Math.min(3, Number(sg.fadeSeconds) || 0));
+      if (Array.isArray(sg.playlist)) {
+        st.signage.playlist = sg.playlist
+          .filter((it) => it && typeof it.url === 'string' && /^\/media\/[^/\\]+$/.test(it.url))
+          .slice(0, 200)
+          .map((it) => ({
+            url: it.url,
+            kind: ['video', 'gif', 'image'].includes(it.kind) ? it.kind : 'video',
+            name: String(it.name || it.url.split('/').pop() || '').slice(0, 80)
+          }));
+      }
+      st.signage.paused = false;
     }
     if (typeof cfg.safeStrobe === 'boolean') {
       st.fx.safeStrobe = cfg.safeStrobe;

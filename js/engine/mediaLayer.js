@@ -37,6 +37,9 @@ export class MediaLayer {
     this.lastError = '';
     this._blobUrl = '';
     this._rvfcActive = false;
+    this.singleLoop = true;
+    this.onVideoEnded = null;
+    this.onMediaError = null;
   }
 
   get isPlaying() {
@@ -70,11 +73,15 @@ export class MediaLayer {
       }
     }
 
-    // Velocidad de reproducción en vivo
+    // Velocidad de reproducción en vivo y bucle único/lista
     if (this.video && this.state.media.source === 'file') {
       const rate = Math.max(0.25, Math.min(2.0, Number(this.state.media.speed) || 1.0));
       if (Math.abs(this.video.playbackRate - rate) > 0.001) {
         this.video.playbackRate = rate;
+      }
+      const wantLoop = Boolean(this.singleLoop);
+      if (this.video.loop !== wantLoop) {
+        this.video.loop = wantLoop;
       }
     }
   }
@@ -183,7 +190,7 @@ export class MediaLayer {
     const v = document.createElement('video');
     v.muted = true;
     v.defaultMuted = true;
-    v.loop = true;
+    v.loop = Boolean(this.singleLoop);
     v.playsInline = true;
     v.autoplay = true;
     v.preload = 'auto';
@@ -215,10 +222,15 @@ export class MediaLayer {
       this.dirty = true;
       v.play().catch(() => {});
     };
+    v.onended = () => {
+      if (this.video !== v || v.loop) return;
+      if (typeof this.onVideoEnded === 'function') this.onVideoEnded();
+    };
     v.onerror = () => {
       if (this.video !== v) return;
       this.lastError = 'No se pudo reproducir el vídeo (formato no soportado o fichero dañado).';
       console.warn('[AETHER-VJ] Media error:', url);
+      if (typeof this.onMediaError === 'function') this.onMediaError(url);
     };
     this._watchVideoFrames(v);
     v.src = url;
@@ -280,6 +292,7 @@ export class MediaLayer {
     };
     img.onerror = () => {
       this.lastError = 'No se pudo cargar la imagen.';
+      if (typeof this.onMediaError === 'function') this.onMediaError(url);
     };
     this.image = img;
     img.src = url;

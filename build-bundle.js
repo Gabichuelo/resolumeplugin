@@ -34,6 +34,7 @@ const orderedFiles = [
   'js/engine/persistence.js',
   'js/engine/midiClock.js',
   'js/engine/mediaLayer.js',
+  'js/engine/signagePlayer.js',
   'js/engine/logoProcessor.js',
   'js/engine/syncBridge.js',
   'js/ui/consoleController.js'

@@ -817,12 +817,25 @@ export function createInitialState() {
       opacity: 1.0,
       blend: 0,               // MEDIA_BLEND_MODES
       fx: 0,                  // MEDIA_FX_MODES
-      fit: 0,                 // 0: Llenar | 1: Encajar
+      fit: 0,                 // 0: Llenar | 1: Encajar | 2: Estirar X×Y
       mirror: false,          // Espejo horizontal (cámara)
       beatZoom: 0.0,          // Golpe de zoom con el bombo
       speed: 1.0,             // Velocidad de reproducción
       cameraId: '',
       version: 0
+    },
+    signage: {
+      enabled: false,         // true = Modo Kiosco Publicidad (arranca solo al encender el Mini-PC)
+      useAllMedia: true,      // true = reproduce todos los vídeos/fotos de /media/ | false = solo playlist
+      playlist: [],           // [{ url, kind, name }] cuando useAllMedia=false o para ordenar elementos
+      slideSeconds: 8,        // segundos por foto/GIF en el carrusel (2..300)
+      fit: 0,                 // 0: Llenar (Cover) | 1: Encajar (Contain) | 2: Estirar exacto X×Y
+      fadeSeconds: 0.4,       // duración de transición suave (0 = corte seco, 0.4 = fundido)
+      paused: false,
+      currentIndex: 0,
+      totalItems: 0,
+      currentName: '',
+      remainingSec: 0
     },
     midi: {
       supported: false,       // El navegador soporta Web MIDI

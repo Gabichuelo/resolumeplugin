@@ -33,6 +33,7 @@ export class SyncBridge {
     this._lastSyncedLogoVersion = -1;
     this.remoteConnected = false;
     this.media = null;              // MediaLayer (para cámaras y ficheros locales)
+    this.signage = null;            // SignagePlayer (para Modo Kiosco Publicidad)
     this.edgeModeOverride = null;   // Ventana de proyector con ?blend=left|right
     this.logoProcessing = false;
 
@@ -116,6 +117,10 @@ export class SyncBridge {
 
   attachMedia(mediaLayer) {
     this.media = mediaLayer;
+  }
+
+  attachSignage(signagePlayer) {
+    this.signage = signagePlayer;
   }
 
   /**
@@ -344,6 +349,8 @@ export class SyncBridge {
         : st.media,
       mediaPlaying: Boolean(this.media && this.media.isPlaying),
       mediaError: this.media ? this.media.lastError : '',
+      signage: st.signage,
+      blackout: Boolean(st.fx && st.fx.blackout),
       transition: st.transition,
       edgeBlend: st.fx.edgeBlend,
       cameras: st.cameras || [],
@@ -657,7 +664,7 @@ export class SyncBridge {
             case 'opacity': m.opacity = clampNum(cmd.value, 0, 1, 1); break;
             case 'blend': m.blend = clampNum(cmd.value, 0, 4, 0) | 0; break;
             case 'fx': m.fx = clampNum(cmd.value, 0, 6, 0) | 0; break;
-            case 'fit': m.fit = clampNum(cmd.value, 0, 1, 0) | 0; break;
+            case 'fit': m.fit = clampNum(cmd.value, 0, 2, 0) | 0; break;
             case 'beatZoom': m.beatZoom = clampNum(cmd.value, 0, 1, 0); break;
             case 'speed': m.speed = clampNum(cmd.value, 0.25, 2, 1); break;
           }
@@ -773,7 +780,75 @@ export class SyncBridge {
         break;
       case 'SET_OUTPUT_PROP':
         if (cmd.prop && st.fx.output && cmd.prop in st.fx.output) {
-          st.fx.output[cmd.prop] = Number(cmd.value);
+          const val = Number(cmd.value);
+          if (cmd.prop === 'brightness') {
+            st.fx.output.brightness = clampNum(val, 0.05, 1.0, 1.0);
+          } else {
+            st.fx.output[cmd.prop] = clampNum(val, -1.0, 1.0, 0.0);
+          }
+        }
+        break;
+      case 'SET_SIGNAGE_ENABLED':
+        if (this.signage) {
+          this.signage.activate(Boolean(cmd.value));
+        } else if (st.signage) {
+          st.signage.enabled = Boolean(cmd.value);
+        }
+        break;
+      case 'SET_SIGNAGE_PROP':
+        if (st.signage && cmd.prop) {
+          const sg = st.signage;
+          if (cmd.prop === 'slideSeconds') {
+            sg.slideSeconds = Math.round(clampNum(cmd.value, 2, 300, 8));
+          } else if (cmd.prop === 'fit') {
+            sg.fit = clampNum(cmd.value, 0, 2, 0) | 0;
+            if (sg.enabled && st.media) st.media.fit = sg.fit;
+          } else if (cmd.prop === 'fadeSeconds') {
+            sg.fadeSeconds = clampNum(cmd.value, 0, 3, 0.4);
+          } else if (cmd.prop === 'paused') {
+            sg.paused = Boolean(cmd.value);
+          } else if (cmd.prop === 'useAllMedia') {
+            sg.useAllMedia = Boolean(cmd.value);
+            if (this.signage && sg.enabled) this.signage.refreshLibrary(true);
+          } else if (cmd.prop === 'playlist' && Array.isArray(cmd.value)) {
+            sg.playlist = cmd.value
+              .filter((it) => it && typeof it.url === 'string' && /^\/media\/[^/\\]+$/.test(it.url))
+              .slice(0, 200)
+              .map((it) => ({
+                url: it.url,
+                kind: ['video', 'gif', 'image'].includes(it.kind) ? it.kind : detectMediaKind(it.url),
+                name: String(it.name || it.url.split('/').pop() || '').slice(0, 80)
+              }));
+            if (cmd.useAllMedia !== undefined) sg.useAllMedia = Boolean(cmd.useAllMedia);
+            if (this.signage && sg.enabled) this.signage.refreshLibrary(true);
+          }
+        }
+        break;
+      case 'SIGNAGE_NEXT':
+        if (this.signage) this.signage.next(Boolean(cmd.immediate));
+        break;
+      case 'SIGNAGE_PREV':
+        if (this.signage) this.signage.prev(Boolean(cmd.immediate));
+        break;
+      case 'SIGNAGE_GOTO':
+        if (this.signage) {
+          if (typeof cmd.url === 'string') this.signage.goToUrl(cmd.url);
+          else this.signage.goTo(Number(cmd.index) || 0, true);
+        }
+        break;
+      case 'SIGNAGE_REFRESH_LIBRARY':
+        if (this.signage) this.signage.refreshLibrary();
+        break;
+      case 'SET_SIGNAGE_BANNER_PRESET':
+        if (st.fx && st.fx.mapping) {
+          const mp = st.fx.mapping;
+          if (cmd.ledScalerEnabled !== undefined) mp.ledScalerEnabled = Boolean(cmd.ledScalerEnabled);
+          if (cmd.ledWidthPx !== undefined) mp.ledWidthPx = Math.round(clampNum(cmd.ledWidthPx, 64, 7680, 1024));
+          if (cmd.ledHeightPx !== undefined) mp.ledHeightPx = Math.round(clampNum(cmd.ledHeightPx, 64, 4320, 512));
+          if (cmd.ledOffsetXPx !== undefined) mp.ledOffsetXPx = Math.round(clampNum(cmd.ledOffsetXPx, 0, 7680, 0));
+          if (cmd.ledOffsetYPx !== undefined) mp.ledOffsetYPx = Math.round(clampNum(cmd.ledOffsetYPx, 0, 4320, 0));
+          if (cmd.ledAnchor === 'center' || cmd.ledAnchor === 'top-left') mp.ledAnchor = cmd.ledAnchor;
+          if (cmd.ledKeepAspect !== undefined) mp.ledKeepAspect = Boolean(cmd.ledKeepAspect);
         }
         break;
       case 'SET_SAFE_STROBE':
@@ -944,6 +1019,7 @@ export class SyncBridge {
     p.colorOffset = st.colorOffset || 0;
     p.text = st.text;
     p.media = st.media;
+    p.signageEnabled = Boolean(st.signage && st.signage.enabled);
 
     p.fx.kaleidoEnabled = st.fx.kaleidoscope.enabled;
     p.fx.kaleidoWet = st.fx.kaleidoscope.wet;
@@ -1056,6 +1132,9 @@ export class SyncBridge {
     }
     if (p.media) {
       st.media = Object.assign(st.media || {}, p.media);
+    }
+    if (st.signage && typeof p.signageEnabled === 'boolean') {
+      st.signage.enabled = p.signageEnabled;
     }
 
     st.fx.kaleidoscope.enabled = p.fx.kaleidoEnabled;

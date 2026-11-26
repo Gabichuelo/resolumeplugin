@@ -940,12 +940,25 @@ function createInitialState() {
       opacity: 1.0,
       blend: 0,               // MEDIA_BLEND_MODES
       fx: 0,                  // MEDIA_FX_MODES
-      fit: 0,                 // 0: Llenar | 1: Encajar
+      fit: 0,                 // 0: Llenar | 1: Encajar | 2: Estirar X×Y
       mirror: false,          // Espejo horizontal (cámara)
       beatZoom: 0.0,          // Golpe de zoom con el bombo
       speed: 1.0,             // Velocidad de reproducción
       cameraId: '',
       version: 0
+    },
+    signage: {
+      enabled: false,         // true = Modo Kiosco Publicidad (arranca solo al encender el Mini-PC)
+      useAllMedia: true,      // true = reproduce todos los vídeos/fotos de /media/ | false = solo playlist
+      playlist: [],           // [{ url, kind, name }] cuando useAllMedia=false o para ordenar elementos
+      slideSeconds: 8,        // segundos por foto/GIF en el carrusel (2..300)
+      fit: 0,                 // 0: Llenar (Cover) | 1: Encajar (Contain) | 2: Estirar exacto X×Y
+      fadeSeconds: 0.4,       // duración de transición suave (0 = corte seco, 0.4 = fundido)
+      paused: false,
+      currentIndex: 0,
+      totalItems: 0,
+      currentName: '',
+      remainingSec: 0
     },
     midi: {
       supported: false,       // El navegador soporta Web MIDI
@@ -5226,15 +5239,21 @@ class WebGLRenderer {
     // Frame delta (ticker del texto)
     const dtRender = Math.max(0, Math.min(0.1, state.renderTime - this._lastRenderTime));
     this._lastRenderTime = state.renderTime;
+    const isSignage = Boolean(state.signage && state.signage.enabled);
 
-    // PASS 1: Render Deck A (only if crossfade < 0.999)
-    if (state.crossfade < 0.999) {
-      this._renderGeneratorPass(state.deckA, this.fboDeckA, state);
-    }
-
-    // PASS 2: Render Deck B (only if crossfade > 0.001)
-    if (state.crossfade > 0.001) {
-      this._renderGeneratorPass(state.deckB, this.fboDeckB, state);
+    // PASS 1 & 2: Render Decks (o fondo negro puro en Modo Kiosco Publicidad para ahorrar GPU/CPU)
+    if (isSignage) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.fboDeckA.fbo);
+      gl.viewport(0, 0, this.width, this.height);
+      gl.clearColor(0.0, 0.0, 0.0, 1.0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+    } else {
+      if (state.crossfade < 0.999) {
+        this._renderGeneratorPass(state.deckA, this.fboDeckA, state);
+      }
+      if (state.crossfade > 0.001) {
+        this._renderGeneratorPass(state.deckB, this.fboDeckB, state);
+      }
     }
 
     // PASS 3: Crossfade A/B + Ping-Pong Feedback Delay / Trails
@@ -5260,17 +5279,17 @@ class WebGLRenderer {
     gl.bindTexture(gl.TEXTURE_2D, fbRead.texture);
     gl.uniform1i(fbU.uTexPrevFeedback, 2);
 
-    gl.uniform1f(fbU.uCrossfade, state.crossfade);
-    gl.uniform1f(fbU.uFeedbackWet, state.fx.feedback.enabled ? state.fx.feedback.wet : 0.0);
+    gl.uniform1f(fbU.uCrossfade, isSignage ? 0.0 : state.crossfade);
+    gl.uniform1f(fbU.uFeedbackWet, (!isSignage && state.fx.feedback.enabled) ? state.fx.feedback.wet : 0.0);
     gl.uniform1f(fbU.uTime, state.renderTime % 18000.0);
-    gl.uniform1f(fbU.uBeatPulse, state.bpm.syncPulse);
+    gl.uniform1f(fbU.uBeatPulse, isSignage ? 0.0 : state.bpm.syncPulse);
 
-    // Capa de vídeo / GIF / cámara
+    // Capa de vídeo / GIF / foto / cámara
     this._syncMediaTexture();
     const med = state.media;
     const mediaReady = Boolean(this.media && this.media.ready);
     const mediaTarget = (med && med.enabled && mediaReady) ? 1.0 : 0.0;
-    this._mediaFade += (mediaTarget - this._mediaFade) * 0.12;
+    this._mediaFade += (mediaTarget - this._mediaFade) * (isSignage ? 0.45 : 0.12);
     if (Math.abs(mediaTarget - this._mediaFade) < 0.004) this._mediaFade = mediaTarget;
 
     gl.activeTexture(gl.TEXTURE3);
@@ -5279,23 +5298,30 @@ class WebGLRenderer {
     const mediaOpacity = med ? Math.max(0, Math.min(1, Number(med.opacity ?? 1))) : 0;
     gl.uniform1f(fbU.uMediaMix, this._mediaFade * mediaOpacity);
     if (this._mediaFade > 0.003 && med) {
-      const contentAspect = (this.width * this._genAspectFactor) / Math.max(1, this.height);
+      const mapCfgMedia = state.fx && state.fx.mapping;
+      const contentAspect = (mapCfgMedia && mapCfgMedia.ledScalerEnabled)
+        ? (Math.max(32, Number(mapCfgMedia.ledWidthPx) || 1024) / Math.max(32, Number(mapCfgMedia.ledHeightPx) || 512))
+        : ((this.width * this._genAspectFactor) / Math.max(1, this.height));
       const mediaAspect = this._mediaW / this._mediaH;
       let sx = 1.0, sy = 1.0;
-      if (med.fit === 1) {
-        // Encajar: se ve el vídeo entero (bandas transparentes)
+      if (med.fit === 2) {
+        // Estirar exacto al ancho × alto (X×Y) del banner LED
+        sx = 1.0;
+        sy = 1.0;
+      } else if (med.fit === 1) {
+        // Encajar: se ve el vídeo/foto entero (bandas negras)
         if (mediaAspect > contentAspect) sy = mediaAspect / contentAspect;
         else sx = contentAspect / mediaAspect;
       } else {
-        // Llenar: cubre toda la pantalla recortando
+        // Llenar: cubre toda la pantalla recortando el sobrante
         if (mediaAspect > contentAspect) sx = contentAspect / mediaAspect;
         else sy = mediaAspect / contentAspect;
       }
-      const bz = Math.max(0, Math.min(1, Number(med.beatZoom) || 0));
-      gl.uniform1i(fbU.uMediaBlend, med.blend || 0);
-      gl.uniform1i(fbU.uMediaFx, med.fx || 0);
+      const bz = isSignage ? 0.0 : Math.max(0, Math.min(1, Number(med.beatZoom) || 0));
+      gl.uniform1i(fbU.uMediaBlend, isSignage ? 0 : (med.blend || 0));
+      gl.uniform1i(fbU.uMediaFx, isSignage ? 0 : (med.fx || 0));
       gl.uniform2f(fbU.uMediaUvScale, sx, sy);
-      gl.uniform1i(fbU.uMediaMirror, med.mirror ? 1 : 0);
+      gl.uniform1i(fbU.uMediaMirror, (!isSignage && med.mirror) ? 1 : 0);
       gl.uniform1f(fbU.uMediaZoom, 1.0 + bz * (0.16 * state.bpm.syncPulse + 0.08 * state.audio.bass));
       gl.uniform2f(fbU.uMediaTexel, 1.0 / this._mediaW, 1.0 / this._mediaH);
       gl.uniform1f(fbU.uMediaAspect, mediaAspect);
@@ -5380,19 +5406,19 @@ class WebGLRenderer {
     gl.uniform1f(postU.uBeatPulse, state.bpm.syncPulse);
     gl.uniform3f(postU.uAudioFFT, state.audio.bass, state.audio.mid, state.audio.high);
 
-    gl.uniform1f(postU.uKaleidoWet, fx.kaleidoscope.enabled ? fx.kaleidoscope.wet : 0.0);
+    gl.uniform1f(postU.uKaleidoWet, (!isSignage && fx.kaleidoscope.enabled) ? fx.kaleidoscope.wet : 0.0);
     gl.uniform1f(postU.uKaleidoAxes, fx.kaleidoscope.axes);
-    gl.uniform1f(postU.uRgbShiftWet, fx.rgbShift.enabled ? fx.rgbShift.wet : 0.0);
-    gl.uniform1f(postU.uGlitchWet, fx.glitch.enabled ? fx.glitch.wet : 0.0);
-    gl.uniform1f(postU.uPixelateWet, fx.pixelate.enabled ? fx.pixelate.wet : 0.0);
+    gl.uniform1f(postU.uRgbShiftWet, (!isSignage && fx.rgbShift.enabled) ? fx.rgbShift.wet : 0.0);
+    gl.uniform1f(postU.uGlitchWet, (!isSignage && fx.glitch.enabled) ? fx.glitch.wet : 0.0);
+    gl.uniform1f(postU.uPixelateWet, (!isSignage && fx.pixelate.enabled) ? fx.pixelate.wet : 0.0);
 
-    const eff3dMode = (fx.effect3d && typeof fx.effect3d.mode === 'number') ? fx.effect3d.mode : 0;
+    const eff3dMode = (!isSignage && fx.effect3d && typeof fx.effect3d.mode === 'number') ? fx.effect3d.mode : 0;
     const eff3dAmt = (fx.effect3d && typeof fx.effect3d.amount === 'number') ? fx.effect3d.amount : 0.55;
     gl.uniform1i(postU.uEffect3DMode, eff3dMode);
     gl.uniform1f(postU.uEffect3DAmount, eff3dAmt);
 
-    // Dynamic DJ Logo Uniforms
-    gl.uniform1f(postU.uLogoEnabled, this._logoFadeVal);
+    // Dynamic DJ Logo Uniforms (oculto en modo Publicidad para no tapar los anuncios)
+    gl.uniform1f(postU.uLogoEnabled, isSignage ? 0.0 : this._logoFadeVal);
     gl.uniform1i(postU.uLogoFxMode, logo.fxMode || 0);
     gl.uniform1f(postU.uLogoScale, logo.scale ?? 0.44);
     gl.uniform1f(postU.uLogoOpacity, logo.opacity ?? 0.96);
@@ -5415,7 +5441,7 @@ class WebGLRenderer {
     gl.uniform2f(postU.uMapOffset, map.offsetX || 0.0, map.offsetY || 0.0);
     gl.uniform2f(postU.uMapScale, map.scaleX ?? 1.0, map.scaleY ?? 1.0);
     gl.uniform2f(postU.uMapKeystone, map.keystoneX || 0.0, map.keystoneY || 0.0);
-    gl.uniform1i(postU.uSliceMode, map.sliceMode || 0);
+    gl.uniform1i(postU.uSliceMode, isSignage ? 0 : (map.sliceMode || 0));
     gl.uniform1i(postU.uSliceCount, map.sliceCount || 3);
     gl.uniform1f(postU.uSliceGap, map.sliceGap ?? 0.04);
     gl.uniform1i(postU.uSliceClone, map.sliceClone !== false ? 1 : 0);
@@ -5427,11 +5453,11 @@ class WebGLRenderer {
     gl.uniform1f(postU.uColorTemp, out.colorTemp || 0.0);
     gl.uniform1i(postU.uSafeStrobe, fx.safeStrobe !== false ? 1 : 0);
 
-    gl.uniform1f(postU.uFlash, fx.flashMomentary ? 1.0 : 0.0);
-    gl.uniform1f(postU.uInvert, fx.invertKill ? 1.0 : 0.0);
-    gl.uniform1f(postU.uMonochrome, fx.bwMonochrome ? 1.0 : 0.0);
+    gl.uniform1f(postU.uFlash, (!isSignage && fx.flashMomentary) ? 1.0 : 0.0);
+    gl.uniform1f(postU.uInvert, (!isSignage && fx.invertKill) ? 1.0 : 0.0);
+    gl.uniform1f(postU.uMonochrome, (!isSignage && fx.bwMonochrome) ? 1.0 : 0.0);
     gl.uniform1f(postU.uBlackout, fx.blackout ? 1.0 : 0.0);
-    gl.uniform1f(postU.uStrobeBurst, fx.strobeBurst ? 1.0 : 0.0);
+    gl.uniform1f(postU.uStrobeBurst, (!isSignage && fx.strobeBurst) ? 1.0 : 0.0);
     const bgModeInt = state.bgMode === 'ALPHA' ? 1 : (state.bgMode === 'CHROMA' ? 2 : 0);
     gl.uniform1i(postU.uBgMode, bgModeInt);
 
@@ -5469,7 +5495,7 @@ class WebGLRenderer {
     // Texto en pantalla
     const txt = state.text;
     this._syncTextTexture(state);
-    const hasText = Boolean(txt && txt.enabled && String(txt.content || '').trim().length > 0);
+    const hasText = Boolean(!isSignage && txt && txt.enabled && String(txt.content || '').trim().length > 0);
     const textTarget = hasText ? 1.0 : 0.0;
     this._textFade += (textTarget - this._textFade) * 0.14;
     if (Math.abs(textTarget - this._textFade) < 0.004) this._textFade = textTarget;
@@ -6752,6 +6778,14 @@ class Persistence {
         beatZoom: st.media.beatZoom,
         speed: st.media.speed,
         cameraId: st.media.cameraId
+      } : null,
+      signage: st.signage ? {
+        enabled: Boolean(st.signage.enabled),
+        useAllMedia: st.signage.useAllMedia !== false,
+        playlist: Array.isArray(st.signage.playlist) ? st.signage.playlist.slice(0, 200) : [],
+        slideSeconds: Math.max(2, Math.min(300, Number(st.signage.slideSeconds) || 8)),
+        fit: [0, 1, 2].includes(Number(st.signage.fit)) ? Number(st.signage.fit) : 0,
+        fadeSeconds: Math.max(0, Math.min(3, Number(st.signage.fadeSeconds) || 0))
       } : null
     };
   }
@@ -6792,6 +6826,25 @@ class Persistence {
       if (st.media.source === 'file' && !st.media.url) st.media.source = 'none';
       if (st.media.source === 'none') st.media.enabled = false;
       st.media.version = (st.media.version || 0) + 1;
+    }
+    if (cfg.signage && typeof cfg.signage === 'object' && st.signage) {
+      const sg = cfg.signage;
+      st.signage.enabled = Boolean(sg.enabled);
+      st.signage.useAllMedia = sg.useAllMedia !== false;
+      st.signage.slideSeconds = Math.max(2, Math.min(300, Number(sg.slideSeconds) || 8));
+      st.signage.fit = [0, 1, 2].includes(Number(sg.fit)) ? Number(sg.fit) : 0;
+      st.signage.fadeSeconds = Math.max(0, Math.min(3, Number(sg.fadeSeconds) || 0));
+      if (Array.isArray(sg.playlist)) {
+        st.signage.playlist = sg.playlist
+          .filter((it) => it && typeof it.url === 'string' && /^\/media\/[^/\\]+$/.test(it.url))
+          .slice(0, 200)
+          .map((it) => ({
+            url: it.url,
+            kind: ['video', 'gif', 'image'].includes(it.kind) ? it.kind : 'video',
+            name: String(it.name || it.url.split('/').pop() || '').slice(0, 80)
+          }));
+      }
+      st.signage.paused = false;
     }
     if (typeof cfg.safeStrobe === 'boolean') {
       st.fx.safeStrobe = cfg.safeStrobe;
@@ -7149,6 +7202,9 @@ class MediaLayer {
     this.lastError = '';
     this._blobUrl = '';
     this._rvfcActive = false;
+    this.singleLoop = true;
+    this.onVideoEnded = null;
+    this.onMediaError = null;
   }
 
   get isPlaying() {
@@ -7182,11 +7238,15 @@ class MediaLayer {
       }
     }
 
-    // Velocidad de reproducción en vivo
+    // Velocidad de reproducción en vivo y bucle único/lista
     if (this.video && this.state.media.source === 'file') {
       const rate = Math.max(0.25, Math.min(2.0, Number(this.state.media.speed) || 1.0));
       if (Math.abs(this.video.playbackRate - rate) > 0.001) {
         this.video.playbackRate = rate;
+      }
+      const wantLoop = Boolean(this.singleLoop);
+      if (this.video.loop !== wantLoop) {
+        this.video.loop = wantLoop;
       }
     }
   }
@@ -7295,7 +7355,7 @@ class MediaLayer {
     const v = document.createElement('video');
     v.muted = true;
     v.defaultMuted = true;
-    v.loop = true;
+    v.loop = Boolean(this.singleLoop);
     v.playsInline = true;
     v.autoplay = true;
     v.preload = 'auto';
@@ -7327,10 +7387,15 @@ class MediaLayer {
       this.dirty = true;
       v.play().catch(() => {});
     };
+    v.onended = () => {
+      if (this.video !== v || v.loop) return;
+      if (typeof this.onVideoEnded === 'function') this.onVideoEnded();
+    };
     v.onerror = () => {
       if (this.video !== v) return;
       this.lastError = 'No se pudo reproducir el vídeo (formato no soportado o fichero dañado).';
       console.warn('[AETHER-VJ] Media error:', url);
+      if (typeof this.onMediaError === 'function') this.onMediaError(url);
     };
     this._watchVideoFrames(v);
     v.src = url;
@@ -7392,6 +7457,7 @@ class MediaLayer {
     };
     img.onerror = () => {
       this.lastError = 'No se pudo cargar la imagen.';
+      if (typeof this.onMediaError === 'function') this.onMediaError(url);
     };
     this.image = img;
     img.src = url;
@@ -7472,6 +7538,327 @@ class MediaLayer {
     if (nowMs >= this.gifNextAt) {
       const next = (this.gifFrameIndex + 1) % this.gifFrameCount;
       this._decodeGifFrame(next, this.gifToken);
+    }
+  }
+}
+
+
+// ==================== MODULE: js/engine/signagePlayer.js ====================
+/**
+ * AETHER-VJ: Reproductor de Kiosco de Publicidad / Cartelería LED (Digital Signage)
+ * Reproduce en bucle 24/7 un vídeo o un carrusel temporizado de fotos/GIFs/vídeos
+ * desde /media/ en las proporciones X×Y y brillo configurados.
+ */
+class SignagePlayer {
+  constructor(state, mediaLayer, syncBridge) {
+    this.state = state;
+    this.media = mediaLayer;
+    this.syncBridge = syncBridge;
+    this.libraryItems = [];
+    this.slideElapsed = 0;
+    this.loadingElapsed = 0;
+    this.fadePhase = 'idle'; // 'idle' | 'out' | 'in'
+    this.fadeElapsed = 0;
+    this.pendingIndex = -1;
+    this._refreshing = false;
+  }
+
+  _buildValidEntry(it) {
+    return {
+      url: it.url,
+      kind: ['video', 'gif', 'image'].includes(it.kind) ? it.kind : 'video',
+      name: String(it.name || it.file || it.url.split('/').pop() || '').slice(0, 80)
+    };
+  }
+
+  _getActiveItems() {
+    const sg = this.state.signage;
+    if (!sg) return [];
+    const libByUrl = new Map();
+    for (let i = 0; i < this.libraryItems.length; i++) {
+      const it = this.libraryItems[i];
+      if (it && it.url) libByUrl.set(it.url, this._buildValidEntry(it));
+    }
+
+    const customList = Array.isArray(sg.playlist)
+      ? sg.playlist
+          .filter((it) => it && typeof it.url === 'string' && /^\/media\/[^/\\]+$/.test(it.url))
+          .filter((it) => libByUrl.size === 0 || libByUrl.has(it.url))
+          .map((it) => libByUrl.get(it.url) || this._buildValidEntry(it))
+      : [];
+
+    if (sg.useAllMedia === false) {
+      return customList;
+    }
+
+    // Todos los archivos de /media/, respetando el orden previo de playlist primero
+    const seen = new Set();
+    const merged = [];
+    for (let i = 0; i < customList.length; i++) {
+      if (!seen.has(customList[i].url)) {
+        seen.add(customList[i].url);
+        merged.push(customList[i]);
+      }
+    }
+    for (let i = 0; i < this.libraryItems.length; i++) {
+      const it = this.libraryItems[i];
+      if (it && it.url && !seen.has(it.url)) {
+        seen.add(it.url);
+        merged.push(this._buildValidEntry(it));
+      }
+    }
+    return merged;
+  }
+
+  async refreshLibrary(forceEnsurePlaying = false) {
+    if (this._refreshing) return;
+    if (typeof window === 'undefined' || !window.location.protocol.startsWith('http')) return;
+    this._refreshing = true;
+    try {
+      const res = await fetch('/api/media-list', { cache: 'no-store' });
+      const data = await res.json().catch(() => null);
+      if (res.ok && data && data.ok && Array.isArray(data.items)) {
+        // Dejar orden cronológico de subida por defecto para que las secuencias queden ordenadas
+        this.libraryItems = data.items.slice().reverse();
+        const libUrls = new Set(this.libraryItems.map((it) => it.url));
+        const sg = this.state.signage;
+        if (sg && Array.isArray(sg.playlist) && sg.playlist.length) {
+          sg.playlist = sg.playlist.filter((it) => it && libUrls.has(it.url));
+        }
+        if (sg && sg.enabled) {
+          const active = this._getActiveItems();
+          sg.totalItems = active.length;
+          if (active.length === 0) {
+            sg.currentIndex = 0;
+            sg.currentName = '';
+            sg.remainingSec = 0;
+          } else {
+            const curUrl = this.state.media ? this.state.media.url : '';
+            const curMatch = active.findIndex((it) => it.url === curUrl);
+            if (curMatch >= 0 && !forceEnsurePlaying) {
+              sg.currentIndex = curMatch;
+              sg.currentName = active[curMatch].name;
+              if (this.media) {
+                this.media.singleLoop = (active.length === 1 && active[curMatch].kind === 'video');
+              }
+            } else {
+              this.goTo(curMatch >= 0 ? curMatch : 0, true);
+            }
+          }
+        }
+      }
+    } catch (_) {
+      // Sin servidor HTTP disponible
+    } finally {
+      this._refreshing = false;
+    }
+  }
+
+  onConfigLoaded() {
+    if (this.media) {
+      this.media.onVideoEnded = () => {
+        const sg = this.state.signage;
+        if (sg && sg.enabled && !sg.paused) {
+          this.next(false);
+        }
+      };
+      this.media.onMediaError = () => {
+        const sg = this.state.signage;
+        if (sg && sg.enabled && sg.totalItems > 1) {
+          this.next(true);
+        }
+      };
+    }
+    this.refreshLibrary(true);
+  }
+
+  activate(enable) {
+    const sg = this.state.signage;
+    if (!sg) return;
+    sg.enabled = Boolean(enable);
+    this.fadePhase = 'idle';
+    this.fadeElapsed = 0;
+    this.slideElapsed = 0;
+    this.loadingElapsed = 0;
+
+    if (sg.enabled) {
+      sg.paused = false;
+      const m = this.state.media;
+      if (m) {
+        m.blend = 0;
+        m.fx = 0;
+        m.beatZoom = 0;
+        m.mirror = false;
+        m.speed = 1.0;
+        m.fit = [0, 1, 2].includes(Number(sg.fit)) ? Number(sg.fit) : 0;
+        m.opacity = 1.0;
+      }
+      this.refreshLibrary(true);
+    } else {
+      if (this.media) this.media.singleLoop = true;
+      if (this.state.media) this.state.media.opacity = 1.0;
+    }
+  }
+
+  _commitItem(idx, items) {
+    const sg = this.state.signage;
+    const m = this.state.media;
+    if (!sg || !m || !items.length) return;
+    const safeIdx = ((idx % items.length) + items.length) % items.length;
+    const item = items[safeIdx];
+
+    sg.currentIndex = safeIdx;
+    sg.totalItems = items.length;
+    sg.currentName = item.name || item.url.split('/').pop() || '';
+    this.slideElapsed = 0;
+    this.loadingElapsed = 0;
+
+    if (this.media) {
+      this.media.singleLoop = (items.length === 1 && item.kind === 'video');
+    }
+
+    m.source = 'file';
+    m.url = item.url;
+    m.kind = item.kind || 'video';
+    m.name = sg.currentName;
+    m.blend = 0;
+    m.fx = 0;
+    m.beatZoom = 0;
+    m.mirror = false;
+    m.speed = 1.0;
+    m.fit = [0, 1, 2].includes(Number(sg.fit)) ? Number(sg.fit) : 0;
+    m.enabled = true;
+    m.version = (m.version || 0) + 1;
+  }
+
+  goTo(index, immediate = false) {
+    const sg = this.state.signage;
+    if (!sg) return;
+    const items = this._getActiveItems();
+    sg.totalItems = items.length;
+    if (!items.length) {
+      sg.currentIndex = 0;
+      sg.currentName = '';
+      sg.remainingSec = 0;
+      return;
+    }
+
+    const fadeSec = Math.max(0, Math.min(3, Number(sg.fadeSeconds) || 0));
+    if (immediate || fadeSec <= 0.02 || items.length <= 1) {
+      this.fadePhase = 'idle';
+      if (this.state.media) this.state.media.opacity = 1.0;
+      this._commitItem(index, items);
+      return;
+    }
+
+    this.pendingIndex = index;
+    this.fadePhase = 'out';
+    this.fadeElapsed = 0;
+  }
+
+  goToUrl(url) {
+    const items = this._getActiveItems();
+    const idx = items.findIndex((it) => it.url === url);
+    this.goTo(idx >= 0 ? idx : 0, true);
+  }
+
+  next(immediate = false) {
+    const sg = this.state.signage;
+    if (!sg) return;
+    this.goTo((sg.currentIndex || 0) + 1, immediate);
+  }
+
+  prev(immediate = false) {
+    const sg = this.state.signage;
+    if (!sg) return;
+    this.goTo((sg.currentIndex || 0) - 1, immediate);
+  }
+
+  update(dt) {
+    const sg = this.state.signage;
+    const m = this.state.media;
+    if (!sg || !sg.enabled || !m) return;
+
+    // Mantener imagen limpia de publicidad sin mezcla ni deformaciones DJ
+    m.blend = 0;
+    m.fx = 0;
+    m.beatZoom = 0;
+    m.fit = [0, 1, 2].includes(Number(sg.fit)) ? Number(sg.fit) : 0;
+
+    const items = this._getActiveItems();
+    sg.totalItems = items.length;
+
+    if (!items.length) {
+      sg.currentIndex = 0;
+      sg.currentName = '';
+      sg.remainingSec = 0;
+      m.opacity = 1.0;
+      return;
+    }
+
+    if (sg.currentIndex >= items.length) {
+      this._commitItem(0, items);
+    }
+    const curItem = items[sg.currentIndex] || items[0];
+    sg.currentName = curItem.name || '';
+    if (this.media) {
+      this.media.singleLoop = (items.length === 1 && curItem.kind === 'video');
+    }
+
+    // Gestión de transición suave (fade out -> swap -> fade in)
+    const halfFade = Math.max(0.05, (Math.max(0, Math.min(3, Number(sg.fadeSeconds) || 0))) * 0.5);
+    if (this.fadePhase === 'out') {
+      this.fadeElapsed += dt;
+      const t = Math.min(1, this.fadeElapsed / halfFade);
+      m.opacity = 1.0 - t;
+      if (t >= 1) {
+        this._commitItem(this.pendingIndex, items);
+        this.fadePhase = 'in';
+        this.fadeElapsed = 0;
+        m.opacity = 0.0;
+      }
+      return;
+    } else if (this.fadePhase === 'in') {
+      this.fadeElapsed += dt;
+      const t = Math.min(1, this.fadeElapsed / halfFade);
+      m.opacity = t;
+      if (t >= 1) {
+        this.fadePhase = 'idle';
+        m.opacity = 1.0;
+      }
+    } else {
+      m.opacity = 1.0;
+    }
+
+    if (sg.paused) return;
+
+    // Temporizador del carrusel si hay 2 o más elementos
+    if (items.length > 1) {
+      if (curItem.kind === 'video') {
+        const v = this.media ? this.media.video : null;
+        if (v && Number.isFinite(v.duration) && v.duration > 0) {
+          sg.remainingSec = Math.max(0, Math.ceil(v.duration - (v.currentTime || 0)));
+          this.loadingElapsed = 0;
+        } else {
+          sg.remainingSec = 0;
+          this.loadingElapsed += dt;
+          if (this.loadingElapsed > 12) {
+            this.loadingElapsed = 0;
+            this.next(true);
+          }
+        }
+      } else {
+        const slideSec = Math.max(2, Math.min(300, Number(sg.slideSeconds) || 8));
+        this.slideElapsed += dt;
+        sg.remainingSec = Math.max(0, Math.ceil(slideSec - this.slideElapsed));
+        if (this.slideElapsed >= slideSec) {
+          this.slideElapsed = 0;
+          this.next(false);
+        }
+      }
+    } else {
+      this.slideElapsed = 0;
+      sg.remainingSec = 0;
     }
   }
 }
@@ -7677,6 +8064,7 @@ class SyncBridge {
     this._lastSyncedLogoVersion = -1;
     this.remoteConnected = false;
     this.media = null;              // MediaLayer (para cámaras y ficheros locales)
+    this.signage = null;            // SignagePlayer (para Modo Kiosco Publicidad)
     this.edgeModeOverride = null;   // Ventana de proyector con ?blend=left|right
     this.logoProcessing = false;
 
@@ -7760,6 +8148,10 @@ class SyncBridge {
 
   attachMedia(mediaLayer) {
     this.media = mediaLayer;
+  }
+
+  attachSignage(signagePlayer) {
+    this.signage = signagePlayer;
   }
 
   /**
@@ -7988,6 +8380,8 @@ class SyncBridge {
         : st.media,
       mediaPlaying: Boolean(this.media && this.media.isPlaying),
       mediaError: this.media ? this.media.lastError : '',
+      signage: st.signage,
+      blackout: Boolean(st.fx && st.fx.blackout),
       transition: st.transition,
       edgeBlend: st.fx.edgeBlend,
       cameras: st.cameras || [],
@@ -8301,7 +8695,7 @@ class SyncBridge {
             case 'opacity': m.opacity = clampNum(cmd.value, 0, 1, 1); break;
             case 'blend': m.blend = clampNum(cmd.value, 0, 4, 0) | 0; break;
             case 'fx': m.fx = clampNum(cmd.value, 0, 6, 0) | 0; break;
-            case 'fit': m.fit = clampNum(cmd.value, 0, 1, 0) | 0; break;
+            case 'fit': m.fit = clampNum(cmd.value, 0, 2, 0) | 0; break;
             case 'beatZoom': m.beatZoom = clampNum(cmd.value, 0, 1, 0); break;
             case 'speed': m.speed = clampNum(cmd.value, 0.25, 2, 1); break;
           }
@@ -8417,7 +8811,75 @@ class SyncBridge {
         break;
       case 'SET_OUTPUT_PROP':
         if (cmd.prop && st.fx.output && cmd.prop in st.fx.output) {
-          st.fx.output[cmd.prop] = Number(cmd.value);
+          const val = Number(cmd.value);
+          if (cmd.prop === 'brightness') {
+            st.fx.output.brightness = clampNum(val, 0.05, 1.0, 1.0);
+          } else {
+            st.fx.output[cmd.prop] = clampNum(val, -1.0, 1.0, 0.0);
+          }
+        }
+        break;
+      case 'SET_SIGNAGE_ENABLED':
+        if (this.signage) {
+          this.signage.activate(Boolean(cmd.value));
+        } else if (st.signage) {
+          st.signage.enabled = Boolean(cmd.value);
+        }
+        break;
+      case 'SET_SIGNAGE_PROP':
+        if (st.signage && cmd.prop) {
+          const sg = st.signage;
+          if (cmd.prop === 'slideSeconds') {
+            sg.slideSeconds = Math.round(clampNum(cmd.value, 2, 300, 8));
+          } else if (cmd.prop === 'fit') {
+            sg.fit = clampNum(cmd.value, 0, 2, 0) | 0;
+            if (sg.enabled && st.media) st.media.fit = sg.fit;
+          } else if (cmd.prop === 'fadeSeconds') {
+            sg.fadeSeconds = clampNum(cmd.value, 0, 3, 0.4);
+          } else if (cmd.prop === 'paused') {
+            sg.paused = Boolean(cmd.value);
+          } else if (cmd.prop === 'useAllMedia') {
+            sg.useAllMedia = Boolean(cmd.value);
+            if (this.signage && sg.enabled) this.signage.refreshLibrary(true);
+          } else if (cmd.prop === 'playlist' && Array.isArray(cmd.value)) {
+            sg.playlist = cmd.value
+              .filter((it) => it && typeof it.url === 'string' && /^\/media\/[^/\\]+$/.test(it.url))
+              .slice(0, 200)
+              .map((it) => ({
+                url: it.url,
+                kind: ['video', 'gif', 'image'].includes(it.kind) ? it.kind : detectMediaKind(it.url),
+                name: String(it.name || it.url.split('/').pop() || '').slice(0, 80)
+              }));
+            if (cmd.useAllMedia !== undefined) sg.useAllMedia = Boolean(cmd.useAllMedia);
+            if (this.signage && sg.enabled) this.signage.refreshLibrary(true);
+          }
+        }
+        break;
+      case 'SIGNAGE_NEXT':
+        if (this.signage) this.signage.next(Boolean(cmd.immediate));
+        break;
+      case 'SIGNAGE_PREV':
+        if (this.signage) this.signage.prev(Boolean(cmd.immediate));
+        break;
+      case 'SIGNAGE_GOTO':
+        if (this.signage) {
+          if (typeof cmd.url === 'string') this.signage.goToUrl(cmd.url);
+          else this.signage.goTo(Number(cmd.index) || 0, true);
+        }
+        break;
+      case 'SIGNAGE_REFRESH_LIBRARY':
+        if (this.signage) this.signage.refreshLibrary();
+        break;
+      case 'SET_SIGNAGE_BANNER_PRESET':
+        if (st.fx && st.fx.mapping) {
+          const mp = st.fx.mapping;
+          if (cmd.ledScalerEnabled !== undefined) mp.ledScalerEnabled = Boolean(cmd.ledScalerEnabled);
+          if (cmd.ledWidthPx !== undefined) mp.ledWidthPx = Math.round(clampNum(cmd.ledWidthPx, 64, 7680, 1024));
+          if (cmd.ledHeightPx !== undefined) mp.ledHeightPx = Math.round(clampNum(cmd.ledHeightPx, 64, 4320, 512));
+          if (cmd.ledOffsetXPx !== undefined) mp.ledOffsetXPx = Math.round(clampNum(cmd.ledOffsetXPx, 0, 7680, 0));
+          if (cmd.ledOffsetYPx !== undefined) mp.ledOffsetYPx = Math.round(clampNum(cmd.ledOffsetYPx, 0, 4320, 0));
+          if (cmd.ledAnchor === 'center' || cmd.ledAnchor === 'top-left') mp.ledAnchor = cmd.ledAnchor;
+          if (cmd.ledKeepAspect !== undefined) mp.ledKeepAspect = Boolean(cmd.ledKeepAspect);
         }
         break;
       case 'SET_SAFE_STROBE':
@@ -8588,6 +9050,7 @@ class SyncBridge {
     p.colorOffset = st.colorOffset || 0;
     p.text = st.text;
     p.media = st.media;
+    p.signageEnabled = Boolean(st.signage && st.signage.enabled);
 
     p.fx.kaleidoEnabled = st.fx.kaleidoscope.enabled;
     p.fx.kaleidoWet = st.fx.kaleidoscope.wet;
@@ -8700,6 +9163,9 @@ class SyncBridge {
     }
     if (p.media) {
       st.media = Object.assign(st.media || {}, p.media);
+    }
+    if (st.signage && typeof p.signageEnabled === 'boolean') {
+      st.signage.enabled = p.signageEnabled;
     }
 
     st.fx.kaleidoscope.enabled = p.fx.kaleidoEnabled;
@@ -10745,6 +11211,32 @@ class ConsoleController {
       updateRepoUrlInput: $('update-repo-url-input'),
       btnRunInternetUpdate: $('btn-run-internet-update'),
       updateStatusMsg: $('update-status-msg'),
+      // Modal Kiosco Publicidad
+      btnOpenSignageModal: $('btn-open-signage-modal'),
+      btnCloseSignageModal: $('btn-close-signage-modal'),
+      signageModalBackdrop: $('signage-modal-backdrop'),
+      deskBtnSignageToggle: $('desk-btn-signage-toggle'),
+      deskSignageNow: $('desk-signage-now'),
+      deskBtnSignagePrev: $('desk-btn-signage-prev'),
+      deskBtnSignagePause: $('desk-btn-signage-pause'),
+      deskBtnSignageNext: $('desk-btn-signage-next'),
+      deskSignageFiles: $('desk-signage-files'),
+      deskBtnSignageUpload: $('desk-btn-signage-upload'),
+      deskSignageMsg: $('desk-signage-msg'),
+      deskSignageSecInput: $('desk-signage-sec-input'),
+      deskSignageSecBtns: toBtns('#desk-signage-sec-grid [data-dssec]', 'data-dssec', (s) => parseInt(s, 10) || 8),
+      deskSignageFadeBtns: toBtns('#desk-signage-fade-grid [data-dsfade]', 'data-dsfade', (s) => parseFloat(s) || 0),
+      deskSignageBannerPresets: Array.from(document.querySelectorAll('#desk-signage-banner-presets [data-bw]')),
+      deskSignageLedW: $('desk-signage-led-w'),
+      deskSignageLedH: $('desk-signage-led-h'),
+      deskSignageLedOx: $('desk-signage-led-ox'),
+      deskSignageLedOy: $('desk-signage-led-oy'),
+      deskSignageFitBtns: toBtns('#desk-signage-fit-grid [data-dsfit]', 'data-dsfit', (s) => parseInt(s, 10) || 0),
+      deskSignageBright: $('desk-signage-bright'),
+      deskSignageBrightVal: $('desk-signage-bright-val'),
+      deskSignageScopeBtns: toBtns('#desk-signage-scope-grid [data-dsall]', 'data-dsall', (s) => parseInt(s, 10) === 1 ? 1 : 0),
+      deskBtnSignageRefresh: $('desk-btn-signage-refresh'),
+      deskSignagePlaylist: $('desk-signage-playlist'),
       // Mutación Automática por Vuelta de Loops (🤖 AUTO por sección)
       autoModBtns: Array.from(document.querySelectorAll('.btn-auto-mod')),
       btnAllAutoToggle: $('btn-all-auto-toggle'),
@@ -11216,6 +11708,219 @@ class ConsoleController {
 
     d.btnStepAutoNow?.addEventListener('click', () => {
       this._cmd({ action: 'STEP_AUTO_MODS_NOW' });
+    });
+
+    // ---- Modal Kiosco de Publicidad / Cartelería LED ----
+    const renderDeskSignagePlaylist = () => {
+      const box = d.deskSignagePlaylist;
+      if (!box) return;
+      const lib = (this._mediaLibItems || []).slice().reverse();
+      const sg = st.signage || {};
+      const byUrl = new Map(lib.map((it) => [it.url, it]));
+      const ordered = [];
+      const seen = new Set();
+      (sg.playlist || []).forEach((p) => {
+        if (p && p.url && byUrl.has(p.url) && !seen.has(p.url)) {
+          seen.add(p.url);
+          ordered.push({ item: byUrl.get(p.url), selected: true });
+        }
+      });
+      lib.forEach((it) => {
+        if (it && it.url && !seen.has(it.url)) {
+          seen.add(it.url);
+          ordered.push({ item: it, selected: sg.useAllMedia !== false });
+        }
+      });
+      if (!ordered.length) {
+        box.innerHTML = '<div class="v2-media-empty">Aún no hay fotos ni vídeos subidos. Pulsa 📤 arriba.</div>';
+        return;
+      }
+      const commitOrder = (nextOrdered, makeCustom) => {
+        const list = nextOrdered.filter((r) => r.selected).map((r) => ({
+          url: r.item.url,
+          kind: r.item.kind || this._mediaKindOf(r.item),
+          name: r.item.name || r.item.file || ''
+        }));
+        this._cmd({
+          action: 'SET_SIGNAGE_PROP',
+          prop: 'playlist',
+          value: list,
+          useAllMedia: makeCustom ? false : (sg.useAllMedia !== false)
+        });
+        renderDeskSignagePlaylist();
+      };
+      box.innerHTML = '';
+      const icons = { video: '🎬', gif: '🌀', image: '🖼' };
+      ordered.forEach((row, idx) => {
+        const it = row.item;
+        const el = document.createElement('div');
+        el.className = 'v2-media-item';
+        const chk = document.createElement('input');
+        chk.type = 'checkbox';
+        chk.checked = Boolean(row.selected);
+        chk.style.cssText = 'width:16px;height:16px;accent-color:#00e676;cursor:pointer';
+        chk.addEventListener('change', () => {
+          ordered[idx].selected = chk.checked;
+          commitOrder(ordered, true);
+        });
+        const nameEl = document.createElement('span');
+        nameEl.className = 'v2-media-name';
+        nameEl.textContent = `${icons[it.kind] || '🎬'} ${it.name || it.file}`;
+        const playBtn = document.createElement('button');
+        playBtn.type = 'button';
+        playBtn.textContent = '▶';
+        playBtn.title = 'Reproducir ahora';
+        playBtn.addEventListener('click', () => {
+          if (!st.signage?.enabled) this._cmd({ action: 'SET_SIGNAGE_ENABLED', value: true });
+          this._cmd({ action: 'SIGNAGE_GOTO', url: it.url });
+        });
+        const upBtn = document.createElement('button');
+        upBtn.type = 'button';
+        upBtn.textContent = '▲';
+        upBtn.disabled = idx === 0;
+        upBtn.addEventListener('click', () => {
+          if (idx <= 0) return;
+          const cp = ordered.slice();
+          [cp[idx - 1], cp[idx]] = [cp[idx], cp[idx - 1]];
+          commitOrder(cp, true);
+        });
+        const dnBtn = document.createElement('button');
+        dnBtn.type = 'button';
+        dnBtn.textContent = '▼';
+        dnBtn.disabled = idx === ordered.length - 1;
+        dnBtn.addEventListener('click', () => {
+          if (idx >= ordered.length - 1) return;
+          const cp = ordered.slice();
+          [cp[idx + 1], cp[idx]] = [cp[idx], cp[idx + 1]];
+          commitOrder(cp, true);
+        });
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'v2-del';
+        delBtn.textContent = '🗑';
+        delBtn.addEventListener('click', async () => {
+          await this._deleteMediaItem(it);
+          renderDeskSignagePlaylist();
+        });
+        el.append(chk, nameEl, playBtn, upBtn, dnBtn, delBtn);
+        box.appendChild(el);
+      });
+    };
+    this._renderDeskSignagePlaylist = renderDeskSignagePlaylist;
+
+    d.btnOpenSignageModal?.addEventListener('click', async () => {
+      d.signageModalBackdrop?.classList.remove('hidden');
+      await this._refreshMediaLibrary();
+      renderDeskSignagePlaylist();
+    });
+    d.btnCloseSignageModal?.addEventListener('click', () => {
+      d.signageModalBackdrop?.classList.add('hidden');
+    });
+    d.signageModalBackdrop?.addEventListener('click', (e) => {
+      if (e.target === d.signageModalBackdrop) d.signageModalBackdrop.classList.add('hidden');
+    });
+    d.deskBtnSignageToggle?.addEventListener('click', () => {
+      this._cmd({ action: 'SET_SIGNAGE_ENABLED', value: !st.signage?.enabled });
+    });
+    d.deskBtnSignagePrev?.addEventListener('click', () => this._cmd({ action: 'SIGNAGE_PREV', immediate: true }));
+    d.deskBtnSignageNext?.addEventListener('click', () => this._cmd({ action: 'SIGNAGE_NEXT', immediate: true }));
+    d.deskBtnSignagePause?.addEventListener('click', () => {
+      this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'paused', value: !st.signage?.paused });
+    });
+    d.deskBtnSignageUpload?.addEventListener('click', () => d.deskSignageFiles?.click());
+    d.deskSignageFiles?.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files || []).filter(Boolean);
+      e.target.value = '';
+      if (!files.length) return;
+      if (!this._isHttp) {
+        if (files[0]) this._cmd({ action: 'LOAD_MEDIA_BLOB', file: files[0] });
+        return;
+      }
+      if (d.deskSignageMsg) d.deskSignageMsg.textContent = `⏳ Subiendo ${files.length} archivo(s)...`;
+      let okCount = 0;
+      for (let i = 0; i < files.length; i++) {
+        const f = files[i];
+        try {
+          const res = await fetch('/api/media-upload?name=' + encodeURIComponent(f.name), {
+            method: 'POST',
+            headers: { 'Content-Type': f.type || 'application/octet-stream' },
+            body: f
+          });
+          if (res.ok) okCount++;
+        } catch (_) {}
+      }
+      await this._refreshMediaLibrary();
+      renderDeskSignagePlaylist();
+      if (!st.signage?.enabled && okCount > 0) {
+        this._cmd({ action: 'SET_SIGNAGE_ENABLED', value: true });
+      } else {
+        this._cmd({ action: 'SIGNAGE_REFRESH_LIBRARY' });
+      }
+      if (d.deskSignageMsg) {
+        d.deskSignageMsg.textContent = okCount ? `✅ ${okCount} archivo(s) subidos al carrusel.` : '❌ No se pudieron subir los archivos.';
+      }
+    });
+    d.deskSignageSecBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => {
+        this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'slideSeconds', value: b.id });
+      });
+    });
+    const applyDeskSlideSec = () => {
+      const v = parseInt(d.deskSignageSecInput?.value, 10);
+      if (Number.isFinite(v)) this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'slideSeconds', value: v });
+    };
+    d.deskSignageSecInput?.addEventListener('input', applyDeskSlideSec);
+    d.deskSignageSecInput?.addEventListener('change', applyDeskSlideSec);
+    d.deskSignageFadeBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => {
+        this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'fadeSeconds', value: b.id });
+      });
+    });
+    d.deskSignageBannerPresets?.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const on = btn.getAttribute('data-bon') === '1';
+        const w = parseInt(btn.getAttribute('data-bw'), 10) || 1024;
+        const h = parseInt(btn.getAttribute('data-bh'), 10) || 512;
+        this._cmd({
+          action: 'SET_SIGNAGE_BANNER_PRESET',
+          ledScalerEnabled: on,
+          ledWidthPx: w,
+          ledHeightPx: h,
+          ledAnchor: st.fx?.mapping?.ledAnchor || 'top-left',
+          ledKeepAspect: st.signage?.fit !== 2
+        });
+      });
+    });
+    bindLedPxInput(d.deskSignageLedW, 'ledWidthPx', 64, 7680);
+    bindLedPxInput(d.deskSignageLedH, 'ledHeightPx', 64, 4320);
+    bindLedPxInput(d.deskSignageLedOx, 'ledOffsetXPx', 0, 7680);
+    bindLedPxInput(d.deskSignageLedOy, 'ledOffsetYPx', 0, 4320);
+    [d.deskSignageLedW, d.deskSignageLedH, d.deskSignageLedOx, d.deskSignageLedOy].forEach((inp) => {
+      inp?.addEventListener('change', () => this._cmd({ action: 'SET_MAP_PROP', prop: 'ledScalerEnabled', value: true }));
+    });
+    d.deskSignageFitBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'fit', value: b.id }));
+    });
+    this._bindCmdSlider(d.deskSignageBright, (val) => ({ action: 'SET_OUTPUT_PROP', prop: 'brightness', value: val }), 1.0);
+    d.deskSignageScopeBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => {
+        const all = b.id === 1;
+        if (!all && (!st.signage?.playlist || !st.signage.playlist.length)) {
+          const list = (this._mediaLibItems || []).slice().reverse().map((it) => ({
+            url: it.url,
+            kind: it.kind || this._mediaKindOf(it),
+            name: it.name || it.file || ''
+          }));
+          this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'playlist', value: list, useAllMedia: false });
+        } else {
+          this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'useAllMedia', value: all });
+        }
+        renderDeskSignagePlaylist();
+      });
+    });
+    d.deskBtnSignageRefresh?.addEventListener('click', async () => {
+      await this._refreshMediaLibrary();
+      renderDeskSignagePlaylist();
     });
   }
 
@@ -11837,6 +12542,50 @@ class ConsoleController {
       const totalLoops = n(am.lapTotalLoops, 8);
       this._setText(d.apLapReadout, `VUELTA #${lapNum} · LOOP ${loopIdx} / ${totalLoops}`);
     }
+
+    // ---- Modal Kiosco de Publicidad ----
+    const sg = st.signage || EMPTY;
+    const sgOn = Boolean(sg.enabled);
+    this._syncToggle(
+      d.deskBtnSignageToggle,
+      'deskSignageOn',
+      sgOn,
+      '🟢 MODO PUBLICIDAD (ARRANQUE AUTO): ACTIVO',
+      '📺 MODO PUBLICIDAD (ARRANQUE AUTO): APAGADO',
+      'primary'
+    );
+    this._syncToggle(d.btnOpenSignageModal, 'topSignageOn', sgOn, '🟢 PUBLICIDAD ON', '📺 PUBLICIDAD', 'active');
+    if (d.deskSignageNow) {
+      let nowTxt = '⏹ Modo Publicidad apagado (arranca con visuales VJ)';
+      if (sgOn) {
+        if (!sg.totalItems) nowTxt = '⚠️ Modo Publicidad activo sin archivos — sube fotos o vídeos abajo';
+        else {
+          const rem = sg.remainingSec > 0 ? ` · ${sg.remainingSec}s` : (sg.totalItems === 1 ? ' · LOOP 24/7' : '');
+          nowTxt = `${sg.paused ? '⏸' : '▶'} ${(sg.currentIndex || 0) + 1}/${sg.totalItems} · ${sg.currentName || 'Archivo'}${rem}`;
+        }
+      }
+      this._setText(d.deskSignageNow, nowTxt);
+    }
+    this._syncToggle(d.deskBtnSignagePause, 'deskSignagePaused', Boolean(sg.paused), '▶ SEGUIR', '⏸ PAUSAR', 'primary');
+    if (d.deskSignageSecInput && document.activeElement !== d.deskSignageSecInput && Number(d.deskSignageSecInput.value) !== (sg.slideSeconds || 8)) {
+      d.deskSignageSecInput.value = sg.slideSeconds || 8;
+    }
+    d.deskSignageSecBtns?.forEach((b) => b.el.classList.toggle('primary', b.id === (sg.slideSeconds || 8)));
+    d.deskSignageFadeBtns?.forEach((b) => b.el.classList.toggle('primary', (b.id > 0.05) === ((Number(sg.fadeSeconds) || 0) > 0.05)));
+    d.deskSignageFitBtns?.forEach((b) => b.el.classList.toggle('primary', b.id === (sg.fit || 0)));
+    d.deskSignageScopeBtns?.forEach((b) => b.el.classList.toggle('primary', (b.id === 1) === (sg.useAllMedia !== false)));
+    d.deskSignageBannerPresets?.forEach((btn) => {
+      const bon = btn.getAttribute('data-bon') === '1';
+      const bw = parseInt(btn.getAttribute('data-bw'), 10);
+      const bh = parseInt(btn.getAttribute('data-bh'), 10);
+      btn.classList.toggle('primary', (!bon && !ledOn) || (bon && ledOn && bw === ledW && bh === ledH));
+    });
+    if (d.deskSignageLedW && document.activeElement !== d.deskSignageLedW && Number(d.deskSignageLedW.value) !== ledW) d.deskSignageLedW.value = ledW;
+    if (d.deskSignageLedH && document.activeElement !== d.deskSignageLedH && Number(d.deskSignageLedH.value) !== ledH) d.deskSignageLedH.value = ledH;
+    if (d.deskSignageLedOx && document.activeElement !== d.deskSignageLedOx && Number(d.deskSignageLedOx.value) !== ledOX) d.deskSignageLedOx.value = ledOX;
+    if (d.deskSignageLedOy && document.activeElement !== d.deskSignageLedOy && Number(d.deskSignageLedOy.value) !== ledOY) d.deskSignageLedOy.value = ledOY;
+    const outBright = n(st.fx?.output?.brightness, 1.0);
+    this._syncSlider(d.deskSignageBright, d.deskSignageBrightVal, outBright, pct(outBright));
 
     // Editor: solo se redibuja si cambia algo y está visible
     const cv = d.cornerCanvas;

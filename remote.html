@@ -757,9 +757,10 @@
   <!-- BOTONES RÁPIDOS SIEMPRE VISIBLES (SOLO TÉCNICO) -->
   <div class="quick-hero-bar admin-only">
     <button type="button" id="btn-hero-all-auto" class="btn-hero auto-all">🤖 PONER TODO EN AUTO</button>
+    <button type="button" id="btn-hero-signage" class="btn-hero map-jump" style="border-color:var(--green);color:var(--green);background:rgba(0,230,118,0.14)">📺 KIOSCO PUBLICIDAD</button>
     <button type="button" id="btn-hero-mapping" class="btn-hero map-jump">📐 MAPEAR PANTALLA / LED</button>
     <button type="button" id="btn-calm" class="btn-hero calm">🌿 CALMAR VISUAL</button>
-    <button type="button" id="btn-next" class="btn-hero next">⏭ SIGUIENTE LOOP</button>
+    <button type="button" id="btn-next" class="btn-hero next" style="grid-column: span 2">⏭ SIGUIENTE LOOP</button>
     <button type="button" id="btn-open-luces-remote" class="btn-hero map-jump" style="grid-column: span 2;border-color:var(--amber);color:var(--amber)">💡 ABRIR MANDO DE LUCES (GRANDDAS + SL04)</button>
     <button type="button" id="btn-panic" class="btn-hero panic" style="grid-column: span 2">🆘 PÁNICO: VOLVER A VISUAL SEGURO</button>
   </div>
@@ -767,6 +768,7 @@
   <!-- NAVEGACIÓN POR PESTAÑAS TÁCTILES ORGANIZADAS POR CATEGORÍA -->
   <nav class="tabs-nav">
     <button type="button" class="tab-btn admin-only active" data-tab="tab-visuals">🌀 1. LOOPS</button>
+    <button type="button" class="tab-btn admin-only" data-tab="tab-signage">📺 PUBLICIDAD</button>
     <button type="button" class="tab-btn admin-only" data-tab="tab-modifiers">✨ 2. ESTILO/3D</button>
     <button type="button" class="tab-btn admin-only" data-tab="tab-faders">🎚 3. FADERS/COMP</button>
     <button type="button" class="tab-btn admin-only" data-tab="tab-color">🎨 4. COLOR/FX</button>
@@ -962,7 +964,7 @@
       </div>
       <div id="m-media-now" class="now-playing">⏹ Nada en reproducción</div>
 
-      <input type="file" id="m-media-file" accept="video/mp4,video/webm,video/quicktime,video/x-m4v,.mp4,.webm,.mov,.m4v,image/gif,image/png,image/jpeg,image/webp" style="display:none" />
+      <input type="file" id="m-media-file" multiple accept="video/mp4,video/webm,video/quicktime,video/x-m4v,.mp4,.webm,.mov,.m4v,image/gif,image/png,image/jpeg,image/webp" style="display:none" />
       <button type="button" id="btn-m-media-upload" class="btn-pad amber-active btn-big btn-full">
         📤 SUBIR VÍDEO / GIF / FOTO DEL MÓVIL
       </button>
@@ -1029,7 +1031,8 @@
       <div class="grid-3" id="m-media-fit-grid">
         <button type="button" class="btn-pad active" data-mfit="0">⛶ Llenar</button>
         <button type="button" class="btn-pad" data-mfit="1">▣ Encajar</button>
-        <button type="button" id="btn-m-media-mirror" class="btn-pad">🪞 Espejo</button>
+        <button type="button" class="btn-pad" data-mfit="2">↔️ Estirar</button>
+        <button type="button" id="btn-m-media-mirror" class="btn-pad" style="grid-column: span 3">🪞 Espejo</button>
       </div>
       <div class="slider-row">
         <span>OPACIDAD</span>
@@ -1042,6 +1045,144 @@
       <div class="slider-row">
         <span>VELOCIDAD</span>
         <input type="range" id="m-media-speed" min="0.25" max="2" step="0.05" value="1" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PESTAÑA KIOSCO DE PUBLICIDAD / CARTELERÍA LED (SOLO TÉCNICO) ==================== -->
+  <section id="tab-signage" class="tab-pane admin-only">
+    <div class="card" style="border-color: rgba(0, 230, 118, 0.45)">
+      <div class="card-title">
+        <span>📺 MODO KIOSCO DE PUBLICIDAD (24/7)</span>
+        <span id="s-status-tag" style="color:var(--amber)">APAGADO</span>
+      </div>
+      <button type="button" id="btn-s-toggle" class="btn-pad btn-big btn-full" style="margin-bottom:8px;font-size:12px">
+        📺 MODO PUBLICIDAD (ARRANQUE AUTO): APAGADO
+      </button>
+      <div id="s-now-playing" class="now-playing" style="margin-bottom:8px">
+        ⏹ Modo Publicidad apagado (arranca con visuales VJ)
+      </div>
+      <div class="grid-3" style="margin-bottom:10px">
+        <button type="button" id="btn-s-prev" class="btn-pad">⏮ Anterior</button>
+        <button type="button" id="btn-s-pause" class="btn-pad">⏸ Pausar</button>
+        <button type="button" id="btn-s-next" class="btn-pad">⏭ Siguiente</button>
+      </div>
+
+      <input type="file" id="s-media-files" multiple accept="video/mp4,video/webm,video/quicktime,video/x-m4v,.mp4,.webm,.mov,.m4v,image/gif,image/png,image/jpeg,image/webp" style="display:none" />
+      <button type="button" id="btn-s-upload" class="btn-pad amber-active btn-big btn-full">
+        📤 SUBIR FOTOS / VÍDEOS (VARIOS A LA VEZ)
+      </button>
+      <div id="s-upload-progress" class="upload-progress" style="display:none">
+        <div class="bar"><div id="s-upload-progress-fill" class="fill"></div></div>
+        <div id="s-upload-progress-text" class="label">0%</div>
+      </div>
+      <div id="s-msg" class="msg-line"></div>
+      <div class="help-text">
+        Cuando está <strong>ACTIVO</strong>, aunque se vaya la luz o reinicies el Mini-PC, arrancará directamente reproduciendo tu vídeo en loop o el carrusel de fotos sin mostrar visuales de discoteca.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>⏱️ CARRUSEL DE FOTOS Y TRANSICIÓN</span>
+        <span id="s-slide-readout" style="color:var(--cyan)">8s / FOTO</span>
+      </div>
+      <div class="grid-4" id="s-slide-presets" style="margin-bottom:8px">
+        <button type="button" class="btn-pad" data-ssec="3">3 seg</button>
+        <button type="button" class="btn-pad" data-ssec="5">5 seg</button>
+        <button type="button" class="btn-pad active" data-ssec="8">8 seg</button>
+        <button type="button" class="btn-pad" data-ssec="10">10 seg</button>
+        <button type="button" class="btn-pad" data-ssec="15">15 seg</button>
+        <button type="button" class="btn-pad" data-ssec="30">30 seg</button>
+        <button type="button" class="btn-pad" data-ssec="60">60 seg</button>
+        <input type="number" id="s-slide-sec" class="text-input" min="2" max="300" step="1" value="8" style="margin:0;text-align:center;font-weight:800" title="Segundos personalizados por foto" />
+      </div>
+      <div class="grid-2" id="s-fade-grid">
+        <button type="button" class="btn-pad active" data-sfade="0.4">✨ Fundido suave</button>
+        <button type="button" class="btn-pad" data-sfade="0">✂️ Corte directo</button>
+      </div>
+      <div class="help-text">
+        Los <strong>vídeos</strong> se reproducen enteros y pasan al siguiente al terminar (o hacen bucle infinito si solo hay 1 vídeo). Las <strong>fotos</strong> cambian cada los segundos que elijas arriba.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>📏 PROPORCIONES X / Y Y BANNER LED</span>
+        <span id="s-banner-readout" style="color:var(--cyan)">16:9 COMPLETA</span>
+      </div>
+      <div class="grid-2" id="s-banner-presets" style="margin-bottom:8px">
+        <button type="button" class="btn-pad active" data-bon="0" data-bw="1920" data-bh="1080">🖥️ 16:9 Completa</button>
+        <button type="button" class="btn-pad" data-bon="1" data-bw="1024" data-bh="512">🪧 Banner 2:1 (1024×512)</button>
+        <button type="button" class="btn-pad" data-bon="1" data-bw="768" data-bh="384">🪧 Banner 2:1 (768×384)</button>
+        <button type="button" class="btn-pad" data-bon="1" data-bw="512" data-bh="256">🪧 Banner 2:1 (512×256)</button>
+        <button type="button" class="btn-pad" data-bon="1" data-bw="1536" data-bh="512">🪧 Banner 3:1 (1536×512)</button>
+        <button type="button" class="btn-pad" data-bon="1" data-bw="1920" data-bh="480">🪧 Banner 4:1 (1920×480)</button>
+        <button type="button" class="btn-pad" data-bon="1" data-bw="1024" data-bh="1024">⬜ Cuadrada 1:1 (1024×1024)</button>
+        <button type="button" class="btn-pad" data-bon="1" data-bw="608" data-bh="1080">📱 Vertical 9:16 (608×1080)</button>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:8px">
+        <div class="slider-row" style="margin:0">
+          <span>ANCHO X (PX)</span>
+          <input type="number" id="s-led-w" class="text-input" min="64" max="7680" step="1" value="1024" style="margin:0;text-align:center" />
+        </div>
+        <div class="slider-row" style="margin:0">
+          <span>ALTO Y (PX)</span>
+          <input type="number" id="s-led-h" class="text-input" min="64" max="4320" step="1" value="512" style="margin:0;text-align:center" />
+        </div>
+        <div class="slider-row" style="margin:0">
+          <span>INICIO X (PX)</span>
+          <input type="number" id="s-led-ox" class="text-input" min="0" max="7680" step="1" value="0" style="margin:0;text-align:center" />
+        </div>
+        <div class="slider-row" style="margin:0">
+          <span>INICIO Y (PX)</span>
+          <input type="number" id="s-led-oy" class="text-input" min="0" max="4320" step="1" value="0" style="margin:0;text-align:center" />
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:8px">
+        <button type="button" id="btn-s-led-anchor" class="btn-pad active">↖ Esquina (0,0) Enviadora</button>
+        <button type="button" id="btn-s-testgrid" class="btn-pad">🎯 Carta de Ajuste</button>
+      </div>
+
+      <div class="card-title" style="margin-top:8px;margin-bottom:6px"><span>🖼 AJUSTE DEL VÍDEO / FOTO EN EL BANNER</span></div>
+      <div class="grid-3" id="s-fit-grid">
+        <button type="button" class="btn-pad active" data-sfit="0">⛶ Llenar</button>
+        <button type="button" class="btn-pad" data-sfit="1">▣ Encajar</button>
+        <button type="button" class="btn-pad" data-sfit="2">↔️ Estirar X×Y</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>💡 BRILLO DE LA PANTALLA LED</span>
+        <span id="s-bright-val" style="color:var(--amber);font-weight:900">100%</span>
+      </div>
+      <div class="slider-row" style="margin-bottom:8px">
+        <span>BRILLO</span>
+        <input type="range" id="s-bright-slider" min="0.05" max="1.0" step="0.01" value="1" />
+      </div>
+      <div class="grid-5" style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px" id="s-bright-presets">
+        <button type="button" class="btn-pad" data-sbright="0.25">25%</button>
+        <button type="button" class="btn-pad" data-sbright="0.50">50%</button>
+        <button type="button" class="btn-pad" data-sbright="0.75">75%</button>
+        <button type="button" class="btn-pad active" data-sbright="1.00">100%</button>
+        <button type="button" id="btn-s-blackout" class="btn-pad danger">🌑 OFF</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>📋 PLAYLIST (FOTOS Y VÍDEOS EN COLA)</span>
+        <button type="button" id="btn-s-refresh-list" class="btn-logout">🔄 VER</button>
+      </div>
+      <div class="grid-2" id="s-scope-grid" style="margin-bottom:8px">
+        <button type="button" class="btn-pad active" data-sall="1">📋 Reproducir TODOS</button>
+        <button type="button" class="btn-pad" data-sall="0">✅ Solo marcados</button>
+      </div>
+      <div id="s-playlist-wrap" class="media-list">
+        <div class="help-text">Sube fotos o vídeos arriba para ver la lista de reproducción.</div>
       </div>
     </div>
   </section>
@@ -1523,7 +1664,7 @@
       </div>
       <div class="slider-row">
         <span>BRILLO</span>
-        <input type="range" id="m-out-bright" min="0.10" max="1.0" step="0.01" value="1" />
+        <input type="range" id="m-out-bright" min="0.05" max="1.0" step="0.01" value="1" />
       </div>
       <div class="slider-row">
         <span>FRÍO ⟷ CÁLIDO</span>
@@ -1805,6 +1946,7 @@
         document.querySelectorAll('.tab-btn').forEach((b) => b.classList.toggle('active', b.getAttribute('data-tab') === tabId));
         document.querySelectorAll('.tab-pane').forEach((p) => p.classList.toggle('active', p.id === tabId));
         if (tabId === 'tab-media' && typeof onMediaTabOpened === 'function') onMediaTabOpened();
+        if (tabId === 'tab-signage' && typeof onSignageTabOpened === 'function') onSignageTabOpened();
         if (tabId === 'tab-mapping' && typeof onMappingTabOpened === 'function') onMappingTabOpened();
       }
       document.querySelectorAll('.tab-btn').forEach((btn) => {
@@ -1851,6 +1993,9 @@
       });
       document.getElementById('btn-hero-mapping')?.addEventListener('click', () => {
         activateTab('tab-mapping');
+      });
+      document.getElementById('btn-hero-signage')?.addEventListener('click', () => {
+        activateTab('tab-signage');
       });
 
       // ==================== PILOTO AUTO Y MUTACIÓN POR VUELTA (AUTO-MODS) ====================
@@ -2513,6 +2658,453 @@
         e.currentTarget.classList.toggle('active');
         sendCommand({ action: 'KILL_ACTION', key: 'blackout' });
       });
+
+      // ==================== KIOSCO PUBLICIDAD / CARTELERÍA LED ====================
+      let signageLocal = {
+        enabled: false,
+        useAllMedia: true,
+        playlist: [],
+        slideSeconds: 8,
+        fit: 0,
+        fadeSeconds: 0.4,
+        paused: false,
+        currentIndex: 0,
+        totalItems: 0,
+        currentName: '',
+        remainingSec: 0
+      };
+      let signageBlackoutLocal = false;
+      const btnSignageToggle = document.getElementById('btn-s-toggle');
+      const signageStatusTag = document.getElementById('s-status-tag');
+      const signageNowPlaying = document.getElementById('s-now-playing');
+      const btnSignagePause = document.getElementById('btn-s-pause');
+      const signageFilesInput = document.getElementById('s-media-files');
+      const btnSignageUpload = document.getElementById('s-upload-progress');
+      const signageProgressFill = document.getElementById('s-upload-progress-fill');
+      const signageProgressText = document.getElementById('s-upload-progress-text');
+      const signageMsg = document.getElementById('s-msg');
+      const inpSignageSlideSec = document.getElementById('s-slide-sec');
+      const signageSlideReadout = document.getElementById('s-slide-readout');
+      const signageBannerReadout = document.getElementById('s-banner-readout');
+      const inpSLedW = document.getElementById('s-led-w');
+      const inpSLedH = document.getElementById('s-led-h');
+      const inpSLedOx = document.getElementById('s-led-ox');
+      const inpSLedOy = document.getElementById('s-led-oy');
+      const btnSLedAnchor = document.getElementById('btn-s-led-anchor');
+      const btnSTestGrid = document.getElementById('btn-s-testgrid');
+      const sBrightSlider = document.getElementById('s-bright-slider');
+      const sBrightVal = document.getElementById('s-bright-val');
+      const btnSBlackout = document.getElementById('btn-s-blackout');
+      const sPlaylistWrap = document.getElementById('s-playlist-wrap');
+
+      let sMsgTimer = null;
+      function showSignageMsg(text, ms = 4000) {
+        if (!signageMsg) return;
+        signageMsg.textContent = text;
+        clearTimeout(sMsgTimer);
+        if (text) sMsgTimer = setTimeout(() => { signageMsg.textContent = ''; }, ms);
+      }
+
+      function renderSignageUI() {
+        const sg = signageLocal;
+        if (btnSignageToggle) {
+          btnSignageToggle.classList.toggle('green-live', Boolean(sg.enabled));
+          btnSignageToggle.textContent = sg.enabled
+            ? '🟢 MODO PUBLICIDAD (ARRANQUE AUTO): ACTIVO'
+            : '📺 MODO PUBLICIDAD (ARRANQUE AUTO): APAGADO';
+        }
+        if (signageStatusTag) {
+          signageStatusTag.textContent = sg.enabled ? (sg.paused ? 'PAUSADO' : '▶ ACTIVO 24/7') : 'APAGADO';
+          signageStatusTag.style.color = sg.enabled ? 'var(--green)' : 'var(--amber)';
+        }
+        if (signageNowPlaying) {
+          if (!sg.enabled) {
+            signageNowPlaying.textContent = '⏹ Modo Publicidad apagado (usa visuales VJ)';
+            signageNowPlaying.classList.remove('live');
+          } else if (!sg.totalItems) {
+            signageNowPlaying.textContent = '⚠️ Sin archivos: sube fotos o vídeos abajo';
+            signageNowPlaying.classList.remove('live');
+          } else {
+            const rem = sg.remainingSec > 0 ? (' · ' + sg.remainingSec + 's') : (sg.totalItems === 1 ? ' · LOOP 24/7' : '');
+            signageNowPlaying.textContent = (sg.paused ? '⏸ ' : '▶ ') + (sg.currentIndex + 1) + '/' + sg.totalItems + ' · ' + (sg.currentName || 'Archivo') + rem;
+            signageNowPlaying.classList.toggle('live', !sg.paused);
+          }
+        }
+        if (btnSignagePause) {
+          btnSignagePause.classList.toggle('amber-active', Boolean(sg.paused));
+          btnSignagePause.textContent = sg.paused ? '▶ Seguir' : '⏸ Pausar';
+        }
+        if (signageSlideReadout) signageSlideReadout.textContent = (sg.slideSeconds || 8) + 's / FOTO';
+        if (inpSignageSlideSec && document.activeElement !== inpSignageSlideSec) {
+          inpSignageSlideSec.value = sg.slideSeconds || 8;
+        }
+        reflectChoiceGrid('s-slide-presets', 'data-ssec', sg.slideSeconds || 8);
+        reflectChoiceGrid('s-fade-grid', 'data-sfade', (Number(sg.fadeSeconds) || 0) > 0.05 ? '0.4' : '0');
+        reflectChoiceGrid('s-fit-grid', 'data-sfit', sg.fit || 0);
+        reflectChoiceGrid('s-scope-grid', 'data-sall', sg.useAllMedia !== false ? '1' : '0');
+        if (btnSTestGrid) {
+          btnSTestGrid.classList.toggle('green-live', testGridOn);
+          btnSTestGrid.textContent = testGridOn ? '🟢 Carta Activa' : '🎯 Carta de Ajuste';
+        }
+        if (btnSBlackout) {
+          btnSBlackout.classList.toggle('active', signageBlackoutLocal);
+          btnSBlackout.textContent = signageBlackoutLocal ? '🟢 ENCENDER' : '🌑 OFF';
+        }
+      }
+
+      function renderSignageBannerUI() {
+        if (signageBannerReadout) {
+          signageBannerReadout.textContent = ledScalerOn ? (ledWLocal + '×' + ledHLocal + ' PX') : '16:9 COMPLETA';
+        }
+        if (btnSLedAnchor) {
+          btnSLedAnchor.classList.toggle('active', ledAnchorLocal === 'top-left');
+          btnSLedAnchor.textContent = ledAnchorLocal === 'top-left' ? '↖ Esquina (0,0) Enviadora' : '🎯 Centrado en HDMI';
+        }
+        document.querySelectorAll('#s-banner-presets .btn-pad').forEach((b) => {
+          const bon = b.getAttribute('data-bon') === '1';
+          const bw = parseInt(b.getAttribute('data-bw'), 10);
+          const bh = parseInt(b.getAttribute('data-bh'), 10);
+          const match = (!bon && !ledScalerOn) || (bon && ledScalerOn && bw === ledWLocal && bh === ledHLocal);
+          b.classList.toggle('active', match);
+        });
+      }
+
+      function getOrderedSignageCatalog() {
+        const lib = (mediaItemsCache || []).slice().reverse();
+        const byUrl = new Map(lib.map((it) => [it.url, it]));
+        const ordered = [];
+        const seen = new Set();
+        (signageLocal.playlist || []).forEach((p) => {
+          if (p && p.url && byUrl.has(p.url) && !seen.has(p.url)) {
+            seen.add(p.url);
+            ordered.push({ item: byUrl.get(p.url), selected: true });
+          }
+        });
+        lib.forEach((it) => {
+          if (it && it.url && !seen.has(it.url)) {
+            seen.add(it.url);
+            ordered.push({ item: it, selected: signageLocal.useAllMedia !== false });
+          }
+        });
+        return ordered;
+      }
+
+      function commitSignagePlaylistOrder(ordered, makeCustom) {
+        const selectedItems = ordered.filter((r) => r.selected).map((r) => ({
+          url: r.item.url,
+          kind: r.item.kind || guessMediaKind(r.item.name || r.item.file),
+          name: r.item.name || r.item.file || ''
+        }));
+        signageLocal.playlist = selectedItems;
+        if (makeCustom) signageLocal.useAllMedia = false;
+        renderSignageUI();
+        renderSignagePlaylist();
+        sendCommand({
+          action: 'SET_SIGNAGE_PROP',
+          prop: 'playlist',
+          value: selectedItems,
+          useAllMedia: signageLocal.useAllMedia
+        });
+      }
+
+      function renderSignagePlaylist() {
+        if (!sPlaylistWrap) return;
+        const ordered = getOrderedSignageCatalog();
+        if (!ordered.length) {
+          sPlaylistWrap.innerHTML = '<div class="help-text">Sube fotos o vídeos arriba para crear tu bucle o carrusel.</div>';
+          return;
+        }
+        sPlaylistWrap.innerHTML = '';
+        ordered.forEach((row, idx) => {
+          const it = row.item;
+          const wrap = document.createElement('div');
+          wrap.className = 'media-item';
+          wrap.style.alignItems = 'center';
+
+          const chk = document.createElement('input');
+          chk.type = 'checkbox';
+          chk.checked = Boolean(row.selected);
+          chk.style.cssText = 'width:18px;height:18px;accent-color:var(--green);flex:0 0 auto;cursor:pointer';
+          chk.addEventListener('change', () => {
+            ordered[idx].selected = chk.checked;
+            commitSignagePlaylistOrder(ordered, true);
+          });
+          wrap.appendChild(chk);
+
+          const playBtn = document.createElement('button');
+          playBtn.type = 'button';
+          playBtn.className = 'btn-pad media-play' + (signageLocal.enabled && it.url === mediaCurrentUrl ? ' playing' : '');
+          playBtn.innerHTML = '<span>' + kindIcon(it.kind) + '</span><span class="mname">' + escapeText(it.name || it.file || '') +
+            '</span><span class="msize">' + formatBytes(it.size) + '</span>';
+          playBtn.addEventListener('click', () => {
+            if (!signageLocal.enabled) {
+              signageLocal.enabled = true;
+              sendCommand({ action: 'SET_SIGNAGE_ENABLED', value: true });
+            }
+            sendCommand({ action: 'SIGNAGE_GOTO', url: it.url });
+          });
+          wrap.appendChild(playBtn);
+
+          const upBtn = document.createElement('button');
+          upBtn.type = 'button';
+          upBtn.className = 'btn-pad';
+          upBtn.style.cssText = 'flex:0 0 auto;padding:8px';
+          upBtn.textContent = '▲';
+          upBtn.disabled = idx === 0;
+          upBtn.addEventListener('click', () => {
+            if (idx <= 0) return;
+            const copy = ordered.slice();
+            const tmp = copy[idx - 1]; copy[idx - 1] = copy[idx]; copy[idx] = tmp;
+            commitSignagePlaylistOrder(copy, true);
+          });
+          wrap.appendChild(upBtn);
+
+          const dnBtn = document.createElement('button');
+          dnBtn.type = 'button';
+          dnBtn.className = 'btn-pad';
+          dnBtn.style.cssText = 'flex:0 0 auto;padding:8px';
+          dnBtn.textContent = '▼';
+          dnBtn.disabled = idx === ordered.length - 1;
+          dnBtn.addEventListener('click', () => {
+            if (idx >= ordered.length - 1) return;
+            const copy = ordered.slice();
+            const tmp = copy[idx + 1]; copy[idx + 1] = copy[idx]; copy[idx] = tmp;
+            commitSignagePlaylistOrder(copy, true);
+          });
+          wrap.appendChild(dnBtn);
+
+          const delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'btn-pad danger media-del';
+          delBtn.textContent = '🗑';
+          delBtn.addEventListener('click', () => deleteMediaItem(it));
+          wrap.appendChild(delBtn);
+
+          sPlaylistWrap.appendChild(wrap);
+        });
+      }
+
+      function onSignageTabOpened() {
+        refreshMediaList();
+        renderSignageUI();
+        renderSignageBannerUI();
+      }
+
+      btnSignageToggle?.addEventListener('click', () => {
+        signageLocal.enabled = !signageLocal.enabled;
+        markTouched(btnSignageToggle);
+        renderSignageUI();
+        sendCommand({ action: 'SET_SIGNAGE_ENABLED', value: signageLocal.enabled });
+      });
+      document.getElementById('btn-s-prev')?.addEventListener('click', () => sendCommand({ action: 'SIGNAGE_PREV', immediate: true }));
+      document.getElementById('btn-s-next')?.addEventListener('click', () => sendCommand({ action: 'SIGNAGE_NEXT', immediate: true }));
+      btnSignagePause?.addEventListener('click', () => {
+        signageLocal.paused = !signageLocal.paused;
+        renderSignageUI();
+        sendCommand({ action: 'SET_SIGNAGE_PROP', prop: 'paused', value: signageLocal.paused });
+      });
+
+      document.getElementById('btn-s-upload')?.addEventListener('click', () => {
+        if (!isHttpMode) {
+          showSignageMsg('⚠️ Abre el mando desde la red Wi-Fi (http://...) para subir archivos.');
+          return;
+        }
+        if (mediaUploading) return;
+        signageFilesInput?.click();
+      });
+      signageFilesInput?.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files || []).filter(Boolean);
+        e.target.value = '';
+        if (!files.length) return;
+        const oversized = files.find((f) => f.size > MAX_MEDIA_BYTES);
+        if (oversized) {
+          showSignageMsg('❌ "' + oversized.name + '" supera los 300 MB.', 7000);
+          return;
+        }
+        mediaUploading = true;
+        if (btnSignageUpload) btnSignageUpload.style.display = 'block';
+        let idx = 0;
+        function uploadNext() {
+          if (idx >= files.length) {
+            mediaUploading = false;
+            setTimeout(() => { if (btnSignageUpload) btnSignageUpload.style.display = 'none'; }, 2200);
+            showSignageMsg('✅ ' + files.length + ' archivo(s) subidos al Mini-PC.', 5000);
+            refreshMediaList();
+            if (!signageLocal.enabled) {
+              signageLocal.enabled = true;
+              renderSignageUI();
+              sendCommand({ action: 'SET_SIGNAGE_ENABLED', value: true });
+            } else {
+              sendCommand({ action: 'SIGNAGE_REFRESH_LIBRARY' });
+            }
+            return;
+          }
+          const f = files[idx++];
+          if (signageProgressFill) signageProgressFill.style.width = '0%';
+          if (signageProgressText) signageProgressText.textContent = '(' + idx + '/' + files.length + ') ' + f.name + ' · 0%';
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', '/api/media-upload?name=' + encodeURIComponent(f.name));
+          xhr.setRequestHeader('X-Aether-Pin', sessionPin);
+          xhr.setRequestHeader('Content-Type', f.type || 'application/octet-stream');
+          xhr.upload.onprogress = (ev) => {
+            if (ev.lengthComputable && ev.total > 0) {
+              const pct = (ev.loaded / ev.total) * 100;
+              if (signageProgressFill) signageProgressFill.style.width = clamp(pct, 0, 100).toFixed(1) + '%';
+              if (signageProgressText) signageProgressText.textContent = '(' + idx + '/' + files.length + ') ' + Math.floor(pct) + '% · ' + f.name;
+            }
+          };
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              if (signageProgressFill) signageProgressFill.style.width = '100%';
+              uploadNext();
+            } else {
+              mediaUploading = false;
+              if (btnSignageUpload) btnSignageUpload.style.display = 'none';
+              showSignageMsg('❌ Error subiendo "' + f.name + '" (' + xhr.status + ').', 7000);
+            }
+          };
+          xhr.onerror = () => {
+            mediaUploading = false;
+            if (btnSignageUpload) btnSignageUpload.style.display = 'none';
+            showSignageMsg('❌ Se cortó la conexión durante la subida.', 7000);
+          };
+          xhr.send(f);
+        }
+        uploadNext();
+      });
+
+      bindChoiceGrid('s-slide-presets', 'data-ssec', (v) => {
+        const sec = Math.max(2, Math.min(300, parseInt(v, 10) || 8));
+        signageLocal.slideSeconds = sec;
+        renderSignageUI();
+        sendCommand({ action: 'SET_SIGNAGE_PROP', prop: 'slideSeconds', value: sec });
+      });
+      const handleCustomSlideSec = () => {
+        const raw = parseInt(inpSignageSlideSec?.value, 10);
+        if (Number.isFinite(raw)) {
+          const sec = Math.max(2, Math.min(300, raw));
+          signageLocal.slideSeconds = sec;
+          renderSignageUI();
+          sendCommand({ action: 'SET_SIGNAGE_PROP', prop: 'slideSeconds', value: sec });
+        }
+      };
+      inpSignageSlideSec?.addEventListener('input', handleCustomSlideSec);
+      inpSignageSlideSec?.addEventListener('change', handleCustomSlideSec);
+
+      bindChoiceGrid('s-fade-grid', 'data-sfade', (v) => {
+        const fade = parseFloat(v) || 0;
+        signageLocal.fadeSeconds = fade;
+        renderSignageUI();
+        sendCommand({ action: 'SET_SIGNAGE_PROP', prop: 'fadeSeconds', value: fade });
+      });
+
+      document.querySelectorAll('#s-banner-presets .btn-pad').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const on = btn.getAttribute('data-bon') === '1';
+          const w = parseInt(btn.getAttribute('data-bw'), 10) || 1024;
+          const h = parseInt(btn.getAttribute('data-bh'), 10) || 512;
+          ledScalerOn = on;
+          ledWLocal = w;
+          ledHLocal = h;
+          if (inpSLedW) inpSLedW.value = w;
+          if (inpSLedH) inpSLedH.value = h;
+          if (inpLedW) inpLedW.value = w;
+          if (inpLedH) inpLedH.value = h;
+          renderSignageBannerUI();
+          renderLedScalerUI();
+          sendCommand({
+            action: 'SET_SIGNAGE_BANNER_PRESET',
+            ledScalerEnabled: on,
+            ledWidthPx: w,
+            ledHeightPx: h,
+            ledAnchor: ledAnchorLocal,
+            ledKeepAspect: signageLocal.fit !== 2
+          });
+        });
+      });
+
+      const bindSignageLedNum = (el, prop, minV, maxV, mirrorEl, onVal) => {
+        if (!el) return;
+        const apply = () => {
+          const raw = parseInt(el.value, 10);
+          if (Number.isFinite(raw)) {
+            const c = Math.max(minV, Math.min(maxV, raw));
+            if (mirrorEl) mirrorEl.value = c;
+            if (onVal) onVal(c);
+            ledScalerOn = true;
+            renderSignageBannerUI();
+            renderLedScalerUI();
+            sendCommand({ action: 'SET_MAP_PROP', prop: 'ledScalerEnabled', value: true });
+            sendCommand({ action: 'SET_MAP_PROP', prop, value: c });
+          }
+        };
+        el.addEventListener('input', apply);
+        el.addEventListener('change', apply);
+      };
+      bindSignageLedNum(inpSLedW, 'ledWidthPx', 64, 7680, inpLedW, (c) => { ledWLocal = c; });
+      bindSignageLedNum(inpSLedH, 'ledHeightPx', 64, 4320, inpLedH, (c) => { ledHLocal = c; });
+      bindSignageLedNum(inpSLedOx, 'ledOffsetXPx', 0, 7680, inpLedOx);
+      bindSignageLedNum(inpSLedOy, 'ledOffsetYPx', 0, 4320, inpLedOy);
+
+      btnSLedAnchor?.addEventListener('click', () => {
+        ledAnchorLocal = ledAnchorLocal === 'center' ? 'top-left' : 'center';
+        renderSignageBannerUI();
+        renderLedScalerUI();
+        sendCommand({ action: 'SET_MAP_PROP', prop: 'ledAnchor', value: ledAnchorLocal });
+      });
+      btnSTestGrid?.addEventListener('click', toggleTestGrid);
+
+      bindChoiceGrid('s-fit-grid', 'data-sfit', (v) => {
+        const fit = parseInt(v, 10) || 0;
+        signageLocal.fit = fit;
+        renderSignageUI();
+        sendCommand({ action: 'SET_SIGNAGE_PROP', prop: 'fit', value: fit });
+      });
+
+      sBrightSlider?.addEventListener('input', (e) => {
+        const v = parseFloat(e.target.value);
+        markTouched(sBrightSlider);
+        if (sBrightVal) sBrightVal.textContent = Math.round(v * 100) + '%';
+        reflectChoiceGrid('s-bright-presets', 'data-sbright', v.toFixed(2));
+        sendCommand({ action: 'SET_OUTPUT_PROP', prop: 'brightness', value: v });
+      });
+      document.querySelectorAll('#s-bright-presets [data-sbright]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const v = parseFloat(btn.getAttribute('data-sbright')) || 1.0;
+          if (sBrightSlider) sBrightSlider.value = v;
+          if (sBrightVal) sBrightVal.textContent = Math.round(v * 100) + '%';
+          reflectChoiceGrid('s-bright-presets', 'data-sbright', v.toFixed(2));
+          sendCommand({ action: 'SET_OUTPUT_PROP', prop: 'brightness', value: v });
+        });
+      });
+      btnSBlackout?.addEventListener('click', () => {
+        signageBlackoutLocal = !signageBlackoutLocal;
+        renderSignageUI();
+        sendCommand({ action: 'KILL_ACTION', key: 'blackout' });
+      });
+
+      bindChoiceGrid('s-scope-grid', 'data-sall', (v) => {
+        const all = v === '1';
+        signageLocal.useAllMedia = all;
+        if (!all && (!signageLocal.playlist || !signageLocal.playlist.length)) {
+          signageLocal.playlist = (mediaItemsCache || []).slice().reverse().map((it) => ({
+            url: it.url,
+            kind: it.kind || guessMediaKind(it.name || it.file),
+            name: it.name || it.file || ''
+          }));
+        }
+        renderSignageUI();
+        renderSignagePlaylist();
+        sendCommand({
+          action: 'SET_SIGNAGE_PROP',
+          prop: 'playlist',
+          value: signageLocal.playlist,
+          useAllMedia: all
+        });
+      });
+      document.getElementById('btn-s-refresh-list')?.addEventListener('click', refreshMediaList);
+      renderSignageUI();
+      renderSignageBannerUI();
 
       // ==================== MAPPING & SLICES LOGIC ====================
       let testGridOn = false;
@@ -3204,66 +3796,89 @@
         if (mediaUploading) return;
         mediaFileInput.click();
       });
-      mediaFileInput.addEventListener('change', (e) => {
-        const file = e.target.files && e.target.files[0];
-        e.target.value = '';
-        if (!file) return;
-        if (file.size > MAX_MEDIA_BYTES) {
-          showMediaMsg('❌ El archivo pesa ' + formatBytes(file.size) + '. Máximo 300 MB.', 7000);
+      function uploadMediaFilesSequential(files, onAllDone) {
+        const list = Array.from(files || []).filter(Boolean);
+        if (!list.length) return;
+        const oversized = list.find((f) => f.size > MAX_MEDIA_BYTES);
+        if (oversized) {
+          showMediaMsg('❌ "' + oversized.name + '" pesa ' + formatBytes(oversized.size) + '. Máximo 300 MB.', 7000);
           return;
         }
-        uploadMediaFile(file);
+        mediaUploading = true;
+        btnMediaUpload.classList.remove('amber-active');
+        btnMediaUpload.textContent = '⏳ SUBIENDO...';
+        let idx = 0;
+        let lastOk = null;
+        function nextFile() {
+          if (idx >= list.length) {
+            mediaUploading = false;
+            btnMediaUpload.classList.add('amber-active');
+            btnMediaUpload.textContent = '📤 SUBIR VÍDEO / GIF / FOTO DEL MÓVIL';
+            setTimeout(() => { if (!mediaUploading) mediaProgress.style.display = 'none'; }, 2500);
+            refreshMediaList();
+            if (typeof onAllDone === 'function') onAllDone(lastOk, list.length);
+            return;
+          }
+          const file = list[idx++];
+          setUploadProgress(0, '(' + idx + '/' + list.length + ') ' + file.name + ' · 0%');
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', '/api/media-upload?name=' + encodeURIComponent(file.name));
+          xhr.setRequestHeader('X-Aether-Pin', sessionPin);
+          xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+          xhr.upload.onprogress = (ev) => {
+            if (ev.lengthComputable && ev.total > 0) {
+              const pct = (ev.loaded / ev.total) * 100;
+              setUploadProgress(pct, '(' + idx + '/' + list.length + ') ' + Math.floor(pct) + '% · ' + formatBytes(ev.loaded) + '/' + formatBytes(ev.total));
+            }
+          };
+          xhr.onload = () => {
+            let data = null;
+            try { data = JSON.parse(xhr.responseText); } catch (_) {}
+            if (xhr.status >= 200 && xhr.status < 300 && data && data.ok && data.url) {
+              lastOk = { url: data.url, kind: data.kind || guessMediaKind(file.name, file.type), name: data.name || file.name };
+              setUploadProgress(100, '(' + idx + '/' + list.length + ') 100% · ¡Subido!');
+              nextFile();
+            } else {
+              mediaUploading = false;
+              btnMediaUpload.classList.add('amber-active');
+              btnMediaUpload.textContent = '📤 SUBIR VÍDEO / GIF / FOTO DEL MÓVIL';
+              mediaProgress.style.display = 'none';
+              if (xhr.status === 401) {
+                showMediaMsg('❌ Clave no válida. Vuelve a entrar.', 7000);
+                loginOverlay.classList.remove('hidden');
+                loginError.textContent = 'La clave ha cambiado. Vuelve a introducirla.';
+              } else if (xhr.status === 413) {
+                showMediaMsg('❌ Archivo demasiado grande o la biblioteca está llena.', 7000);
+              } else {
+                showMediaMsg('❌ ' + ((data && data.error) || ('Error al subir (' + xhr.status + ')')), 7000);
+              }
+            }
+          };
+          xhr.onerror = () => {
+            mediaUploading = false;
+            btnMediaUpload.classList.add('amber-active');
+            btnMediaUpload.textContent = '📤 SUBIR VÍDEO / GIF / FOTO DEL MÓVIL';
+            mediaProgress.style.display = 'none';
+            showMediaMsg('❌ Se cortó la conexión durante la subida.', 7000);
+          };
+          xhr.send(file);
+        }
+        nextFile();
+      }
+
+      mediaFileInput.addEventListener('change', (e) => {
+        const files = e.target.files ? Array.from(e.target.files) : [];
+        e.target.value = '';
+        if (!files.length) return;
+        uploadMediaFilesSequential(files, (lastOk) => {
+          if (lastOk) loadMediaItem(lastOk);
+        });
       });
 
       function setUploadProgress(pct, label) {
         mediaProgress.style.display = 'block';
         mediaProgressFill.style.width = clamp(pct, 0, 100).toFixed(1) + '%';
         mediaProgressText.textContent = label;
-      }
-      function uploadMediaFile(file) {
-        mediaUploading = true;
-        btnMediaUpload.classList.remove('amber-active');
-        btnMediaUpload.textContent = '⏳ SUBIENDO...';
-        setUploadProgress(0, '0% · 0 B / ' + formatBytes(file.size));
-        const finish = () => {
-          mediaUploading = false;
-          btnMediaUpload.classList.add('amber-active');
-          btnMediaUpload.textContent = '📤 SUBIR VÍDEO / GIF / FOTO DEL MÓVIL';
-          setTimeout(() => { if (!mediaUploading) mediaProgress.style.display = 'none'; }, 2500);
-        };
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/api/media-upload?name=' + encodeURIComponent(file.name));
-        xhr.setRequestHeader('X-Aether-Pin', sessionPin);
-        xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
-        xhr.upload.onprogress = (ev) => {
-          if (ev.lengthComputable && ev.total > 0) {
-            const pct = (ev.loaded / ev.total) * 100;
-            setUploadProgress(pct, Math.floor(pct) + '% · ' + formatBytes(ev.loaded) + ' / ' + formatBytes(ev.total));
-          }
-        };
-        xhr.onload = () => {
-          let data = null;
-          try { data = JSON.parse(xhr.responseText); } catch (_) {}
-          if (xhr.status >= 200 && xhr.status < 300 && data && data.ok && data.url) {
-            setUploadProgress(100, '100% · ¡Subido!');
-            loadMediaItem({ url: data.url, kind: data.kind || guessMediaKind(file.name, file.type), name: data.name || file.name });
-            refreshMediaList();
-          } else if (xhr.status === 401) {
-            showMediaMsg('❌ Clave no válida. Vuelve a entrar.', 7000);
-            loginOverlay.classList.remove('hidden');
-            loginError.textContent = 'La clave ha cambiado. Vuelve a introducirla.';
-          } else if (xhr.status === 413) {
-            showMediaMsg('❌ Archivo demasiado grande o la biblioteca está llena.', 7000);
-          } else {
-            showMediaMsg('❌ ' + ((data && data.error) || ('Error al subir (' + xhr.status + ')')), 7000);
-          }
-          finish();
-        };
-        xhr.onerror = () => {
-          showMediaMsg('❌ Se cortó la conexión durante la subida.', 7000);
-          finish();
-        };
-        xhr.send(file);
       }
 
       function renderMediaList(items) {
@@ -3303,6 +3918,7 @@
             if (res.ok && res.data && res.data.ok) {
               mediaItemsCache = Array.isArray(res.data.items) ? res.data.items : [];
               renderMediaList(mediaItemsCache);
+              if (typeof renderSignagePlaylist === 'function') renderSignagePlaylist();
             } else {
               mediaListEl.innerHTML = '<div class="help-text">No se pudo cargar la biblioteca' + (res.data && res.data.error ? ': ' + escapeText(res.data.error) : '.') + '</div>';
             }
@@ -3748,20 +4364,25 @@
           if (typeof mp.ledWidthPx === 'number') {
             ledWLocal = mp.ledWidthPx;
             if (inpLedW && document.activeElement !== inpLedW) inpLedW.value = ledWLocal;
+            if (inpSLedW && document.activeElement !== inpSLedW) inpSLedW.value = ledWLocal;
           }
           if (typeof mp.ledHeightPx === 'number') {
             ledHLocal = mp.ledHeightPx;
             if (inpLedH && document.activeElement !== inpLedH) inpLedH.value = ledHLocal;
+            if (inpSLedH && document.activeElement !== inpSLedH) inpSLedH.value = ledHLocal;
           }
-          if (typeof mp.ledOffsetXPx === 'number' && inpLedOx && document.activeElement !== inpLedOx) {
-            inpLedOx.value = mp.ledOffsetXPx;
+          if (typeof mp.ledOffsetXPx === 'number') {
+            if (inpLedOx && document.activeElement !== inpLedOx) inpLedOx.value = mp.ledOffsetXPx;
+            if (inpSLedOx && document.activeElement !== inpSLedOx) inpSLedOx.value = mp.ledOffsetXPx;
           }
-          if (typeof mp.ledOffsetYPx === 'number' && inpLedOy && document.activeElement !== inpLedOy) {
-            inpLedOy.value = mp.ledOffsetYPx;
+          if (typeof mp.ledOffsetYPx === 'number') {
+            if (inpLedOy && document.activeElement !== inpLedOy) inpLedOy.value = mp.ledOffsetYPx;
+            if (inpSLedOy && document.activeElement !== inpSLedOy) inpSLedOy.value = mp.ledOffsetYPx;
           }
           if (typeof mp.ledAnchor === 'string') ledAnchorLocal = mp.ledAnchor;
           if (typeof mp.ledKeepAspect === 'boolean') ledAspectLocal = mp.ledKeepAspect;
           renderLedScalerUI();
+          renderSignageBannerUI();
         }
         if (cpDragging < 0 && Date.now() - cpLastEdit > TOUCH_GUARD_MS) {
           [mp.corners, mp.corners2].forEach((q, p) => {
@@ -3814,6 +4435,34 @@
       function applyV2Status(st) {
         if (st.text) applyTextStatus(st.text);
         if (st.media || typeof st.mediaPlaying === 'boolean') applyMediaStatus(st.media, st.mediaPlaying);
+        if (st.signage && typeof st.signage === 'object') {
+          const prevSig = JSON.stringify({
+            e: signageLocal.enabled, u: signageLocal.useAllMedia,
+            pl: signageLocal.playlist, cur: mediaCurrentUrl
+          });
+          Object.assign(signageLocal, st.signage);
+          renderSignageUI();
+          const nextSig = JSON.stringify({
+            e: signageLocal.enabled, u: signageLocal.useAllMedia,
+            pl: signageLocal.playlist, cur: st.media && st.media.url
+          });
+          if (prevSig !== nextSig) renderSignagePlaylist();
+        }
+        if (st.output && typeof st.output.brightness === 'number') {
+          setRangeIfIdle('m-out-bright', st.output.brightness);
+          setRangeIfIdle('s-bright-slider', st.output.brightness);
+          if (sBrightVal && isIdle(sBrightSlider)) {
+            sBrightVal.textContent = Math.round(st.output.brightness * 100) + '%';
+            reflectChoiceGrid('s-bright-presets', 'data-sbright', st.output.brightness.toFixed(2));
+          }
+        }
+        if (st.output && typeof st.output.colorTemp === 'number') {
+          setRangeIfIdle('m-out-temp', st.output.colorTemp);
+        }
+        if (typeof st.blackout === 'boolean') {
+          signageBlackoutLocal = st.blackout;
+          renderSignageUI();
+        }
         if (Array.isArray(st.cameras)) renderCameras(st.cameras);
         if (st.transition && typeof st.transition.bars === 'number') {
           const tGrid = document.getElementById('m-transition-grid');

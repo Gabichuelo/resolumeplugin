@@ -12,6 +12,7 @@ import { SyncBridge } from './engine/syncBridge.js';
 import { Persistence } from './engine/persistence.js';
 import { MidiClock } from './engine/midiClock.js';
 import { MediaLayer } from './engine/mediaLayer.js';
+import { SignagePlayer } from './engine/signagePlayer.js';
 import { ConsoleController } from './ui/consoleController.js';
 
 const AUTO_QUALITY_STEPS = [1.0, 0.75, 0.5];
@@ -34,6 +35,8 @@ class AetherVJApplication {
     this.media = new MediaLayer(this.state);
     this.renderer.media = this.media;
     this.syncBridge.attachMedia(this.media);
+    this.signagePlayer = new SignagePlayer(this.state, this.media, this.syncBridge);
+    this.syncBridge.attachSignage(this.signagePlayer);
     this.media.refreshCameras();
     this.persistence = new Persistence(this.state, this.syncBridge);
     this.ui = new ConsoleController(
@@ -43,6 +46,7 @@ class AetherVJApplication {
       this.syncBridge
     );
     this.ui.midiClock = this.midiClock;
+    this.ui.signagePlayer = this.signagePlayer;
     this.syncBridge.attachControllers(this.autopilot, () => this.ui._buildGeneratorBanks());
 
     if (this.state.uiHidden) {
@@ -68,6 +72,7 @@ class AetherVJApplication {
       if (this.state.autoQuality) {
         this.state.resolutionScale = AUTO_QUALITY_STEPS[0];
       }
+      this.signagePlayer.onConfigLoaded();
     });
 
     // Kiosk with ?mic=1: listen to the real room / mixer audio automatically (falls back to the simulator)
@@ -198,6 +203,11 @@ class AetherVJApplication {
 
     // 2. Update 8-Hour Autopilot Brain, BPM Clock, and 8 Multi-Wave LFOs
     this.autopilot.update(dt);
+
+    // 2.5 Update Advertising Kiosk / Signage Player (loops or timed carousel)
+    if (this.signagePlayer) {
+      this.signagePlayer.update(dt);
+    }
 
     // 3. Execute Multi-Pass GPU Shader Pipeline (skip GPU draw if window is minimized to save power while keeping Projector & Remote live)
     if (!isBackground) {

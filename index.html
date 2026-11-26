@@ -57,6 +57,106 @@
     </div>
   </div>
 
+  <!-- Modal de Kiosco de Publicidad / Cartelería LED (24/7 + Carrusel + Banner X×Y + Brillo) -->
+  <div id="signage-modal-backdrop" class="help-modal-backdrop hidden">
+    <div class="help-modal-card" style="max-width:720px">
+      <div class="help-modal-header">
+        <h2>📺 MODO KIOSCO DE PUBLICIDAD (VÍDEO LOOP · CARRUSEL FOTOS · BANNER LED)</h2>
+        <button type="button" id="btn-close-signage-modal" class="btn-close-help">✕ CERRAR</button>
+      </div>
+      <div class="help-modal-body">
+        <div class="help-step-box">
+          <div class="help-step-num">📺</div>
+          <div style="flex:1">
+            <h3>ARRANQUE AUTOMÁTICO Y REPRODUCCIÓN</h3>
+            <p>Actívalo para que este Mini-PC arranque directamente mostrando tu vídeo en loop o carrusel de fotos (sin visuales VJ), guardándose para cortes de luz y reinicios.</p>
+            <button type="button" id="desk-btn-signage-toggle" class="btn-console-action primary" style="width:100%;margin:8px 0;padding:10px;font-size:13px">
+              📺 MODO PUBLICIDAD (ARRANQUE AUTO): APAGADO
+            </button>
+            <div id="desk-signage-now" style="padding:8px 10px;background:#070a10;border:1px solid #1e293b;border-radius:6px;font-family:monospace;font-size:12px;color:#00e5ff;margin-bottom:8px">
+              ⏹ Modo Publicidad apagado
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+              <button type="button" id="desk-btn-signage-prev" class="btn-console-action">⏮ ANTERIOR</button>
+              <button type="button" id="desk-btn-signage-pause" class="btn-console-action">⏸ PAUSAR</button>
+              <button type="button" id="desk-btn-signage-next" class="btn-console-action">⏭ SIGUIENTE</button>
+            </div>
+            <input type="file" id="desk-signage-files" multiple accept="video/*,image/gif,image/*" style="display:none" />
+            <button type="button" id="desk-btn-signage-upload" class="btn-console-action primary" style="width:100%">
+              📤 SUBIR FOTOS / VÍDEOS DESDE ESTE PC (VARIOS A LA VEZ)
+            </button>
+            <div id="desk-signage-msg" style="margin-top:6px;font-size:12px;color:#00e676"></div>
+          </div>
+        </div>
+
+        <div class="help-step-box">
+          <div class="help-step-num">⏱️</div>
+          <div style="flex:1">
+            <h3>CARRUSEL DE FOTOS Y TRANSICIÓN</h3>
+            <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin:8px 0" id="desk-signage-sec-grid">
+              <button type="button" class="btn-console-action" data-dssec="3">3s</button>
+              <button type="button" class="btn-console-action" data-dssec="5">5s</button>
+              <button type="button" class="btn-console-action primary" data-dssec="8">8s</button>
+              <button type="button" class="btn-console-action" data-dssec="15">15s</button>
+              <button type="button" class="btn-console-action" data-dssec="30">30s</button>
+              <input type="number" id="desk-signage-sec-input" class="v2-text-input" min="2" max="300" step="1" value="8" style="text-align:center;font-weight:700" title="Segundos personalizados por foto" />
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px" id="desk-signage-fade-grid">
+              <button type="button" class="btn-console-action primary" data-dsfade="0.4">✨ Fundido suave</button>
+              <button type="button" class="btn-console-action" data-dsfade="0">✂️ Corte directo</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="help-step-box">
+          <div class="help-step-num">📏</div>
+          <div style="flex:1">
+            <h3>PROPORCIONES X / Y (BANNER LED) Y BRILLO</h3>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:8px 0" id="desk-signage-banner-presets">
+              <button type="button" class="btn-console-action primary" data-bon="0" data-bw="1920" data-bh="1080">🖥️ 16:9</button>
+              <button type="button" class="btn-console-action" data-bon="1" data-bw="1024" data-bh="512">2:1 (1024×512)</button>
+              <button type="button" class="btn-console-action" data-bon="1" data-bw="768" data-bh="384">2:1 (768×384)</button>
+              <button type="button" class="btn-console-action" data-bon="1" data-bw="512" data-bh="256">2:1 (512×256)</button>
+              <button type="button" class="btn-console-action" data-bon="1" data-bw="1536" data-bh="512">3:1 (1536×512)</button>
+              <button type="button" class="btn-console-action" data-bon="1" data-bw="1920" data-bh="480">4:1 (1920×480)</button>
+              <button type="button" class="btn-console-action" data-bon="1" data-bw="1024" data-bh="1024">1:1 (1024×1024)</button>
+              <button type="button" class="btn-console-action" data-bon="1" data-bw="608" data-bh="1080">9:16 (608×1080)</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px">
+              <div><small style="color:#98a4b8">ANCHO X (PX)</small><input type="number" id="desk-signage-led-w" class="v2-text-input" min="64" max="7680" value="1024" style="width:100%;text-align:center" /></div>
+              <div><small style="color:#98a4b8">ALTO Y (PX)</small><input type="number" id="desk-signage-led-h" class="v2-text-input" min="64" max="4320" value="512" style="width:100%;text-align:center" /></div>
+              <div><small style="color:#98a4b8">INICIO X</small><input type="number" id="desk-signage-led-ox" class="v2-text-input" min="0" max="7680" value="0" style="width:100%;text-align:center" /></div>
+              <div><small style="color:#98a4b8">INICIO Y</small><input type="number" id="desk-signage-led-oy" class="v2-text-input" min="0" max="4320" value="0" style="width:100%;text-align:center" /></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px" id="desk-signage-fit-grid">
+              <button type="button" class="btn-console-action primary" data-dsfit="0">⛶ Llenar</button>
+              <button type="button" class="btn-console-action" data-dsfit="1">▣ Encajar</button>
+              <button type="button" class="btn-console-action" data-dsfit="2">↔️ Estirar X×Y</button>
+            </div>
+            <div class="fx-row" style="margin-top:4px">
+              <span class="fft-band-name" style="width:90px">💡 BRILLO LED</span>
+              <input type="range" id="desk-signage-bright" class="fx-wet-slider" min="0.05" max="1.0" step="0.01" value="1" />
+              <span id="desk-signage-bright-val" class="module-tag">100%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="help-step-box">
+          <div class="help-step-num">📋</div>
+          <div style="flex:1">
+            <h3>PLAYLIST DE PUBLICIDAD</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:6px;margin:6px 0" id="desk-signage-scope-grid">
+              <button type="button" class="btn-console-action primary" data-dsall="1">📋 Reproducir TODOS</button>
+              <button type="button" class="btn-console-action" data-dsall="0">✅ Solo marcados</button>
+              <button type="button" id="desk-btn-signage-refresh" class="btn-console-action">🔄</button>
+            </div>
+            <div id="desk-signage-playlist" style="max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:4px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal de Mando Móvil, Recursos del Mini-PC y Actualización por Internet -->
   <div id="remote-modal-backdrop" class="help-modal-backdrop hidden">
     <div class="help-modal-card" style="max-width:680px">
@@ -200,6 +300,9 @@
         </button>
         <button type="button" id="btn-toggle-simple-ui" class="btn-console-action mode-btn" title="Alternar entre Modo Fácil (controles esenciales claros) y Modo Avanzado (mezclador A/B manual y LFOs)">
           ✨ MODO: FÁCIL
+        </button>
+        <button type="button" id="btn-open-signage-modal" class="btn-console-action calm-btn" title="Configurar Kiosco de Publicidad 24/7: vídeos en loop, carrusel de fotos, proporciones X/Y de banner LED y brillo">
+          📺 PUBLICIDAD
         </button>
         <button type="button" id="btn-open-remote-modal" class="btn-console-action primary" title="Ver dirección IP para el móvil, consumo de CPU/RAM/Temperatura del Mini-PC y actualizar por Internet">
           📱 MÓVIL REMOTO
@@ -607,9 +710,10 @@
           <div id="media-fx-grid" class="weight-selector-grid"></div>
 
           <div class="sub-label">ENCUADRE</div>
-          <div class="v2-three-btns">
+          <div class="v2-three-btns" style="grid-template-columns:repeat(4,1fr)">
             <button type="button" class="btn-sweep-mode btn-media-fit active" data-fit="0" title="Rellena toda la pantalla recortando los bordes">⬛ LLENAR</button>
             <button type="button" class="btn-sweep-mode btn-media-fit" data-fit="1" title="Muestra la imagen completa sin recortar">🔲 ENCAJAR</button>
+            <button type="button" class="btn-sweep-mode btn-media-fit" data-fit="2" title="Estira la imagen al ancho × alto exacto del banner">↔ ESTIRAR</button>
             <button type="button" id="btn-media-mirror" class="btn-sweep-mode" title="Espejo horizontal (útil para cámaras tipo selfie)">↔ ESPEJO</button>
           </div>
 
@@ -979,7 +1083,7 @@
           <div class="sub-label">SALIDA DE PANTALLA (LED / PROYECTOR)</div>
           <div class="fx-row">
             <span class="fft-band-name" style="width:82px">BRILLO</span>
-            <input type="range" id="out-brightness" class="fx-wet-slider" min="0.10" max="1.00" step="0.01" value="1" title="Brillo general de salida. Bájalo en salas pequeñas con pantalla LED potente" />
+            <input type="range" id="out-brightness" class="fx-wet-slider" min="0.05" max="1.00" step="0.01" value="1" title="Brillo general de salida. Bájalo en salas pequeñas con pantalla LED potente" />
             <span id="out-brightness-val" class="module-tag">100%</span>
           </div>
           <div class="fx-row" style="margin-top:2px">

@@ -2046,6 +2046,32 @@ export class ConsoleController {
       updateRepoUrlInput: $('update-repo-url-input'),
       btnRunInternetUpdate: $('btn-run-internet-update'),
       updateStatusMsg: $('update-status-msg'),
+      // Modal Kiosco Publicidad
+      btnOpenSignageModal: $('btn-open-signage-modal'),
+      btnCloseSignageModal: $('btn-close-signage-modal'),
+      signageModalBackdrop: $('signage-modal-backdrop'),
+      deskBtnSignageToggle: $('desk-btn-signage-toggle'),
+      deskSignageNow: $('desk-signage-now'),
+      deskBtnSignagePrev: $('desk-btn-signage-prev'),
+      deskBtnSignagePause: $('desk-btn-signage-pause'),
+      deskBtnSignageNext: $('desk-btn-signage-next'),
+      deskSignageFiles: $('desk-signage-files'),
+      deskBtnSignageUpload: $('desk-btn-signage-upload'),
+      deskSignageMsg: $('desk-signage-msg'),
+      deskSignageSecInput: $('desk-signage-sec-input'),
+      deskSignageSecBtns: toBtns('#desk-signage-sec-grid [data-dssec]', 'data-dssec', (s) => parseInt(s, 10) || 8),
+      deskSignageFadeBtns: toBtns('#desk-signage-fade-grid [data-dsfade]', 'data-dsfade', (s) => parseFloat(s) || 0),
+      deskSignageBannerPresets: Array.from(document.querySelectorAll('#desk-signage-banner-presets [data-bw]')),
+      deskSignageLedW: $('desk-signage-led-w'),
+      deskSignageLedH: $('desk-signage-led-h'),
+      deskSignageLedOx: $('desk-signage-led-ox'),
+      deskSignageLedOy: $('desk-signage-led-oy'),
+      deskSignageFitBtns: toBtns('#desk-signage-fit-grid [data-dsfit]', 'data-dsfit', (s) => parseInt(s, 10) || 0),
+      deskSignageBright: $('desk-signage-bright'),
+      deskSignageBrightVal: $('desk-signage-bright-val'),
+      deskSignageScopeBtns: toBtns('#desk-signage-scope-grid [data-dsall]', 'data-dsall', (s) => parseInt(s, 10) === 1 ? 1 : 0),
+      deskBtnSignageRefresh: $('desk-btn-signage-refresh'),
+      deskSignagePlaylist: $('desk-signage-playlist'),
       // Mutación Automática por Vuelta de Loops (🤖 AUTO por sección)
       autoModBtns: Array.from(document.querySelectorAll('.btn-auto-mod')),
       btnAllAutoToggle: $('btn-all-auto-toggle'),
@@ -2517,6 +2543,219 @@ export class ConsoleController {
 
     d.btnStepAutoNow?.addEventListener('click', () => {
       this._cmd({ action: 'STEP_AUTO_MODS_NOW' });
+    });
+
+    // ---- Modal Kiosco de Publicidad / Cartelería LED ----
+    const renderDeskSignagePlaylist = () => {
+      const box = d.deskSignagePlaylist;
+      if (!box) return;
+      const lib = (this._mediaLibItems || []).slice().reverse();
+      const sg = st.signage || {};
+      const byUrl = new Map(lib.map((it) => [it.url, it]));
+      const ordered = [];
+      const seen = new Set();
+      (sg.playlist || []).forEach((p) => {
+        if (p && p.url && byUrl.has(p.url) && !seen.has(p.url)) {
+          seen.add(p.url);
+          ordered.push({ item: byUrl.get(p.url), selected: true });
+        }
+      });
+      lib.forEach((it) => {
+        if (it && it.url && !seen.has(it.url)) {
+          seen.add(it.url);
+          ordered.push({ item: it, selected: sg.useAllMedia !== false });
+        }
+      });
+      if (!ordered.length) {
+        box.innerHTML = '<div class="v2-media-empty">Aún no hay fotos ni vídeos subidos. Pulsa 📤 arriba.</div>';
+        return;
+      }
+      const commitOrder = (nextOrdered, makeCustom) => {
+        const list = nextOrdered.filter((r) => r.selected).map((r) => ({
+          url: r.item.url,
+          kind: r.item.kind || this._mediaKindOf(r.item),
+          name: r.item.name || r.item.file || ''
+        }));
+        this._cmd({
+          action: 'SET_SIGNAGE_PROP',
+          prop: 'playlist',
+          value: list,
+          useAllMedia: makeCustom ? false : (sg.useAllMedia !== false)
+        });
+        renderDeskSignagePlaylist();
+      };
+      box.innerHTML = '';
+      const icons = { video: '🎬', gif: '🌀', image: '🖼' };
+      ordered.forEach((row, idx) => {
+        const it = row.item;
+        const el = document.createElement('div');
+        el.className = 'v2-media-item';
+        const chk = document.createElement('input');
+        chk.type = 'checkbox';
+        chk.checked = Boolean(row.selected);
+        chk.style.cssText = 'width:16px;height:16px;accent-color:#00e676;cursor:pointer';
+        chk.addEventListener('change', () => {
+          ordered[idx].selected = chk.checked;
+          commitOrder(ordered, true);
+        });
+        const nameEl = document.createElement('span');
+        nameEl.className = 'v2-media-name';
+        nameEl.textContent = `${icons[it.kind] || '🎬'} ${it.name || it.file}`;
+        const playBtn = document.createElement('button');
+        playBtn.type = 'button';
+        playBtn.textContent = '▶';
+        playBtn.title = 'Reproducir ahora';
+        playBtn.addEventListener('click', () => {
+          if (!st.signage?.enabled) this._cmd({ action: 'SET_SIGNAGE_ENABLED', value: true });
+          this._cmd({ action: 'SIGNAGE_GOTO', url: it.url });
+        });
+        const upBtn = document.createElement('button');
+        upBtn.type = 'button';
+        upBtn.textContent = '▲';
+        upBtn.disabled = idx === 0;
+        upBtn.addEventListener('click', () => {
+          if (idx <= 0) return;
+          const cp = ordered.slice();
+          [cp[idx - 1], cp[idx]] = [cp[idx], cp[idx - 1]];
+          commitOrder(cp, true);
+        });
+        const dnBtn = document.createElement('button');
+        dnBtn.type = 'button';
+        dnBtn.textContent = '▼';
+        dnBtn.disabled = idx === ordered.length - 1;
+        dnBtn.addEventListener('click', () => {
+          if (idx >= ordered.length - 1) return;
+          const cp = ordered.slice();
+          [cp[idx + 1], cp[idx]] = [cp[idx], cp[idx + 1]];
+          commitOrder(cp, true);
+        });
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'v2-del';
+        delBtn.textContent = '🗑';
+        delBtn.addEventListener('click', async () => {
+          await this._deleteMediaItem(it);
+          renderDeskSignagePlaylist();
+        });
+        el.append(chk, nameEl, playBtn, upBtn, dnBtn, delBtn);
+        box.appendChild(el);
+      });
+    };
+    this._renderDeskSignagePlaylist = renderDeskSignagePlaylist;
+
+    d.btnOpenSignageModal?.addEventListener('click', async () => {
+      d.signageModalBackdrop?.classList.remove('hidden');
+      await this._refreshMediaLibrary();
+      renderDeskSignagePlaylist();
+    });
+    d.btnCloseSignageModal?.addEventListener('click', () => {
+      d.signageModalBackdrop?.classList.add('hidden');
+    });
+    d.signageModalBackdrop?.addEventListener('click', (e) => {
+      if (e.target === d.signageModalBackdrop) d.signageModalBackdrop.classList.add('hidden');
+    });
+    d.deskBtnSignageToggle?.addEventListener('click', () => {
+      this._cmd({ action: 'SET_SIGNAGE_ENABLED', value: !st.signage?.enabled });
+    });
+    d.deskBtnSignagePrev?.addEventListener('click', () => this._cmd({ action: 'SIGNAGE_PREV', immediate: true }));
+    d.deskBtnSignageNext?.addEventListener('click', () => this._cmd({ action: 'SIGNAGE_NEXT', immediate: true }));
+    d.deskBtnSignagePause?.addEventListener('click', () => {
+      this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'paused', value: !st.signage?.paused });
+    });
+    d.deskBtnSignageUpload?.addEventListener('click', () => d.deskSignageFiles?.click());
+    d.deskSignageFiles?.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files || []).filter(Boolean);
+      e.target.value = '';
+      if (!files.length) return;
+      if (!this._isHttp) {
+        if (files[0]) this._cmd({ action: 'LOAD_MEDIA_BLOB', file: files[0] });
+        return;
+      }
+      if (d.deskSignageMsg) d.deskSignageMsg.textContent = `⏳ Subiendo ${files.length} archivo(s)...`;
+      let okCount = 0;
+      for (let i = 0; i < files.length; i++) {
+        const f = files[i];
+        try {
+          const res = await fetch('/api/media-upload?name=' + encodeURIComponent(f.name), {
+            method: 'POST',
+            headers: { 'Content-Type': f.type || 'application/octet-stream' },
+            body: f
+          });
+          if (res.ok) okCount++;
+        } catch (_) {}
+      }
+      await this._refreshMediaLibrary();
+      renderDeskSignagePlaylist();
+      if (!st.signage?.enabled && okCount > 0) {
+        this._cmd({ action: 'SET_SIGNAGE_ENABLED', value: true });
+      } else {
+        this._cmd({ action: 'SIGNAGE_REFRESH_LIBRARY' });
+      }
+      if (d.deskSignageMsg) {
+        d.deskSignageMsg.textContent = okCount ? `✅ ${okCount} archivo(s) subidos al carrusel.` : '❌ No se pudieron subir los archivos.';
+      }
+    });
+    d.deskSignageSecBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => {
+        this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'slideSeconds', value: b.id });
+      });
+    });
+    const applyDeskSlideSec = () => {
+      const v = parseInt(d.deskSignageSecInput?.value, 10);
+      if (Number.isFinite(v)) this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'slideSeconds', value: v });
+    };
+    d.deskSignageSecInput?.addEventListener('input', applyDeskSlideSec);
+    d.deskSignageSecInput?.addEventListener('change', applyDeskSlideSec);
+    d.deskSignageFadeBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => {
+        this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'fadeSeconds', value: b.id });
+      });
+    });
+    d.deskSignageBannerPresets?.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const on = btn.getAttribute('data-bon') === '1';
+        const w = parseInt(btn.getAttribute('data-bw'), 10) || 1024;
+        const h = parseInt(btn.getAttribute('data-bh'), 10) || 512;
+        this._cmd({
+          action: 'SET_SIGNAGE_BANNER_PRESET',
+          ledScalerEnabled: on,
+          ledWidthPx: w,
+          ledHeightPx: h,
+          ledAnchor: st.fx?.mapping?.ledAnchor || 'top-left',
+          ledKeepAspect: st.signage?.fit !== 2
+        });
+      });
+    });
+    bindLedPxInput(d.deskSignageLedW, 'ledWidthPx', 64, 7680);
+    bindLedPxInput(d.deskSignageLedH, 'ledHeightPx', 64, 4320);
+    bindLedPxInput(d.deskSignageLedOx, 'ledOffsetXPx', 0, 7680);
+    bindLedPxInput(d.deskSignageLedOy, 'ledOffsetYPx', 0, 4320);
+    [d.deskSignageLedW, d.deskSignageLedH, d.deskSignageLedOx, d.deskSignageLedOy].forEach((inp) => {
+      inp?.addEventListener('change', () => this._cmd({ action: 'SET_MAP_PROP', prop: 'ledScalerEnabled', value: true }));
+    });
+    d.deskSignageFitBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'fit', value: b.id }));
+    });
+    this._bindCmdSlider(d.deskSignageBright, (val) => ({ action: 'SET_OUTPUT_PROP', prop: 'brightness', value: val }), 1.0);
+    d.deskSignageScopeBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => {
+        const all = b.id === 1;
+        if (!all && (!st.signage?.playlist || !st.signage.playlist.length)) {
+          const list = (this._mediaLibItems || []).slice().reverse().map((it) => ({
+            url: it.url,
+            kind: it.kind || this._mediaKindOf(it),
+            name: it.name || it.file || ''
+          }));
+          this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'playlist', value: list, useAllMedia: false });
+        } else {
+          this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'useAllMedia', value: all });
+        }
+        renderDeskSignagePlaylist();
+      });
+    });
+    d.deskBtnSignageRefresh?.addEventListener('click', async () => {
+      await this._refreshMediaLibrary();
+      renderDeskSignagePlaylist();
     });
   }
 
@@ -3138,6 +3377,50 @@ export class ConsoleController {
       const totalLoops = n(am.lapTotalLoops, 8);
       this._setText(d.apLapReadout, `VUELTA #${lapNum} · LOOP ${loopIdx} / ${totalLoops}`);
     }
+
+    // ---- Modal Kiosco de Publicidad ----
+    const sg = st.signage || EMPTY;
+    const sgOn = Boolean(sg.enabled);
+    this._syncToggle(
+      d.deskBtnSignageToggle,
+      'deskSignageOn',
+      sgOn,
+      '🟢 MODO PUBLICIDAD (ARRANQUE AUTO): ACTIVO',
+      '📺 MODO PUBLICIDAD (ARRANQUE AUTO): APAGADO',
+      'primary'
+    );
+    this._syncToggle(d.btnOpenSignageModal, 'topSignageOn', sgOn, '🟢 PUBLICIDAD ON', '📺 PUBLICIDAD', 'active');
+    if (d.deskSignageNow) {
+      let nowTxt = '⏹ Modo Publicidad apagado (arranca con visuales VJ)';
+      if (sgOn) {
+        if (!sg.totalItems) nowTxt = '⚠️ Modo Publicidad activo sin archivos — sube fotos o vídeos abajo';
+        else {
+          const rem = sg.remainingSec > 0 ? ` · ${sg.remainingSec}s` : (sg.totalItems === 1 ? ' · LOOP 24/7' : '');
+          nowTxt = `${sg.paused ? '⏸' : '▶'} ${(sg.currentIndex || 0) + 1}/${sg.totalItems} · ${sg.currentName || 'Archivo'}${rem}`;
+        }
+      }
+      this._setText(d.deskSignageNow, nowTxt);
+    }
+    this._syncToggle(d.deskBtnSignagePause, 'deskSignagePaused', Boolean(sg.paused), '▶ SEGUIR', '⏸ PAUSAR', 'primary');
+    if (d.deskSignageSecInput && document.activeElement !== d.deskSignageSecInput && Number(d.deskSignageSecInput.value) !== (sg.slideSeconds || 8)) {
+      d.deskSignageSecInput.value = sg.slideSeconds || 8;
+    }
+    d.deskSignageSecBtns?.forEach((b) => b.el.classList.toggle('primary', b.id === (sg.slideSeconds || 8)));
+    d.deskSignageFadeBtns?.forEach((b) => b.el.classList.toggle('primary', (b.id > 0.05) === ((Number(sg.fadeSeconds) || 0) > 0.05)));
+    d.deskSignageFitBtns?.forEach((b) => b.el.classList.toggle('primary', b.id === (sg.fit || 0)));
+    d.deskSignageScopeBtns?.forEach((b) => b.el.classList.toggle('primary', (b.id === 1) === (sg.useAllMedia !== false)));
+    d.deskSignageBannerPresets?.forEach((btn) => {
+      const bon = btn.getAttribute('data-bon') === '1';
+      const bw = parseInt(btn.getAttribute('data-bw'), 10);
+      const bh = parseInt(btn.getAttribute('data-bh'), 10);
+      btn.classList.toggle('primary', (!bon && !ledOn) || (bon && ledOn && bw === ledW && bh === ledH));
+    });
+    if (d.deskSignageLedW && document.activeElement !== d.deskSignageLedW && Number(d.deskSignageLedW.value) !== ledW) d.deskSignageLedW.value = ledW;
+    if (d.deskSignageLedH && document.activeElement !== d.deskSignageLedH && Number(d.deskSignageLedH.value) !== ledH) d.deskSignageLedH.value = ledH;
+    if (d.deskSignageLedOx && document.activeElement !== d.deskSignageLedOx && Number(d.deskSignageLedOx.value) !== ledOX) d.deskSignageLedOx.value = ledOX;
+    if (d.deskSignageLedOy && document.activeElement !== d.deskSignageLedOy && Number(d.deskSignageLedOy.value) !== ledOY) d.deskSignageLedOy.value = ledOY;
+    const outBright = n(st.fx?.output?.brightness, 1.0);
+    this._syncSlider(d.deskSignageBright, d.deskSignageBrightVal, outBright, pct(outBright));
 
     // Editor: solo se redibuja si cambia algo y está visible
     const cv = d.cornerCanvas;

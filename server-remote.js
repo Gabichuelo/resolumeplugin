@@ -571,6 +571,7 @@ function handleMediaUpload(req, res, parsedUrl, local, ip) {
       }
       finished = true;
       release();
+      writeSse(masterClients, { type: 'REMOTE_COMMAND', action: 'SIGNAGE_REFRESH_LIBRARY' });
       sendJson(res, 200, {
         ok: true,
         url: `/media/${encodeURIComponent(finalName)}`,
@@ -1055,6 +1056,7 @@ const requestHandler = async (req, res) => {
           sendJson(res, err.code === 'ENOENT' ? 404 : 500, { ok: false, error: err.code === 'ENOENT' ? 'El fichero no existe' : err.message });
           return;
         }
+        writeSse(masterClients, { type: 'REMOTE_COMMAND', action: 'SIGNAGE_REFRESH_LIBRARY' });
         sendJson(res, 200, { ok: true, file });
       });
     } catch (err) {

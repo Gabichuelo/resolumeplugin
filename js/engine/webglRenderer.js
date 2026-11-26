@@ -577,15 +577,21 @@ export class WebGLRenderer {
     // Frame delta (ticker del texto)
     const dtRender = Math.max(0, Math.min(0.1, state.renderTime - this._lastRenderTime));
     this._lastRenderTime = state.renderTime;
+    const isSignage = Boolean(state.signage && state.signage.enabled);
 
-    // PASS 1: Render Deck A (only if crossfade < 0.999)
-    if (state.crossfade < 0.999) {
-      this._renderGeneratorPass(state.deckA, this.fboDeckA, state);
-    }
-
-    // PASS 2: Render Deck B (only if crossfade > 0.001)
-    if (state.crossfade > 0.001) {
-      this._renderGeneratorPass(state.deckB, this.fboDeckB, state);
+    // PASS 1 & 2: Render Decks (o fondo negro puro en Modo Kiosco Publicidad para ahorrar GPU/CPU)
+    if (isSignage) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.fboDeckA.fbo);
+      gl.viewport(0, 0, this.width, this.height);
+      gl.clearColor(0.0, 0.0, 0.0, 1.0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+    } else {
+      if (state.crossfade < 0.999) {
+        this._renderGeneratorPass(state.deckA, this.fboDeckA, state);
+      }
+      if (state.crossfade > 0.001) {
+        this._renderGeneratorPass(state.deckB, this.fboDeckB, state);
+      }
     }
 
     // PASS 3: Crossfade A/B + Ping-Pong Feedback Delay / Trails
@@ -611,17 +617,17 @@ export class WebGLRenderer {
     gl.bindTexture(gl.TEXTURE_2D, fbRead.texture);
     gl.uniform1i(fbU.uTexPrevFeedback, 2);
 
-    gl.uniform1f(fbU.uCrossfade, state.crossfade);
-    gl.uniform1f(fbU.uFeedbackWet, state.fx.feedback.enabled ? state.fx.feedback.wet : 0.0);
+    gl.uniform1f(fbU.uCrossfade, isSignage ? 0.0 : state.crossfade);
+    gl.uniform1f(fbU.uFeedbackWet, (!isSignage && state.fx.feedback.enabled) ? state.fx.feedback.wet : 0.0);
     gl.uniform1f(fbU.uTime, state.renderTime % 18000.0);
-    gl.uniform1f(fbU.uBeatPulse, state.bpm.syncPulse);
+    gl.uniform1f(fbU.uBeatPulse, isSignage ? 0.0 : state.bpm.syncPulse);
 
-    // Capa de vídeo / GIF / cámara
+    // Capa de vídeo / GIF / foto / cámara
     this._syncMediaTexture();
     const med = state.media;
     const mediaReady = Boolean(this.media && this.media.ready);
     const mediaTarget = (med && med.enabled && mediaReady) ? 1.0 : 0.0;
-    this._mediaFade += (mediaTarget - this._mediaFade) * 0.12;
+    this._mediaFade += (mediaTarget - this._mediaFade) * (isSignage ? 0.45 : 0.12);
     if (Math.abs(mediaTarget - this._mediaFade) < 0.004) this._mediaFade = mediaTarget;
 
     gl.activeTexture(gl.TEXTURE3);
@@ -630,23 +636,30 @@ export class WebGLRenderer {
     const mediaOpacity = med ? Math.max(0, Math.min(1, Number(med.opacity ?? 1))) : 0;
     gl.uniform1f(fbU.uMediaMix, this._mediaFade * mediaOpacity);
     if (this._mediaFade > 0.003 && med) {
-      const contentAspect = (this.width * this._genAspectFactor) / Math.max(1, this.height);
+      const mapCfgMedia = state.fx && state.fx.mapping;
+      const contentAspect = (mapCfgMedia && mapCfgMedia.ledScalerEnabled)
+        ? (Math.max(32, Number(mapCfgMedia.ledWidthPx) || 1024) / Math.max(32, Number(mapCfgMedia.ledHeightPx) || 512))
+        : ((this.width * this._genAspectFactor) / Math.max(1, this.height));
       const mediaAspect = this._mediaW / this._mediaH;
       let sx = 1.0, sy = 1.0;
-      if (med.fit === 1) {
-        // Encajar: se ve el vídeo entero (bandas transparentes)
+      if (med.fit === 2) {
+        // Estirar exacto al ancho × alto (X×Y) del banner LED
+        sx = 1.0;
+        sy = 1.0;
+      } else if (med.fit === 1) {
+        // Encajar: se ve el vídeo/foto entero (bandas negras)
         if (mediaAspect > contentAspect) sy = mediaAspect / contentAspect;
         else sx = contentAspect / mediaAspect;
       } else {
-        // Llenar: cubre toda la pantalla recortando
+        // Llenar: cubre toda la pantalla recortando el sobrante
         if (mediaAspect > contentAspect) sx = contentAspect / mediaAspect;
         else sy = mediaAspect / contentAspect;
       }
-      const bz = Math.max(0, Math.min(1, Number(med.beatZoom) || 0));
-      gl.uniform1i(fbU.uMediaBlend, med.blend || 0);
-      gl.uniform1i(fbU.uMediaFx, med.fx || 0);
+      const bz = isSignage ? 0.0 : Math.max(0, Math.min(1, Number(med.beatZoom) || 0));
+      gl.uniform1i(fbU.uMediaBlend, isSignage ? 0 : (med.blend || 0));
+      gl.uniform1i(fbU.uMediaFx, isSignage ? 0 : (med.fx || 0));
       gl.uniform2f(fbU.uMediaUvScale, sx, sy);
-      gl.uniform1i(fbU.uMediaMirror, med.mirror ? 1 : 0);
+      gl.uniform1i(fbU.uMediaMirror, (!isSignage && med.mirror) ? 1 : 0);
       gl.uniform1f(fbU.uMediaZoom, 1.0 + bz * (0.16 * state.bpm.syncPulse + 0.08 * state.audio.bass));
       gl.uniform2f(fbU.uMediaTexel, 1.0 / this._mediaW, 1.0 / this._mediaH);
       gl.uniform1f(fbU.uMediaAspect, mediaAspect);
@@ -731,19 +744,19 @@ export class WebGLRenderer {
     gl.uniform1f(postU.uBeatPulse, state.bpm.syncPulse);
     gl.uniform3f(postU.uAudioFFT, state.audio.bass, state.audio.mid, state.audio.high);
 
-    gl.uniform1f(postU.uKaleidoWet, fx.kaleidoscope.enabled ? fx.kaleidoscope.wet : 0.0);
+    gl.uniform1f(postU.uKaleidoWet, (!isSignage && fx.kaleidoscope.enabled) ? fx.kaleidoscope.wet : 0.0);
     gl.uniform1f(postU.uKaleidoAxes, fx.kaleidoscope.axes);
-    gl.uniform1f(postU.uRgbShiftWet, fx.rgbShift.enabled ? fx.rgbShift.wet : 0.0);
-    gl.uniform1f(postU.uGlitchWet, fx.glitch.enabled ? fx.glitch.wet : 0.0);
-    gl.uniform1f(postU.uPixelateWet, fx.pixelate.enabled ? fx.pixelate.wet : 0.0);
+    gl.uniform1f(postU.uRgbShiftWet, (!isSignage && fx.rgbShift.enabled) ? fx.rgbShift.wet : 0.0);
+    gl.uniform1f(postU.uGlitchWet, (!isSignage && fx.glitch.enabled) ? fx.glitch.wet : 0.0);
+    gl.uniform1f(postU.uPixelateWet, (!isSignage && fx.pixelate.enabled) ? fx.pixelate.wet : 0.0);
 
-    const eff3dMode = (fx.effect3d && typeof fx.effect3d.mode === 'number') ? fx.effect3d.mode : 0;
+    const eff3dMode = (!isSignage && fx.effect3d && typeof fx.effect3d.mode === 'number') ? fx.effect3d.mode : 0;
     const eff3dAmt = (fx.effect3d && typeof fx.effect3d.amount === 'number') ? fx.effect3d.amount : 0.55;
     gl.uniform1i(postU.uEffect3DMode, eff3dMode);
     gl.uniform1f(postU.uEffect3DAmount, eff3dAmt);
 
-    // Dynamic DJ Logo Uniforms
-    gl.uniform1f(postU.uLogoEnabled, this._logoFadeVal);
+    // Dynamic DJ Logo Uniforms (oculto en modo Publicidad para no tapar los anuncios)
+    gl.uniform1f(postU.uLogoEnabled, isSignage ? 0.0 : this._logoFadeVal);
     gl.uniform1i(postU.uLogoFxMode, logo.fxMode || 0);
     gl.uniform1f(postU.uLogoScale, logo.scale ?? 0.44);
     gl.uniform1f(postU.uLogoOpacity, logo.opacity ?? 0.96);
@@ -766,7 +779,7 @@ export class WebGLRenderer {
     gl.uniform2f(postU.uMapOffset, map.offsetX || 0.0, map.offsetY || 0.0);
     gl.uniform2f(postU.uMapScale, map.scaleX ?? 1.0, map.scaleY ?? 1.0);
     gl.uniform2f(postU.uMapKeystone, map.keystoneX || 0.0, map.keystoneY || 0.0);
-    gl.uniform1i(postU.uSliceMode, map.sliceMode || 0);
+    gl.uniform1i(postU.uSliceMode, isSignage ? 0 : (map.sliceMode || 0));
     gl.uniform1i(postU.uSliceCount, map.sliceCount || 3);
     gl.uniform1f(postU.uSliceGap, map.sliceGap ?? 0.04);
     gl.uniform1i(postU.uSliceClone, map.sliceClone !== false ? 1 : 0);
@@ -778,11 +791,11 @@ export class WebGLRenderer {
     gl.uniform1f(postU.uColorTemp, out.colorTemp || 0.0);
     gl.uniform1i(postU.uSafeStrobe, fx.safeStrobe !== false ? 1 : 0);
 
-    gl.uniform1f(postU.uFlash, fx.flashMomentary ? 1.0 : 0.0);
-    gl.uniform1f(postU.uInvert, fx.invertKill ? 1.0 : 0.0);
-    gl.uniform1f(postU.uMonochrome, fx.bwMonochrome ? 1.0 : 0.0);
+    gl.uniform1f(postU.uFlash, (!isSignage && fx.flashMomentary) ? 1.0 : 0.0);
+    gl.uniform1f(postU.uInvert, (!isSignage && fx.invertKill) ? 1.0 : 0.0);
+    gl.uniform1f(postU.uMonochrome, (!isSignage && fx.bwMonochrome) ? 1.0 : 0.0);
     gl.uniform1f(postU.uBlackout, fx.blackout ? 1.0 : 0.0);
-    gl.uniform1f(postU.uStrobeBurst, fx.strobeBurst ? 1.0 : 0.0);
+    gl.uniform1f(postU.uStrobeBurst, (!isSignage && fx.strobeBurst) ? 1.0 : 0.0);
     const bgModeInt = state.bgMode === 'ALPHA' ? 1 : (state.bgMode === 'CHROMA' ? 2 : 0);
     gl.uniform1i(postU.uBgMode, bgModeInt);
 
@@ -820,7 +833,7 @@ export class WebGLRenderer {
     // Texto en pantalla
     const txt = state.text;
     this._syncTextTexture(state);
-    const hasText = Boolean(txt && txt.enabled && String(txt.content || '').trim().length > 0);
+    const hasText = Boolean(!isSignage && txt && txt.enabled && String(txt.content || '').trim().length > 0);
     const textTarget = hasText ? 1.0 : 0.0;
     this._textFade += (textTarget - this._textFade) * 0.14;
     if (Math.abs(textTarget - this._textFade) < 0.004) this._textFade = textTarget;
