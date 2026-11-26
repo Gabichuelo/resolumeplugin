@@ -1072,6 +1072,10 @@
       <button type="button" id="btn-s-upload" class="btn-pad amber-active btn-big btn-full">
         📤 SUBIR FOTOS / VÍDEOS (VARIOS A LA VEZ)
       </button>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--text-dim);cursor:pointer">
+        <input type="checkbox" id="s-clean-logo" style="width:16px;height:16px;accent-color:var(--green)" />
+        <span>✨ Auto-limpiar logos LED al subir (fondo blanco, texto negro y bordes)</span>
+      </label>
       <div id="s-upload-progress" class="upload-progress" style="display:none">
         <div class="bar"><div id="s-upload-progress-fill" class="fill"></div></div>
         <div id="s-upload-progress-text" class="label">0%</div>
@@ -4290,7 +4294,9 @@
           if (signageProgressFill) signageProgressFill.style.width = '0%';
           if (signageProgressText) signageProgressText.textContent = '(' + idx + '/' + files.length + ') ' + f.name + ' · 0%';
           const xhr = new XMLHttpRequest();
-          xhr.open('POST', '/api/media-upload?name=' + encodeURIComponent(f.name));
+          const cleanLogoEl = document.getElementById('s-clean-logo');
+          const cleanQ = (cleanLogoEl && cleanLogoEl.checked) ? '&cleanLogo=1' : '';
+          xhr.open('POST', '/api/media-upload?name=' + encodeURIComponent(f.name) + cleanQ);
           xhr.setRequestHeader('X-Aether-Pin', sessionPin);
           xhr.setRequestHeader('Content-Type', f.type || 'application/octet-stream');
           xhr.upload.onprogress = (ev) => {

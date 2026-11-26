@@ -30,7 +30,7 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { exec } from 'child_process';
+import { exec, execFile } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -564,21 +564,46 @@ function handleMediaUpload(req, res, parsedUrl, local, ip) {
     while (fs.existsSync(path.join(MEDIA_DIR, finalName))) {
       finalName = `${baseName}-${Date.now()}${n++}${ext}`;
     }
-    fs.rename(tmpPath, path.join(MEDIA_DIR, finalName), (err) => {
+    const wantClean = parsedUrl.searchParams.get('cleanLogo') === '1' && /\.(png|jpe?g|webp)$/i.test(ext);
+    const savedPath = path.join(MEDIA_DIR, finalName);
+    fs.rename(tmpPath, savedPath, (err) => {
       if (err) {
         fail(500, { ok: false, error: 'No se pudo guardar el fichero: ' + err.message });
         return;
       }
-      finished = true;
-      release();
-      writeSse(masterClients, { type: 'REMOTE_COMMAND', action: 'SIGNAGE_REFRESH_LIBRARY' });
-      sendJson(res, 200, {
-        ok: true,
-        url: `/media/${encodeURIComponent(finalName)}`,
-        file: finalName,
-        kind,
-        name: `${baseName}${ext}`,
-        size: received
+      const finishUpload = (outFile, outDisplayName, cleanedFlag) => {
+        finished = true;
+        release();
+        writeSse(masterClients, { type: 'REMOTE_COMMAND', action: 'SIGNAGE_REFRESH_LIBRARY' });
+        sendJson(res, 200, {
+          ok: true,
+          url: `/media/${encodeURIComponent(outFile)}`,
+          file: outFile,
+          kind,
+          name: outDisplayName,
+          size: received,
+          cleaned: cleanedFlag
+        });
+      };
+
+      if (!wantClean) {
+        finishUpload(finalName, `${baseName}${ext}`, false);
+        return;
+      }
+
+      const pngName = finalName.replace(/\.[^.]+$/, '.png');
+      const pngPath = path.join(MEDIA_DIR, pngName);
+      const scriptPath = path.join(__dirname, 'scripts', 'auto_clean_logo.py');
+      const pyBin = process.platform === 'win32' ? 'python' : 'python3';
+      execFile(pyBin, [scriptPath, savedPath, pngPath], { timeout: 25000 }, (pyErr) => {
+        if (!pyErr && fs.existsSync(pngPath)) {
+          if (savedPath !== pngPath) {
+            fs.unlink(savedPath, () => {});
+          }
+          finishUpload(pngName, `${baseName}.png`, true);
+        } else {
+          finishUpload(finalName, `${baseName}${ext}`, false);
+        }
       });
     });
   });

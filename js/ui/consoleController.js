@@ -2057,6 +2057,7 @@ export class ConsoleController {
       deskBtnSignageNext: $('desk-btn-signage-next'),
       deskSignageFiles: $('desk-signage-files'),
       deskBtnSignageUpload: $('desk-btn-signage-upload'),
+      deskSignageCleanLogo: $('desk-signage-clean-logo'),
       deskSignageMsg: $('desk-signage-msg'),
       deskSignageSecInput: $('desk-signage-sec-input'),
       deskSignageSecBtns: toBtns('#desk-signage-sec-grid [data-dssec]', 'data-dssec', (s) => parseInt(s, 10) || 8),
@@ -2672,12 +2673,14 @@ export class ConsoleController {
         if (files[0]) this._cmd({ action: 'LOAD_MEDIA_BLOB', file: files[0] });
         return;
       }
+      const wantCleanLogo = Boolean(d.deskSignageCleanLogo && d.deskSignageCleanLogo.checked);
       if (d.deskSignageMsg) d.deskSignageMsg.textContent = `⏳ Subiendo ${files.length} archivo(s)...`;
       let okCount = 0;
       for (let i = 0; i < files.length; i++) {
         const f = files[i];
         try {
-          const res = await fetch('/api/media-upload?name=' + encodeURIComponent(f.name), {
+          const cleanQ = wantCleanLogo ? '&cleanLogo=1' : '';
+          const res = await fetch('/api/media-upload?name=' + encodeURIComponent(f.name) + cleanQ, {
             method: 'POST',
             headers: { 'Content-Type': f.type || 'application/octet-stream' },
             body: f
