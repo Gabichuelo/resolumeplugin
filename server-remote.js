@@ -926,6 +926,21 @@ const requestHandler = async (req, res) => {
         rawCmd = 'sudo -S bash clonar-m2.sh --usb-backup';
       } else if (preset === 'clone-m2') {
         rawCmd = 'sudo -S bash clonar-m2.sh --clone';
+      } else if (preset === 'hotspot-on') {
+        rawCmd = 'sudo -S bash setup-hotspot-linux.sh --no-restart';
+      } else if (preset === 'hotspot-off') {
+        rawCmd = 'sudo -S bash setup-hotspot-linux.sh --off';
+      } else if (preset === 'hotspot-status') {
+        rawCmd = [
+          'echo "=== ADAPTADORES WI-FI DETECTADOS (NMCLI) ==="',
+          'nmcli device status 2>/dev/null || true',
+          'echo "=== DISPOSITIVOS USB (ANTENA WI-FI) ==="',
+          'lsusb 2>/dev/null || true',
+          'echo "=== ¿SOPORTA MODO PUNTO DE ACCESO (AP)? ==="',
+          'iw list 2>/dev/null | grep -A 10 "Supported interface modes" | head -n 12 || echo "(iw no instalado; se prueba directo con nmcli)"',
+          'echo "=== ESTADO HOTSPOT AETHER-VJ ==="',
+          'sudo -S bash setup-hotspot-linux.sh --status 2>/dev/null || true'
+        ].join(' ; ');
       } else if (preset === 'reboot') {
         rawCmd = 'sudo -S reboot';
       } else if (customCmd) {

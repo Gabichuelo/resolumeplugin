@@ -22,11 +22,13 @@ DNSMASQ_DIR="/etc/NetworkManager/dnsmasq-shared.d"
 DNSMASQ_FILE="$DNSMASQ_DIR/aether.conf"
 
 ACTION="up"
+NO_RESTART=0
 POSITIONAL=()
 for arg in "$@"; do
   case "$arg" in
     --off|off|--down) ACTION="off" ;;
     --status|status) ACTION="status" ;;
+    --no-restart) NO_RESTART=1 ;;
     -h|--help)
       sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
       exit 0
@@ -63,7 +65,12 @@ detect_iface() {
   if [ -z "$IFACE" ]; then
     IFACE="$(nmcli -t -f DEVICE,TYPE device 2>/dev/null | awk -F: '$2=="wifi"{print $1; exit}' || true)"
   fi
-  [ -n "$IFACE" ] || fatal "No se encontró ninguna tarjeta Wi-Fi. Conecta un adaptador Wi-Fi o indica IFACE=wlan0."
+  if [ -z "$IFACE" ]; then
+    echo "=== DIAGNOSTICO ADAPTADORES USB WI-FI ===" >&2
+    nmcli device status 2>/dev/null >&2 || true
+    lsusb 2>/dev/null | grep -iE 'wifi|wlan|realtek|ralink|mediatek|atheros|tp-link|802\.11|wireless|net|intel|broadcom' >&2 || lsusb 2>/dev/null >&2 || true
+    fatal "No se encontró ninguna tarjeta Wi-Fi activa en Linux. Si acabas de enchufar una antena USB nueva, puede que necesite driver (mira el chip en lsusb arriba)."
+  fi
 }
 
 con_exists() {
@@ -141,8 +148,8 @@ echo "===================================================================="
 require_nmcli
 
 # 1. Avahi (mDNS) para que los móviles encuentren "aether.local"
-info "Instalando Avahi (mDNS)..."
-if command -v apt-get >/dev/null 2>&1; then
+if ! command -v avahi-daemon >/dev/null 2>&1 && command -v apt-get >/dev/null 2>&1; then
+  info "Instalando Avahi (mDNS)..."
   $SUDO apt-get install -y avahi-daemon libnss-mdns >/dev/null || info "Aviso: no se pudo instalar avahi-daemon/libnss-mdns (¿sin internet?). Se continúa."
 fi
 $SUDO systemctl enable --now avahi-daemon >/dev/null 2>&1 || true
@@ -219,13 +226,15 @@ else
 fi
 
 # 7. Encender el hotspot (si había otra Wi-Fi conectada en esa tarjeta, se sustituye)
-info "Encendiendo el hotspot..."
+info "Encendiendo el hotspot en $IFACE..."
 if ! $SUDO nmcli connection up "$CON_NAME" ifname "$IFACE" >/dev/null; then
-  fatal "No se pudo encender el hotspot. Puede que la tarjeta Wi-Fi no soporte modo punto de acceso (AP)."
+  echo "=== MODOS SOPORTADOS POR LA ANTENA WI-FI ===" >&2
+  iw list 2>/dev/null | grep -A 10 "Supported interface modes" >&2 || true
+  fatal "No se pudo encender el hotspot. Puede que la antena USB no soporte modo punto de acceso (AP) o su driver necesite revisión."
 fi
 
-# Reiniciar el servidor AETHER-VJ si existe, para que abra el puerto 80
-if systemctl list-unit-files aether-vj.service >/dev/null 2>&1 && systemctl is-enabled --quiet aether-vj.service 2>/dev/null; then
+# Reiniciar el servidor AETHER-VJ si existe, para que abra el puerto 80 (salvo --no-restart desde UI web)
+if [ "$NO_RESTART" -eq 0 ] && systemctl list-unit-files aether-vj.service >/dev/null 2>&1 && systemctl is-enabled --quiet aether-vj.service 2>/dev/null; then
   $SUDO systemctl restart aether-vj.service || true
 fi
 
