@@ -315,7 +315,9 @@ if [ -n "$CUR_SIG" ] && [ "$CUR_SIG" != "-" ] && [ "$CUR_SIG" != "$OLD_SIG" ]; t
     rm -f /etc/machine-id /var/lib/dbus/machine-id 2>/dev/null || true
     systemd-machine-id-setup 2>/dev/null || true
     ln -sf /etc/machine-id /var/lib/dbus/machine-id 2>/dev/null || true
-    systemctl restart avahi-daemon NetworkManager 2>/dev/null || true
+    if systemctl is-active --quiet NetworkManager 2>/dev/null; then
+      systemctl restart --no-block avahi-daemon NetworkManager 2>/dev/null || true
+    fi
   fi
   # Si se clonó por bloques (dd / clonadora física) a un M.2 más grande, expandir partición raíz automáticamente
   ROOT_SRC="$(findmnt -n -o SOURCE / 2>/dev/null || true)"
@@ -341,6 +343,7 @@ Before=NetworkManager.service avahi-daemon.service systemd-networkd.service
 [Service]
 Type=oneshot
 ExecStart=/usr/local/bin/aether-clone-hwcheck.sh
+TimeoutStartSec=20
 RemainAfterExit=yes
 
 [Install]
