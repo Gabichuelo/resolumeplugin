@@ -69,7 +69,7 @@ xubuntu-numlockx 2>/dev/null || true
 (
   for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
     sleep 1
-    if pgrep -f lightdm-gtk-greeter >/dev/null 2>&1; then
+    if pgrep -f '/[l]ightdm-gtk-greeter' >/dev/null 2>&1 && ! pgrep -x xfwm4 >/dev/null 2>&1 && ! pgrep -x gnome-shell >/dev/null 2>&1; then
       DISPLAY="${DISPLAY:-:0}" xdotool key Return 2>/dev/null || true
       python3 -c '
 import fcntl, os, struct, time

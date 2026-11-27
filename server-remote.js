@@ -1395,11 +1395,11 @@ server.listen(PORT, '0.0.0.0', () => {
 // 2) Si eno1 tiene el cable conectado pero una regla vieja le puso 2.0.0.10/8 sin DHCP, limpia 2.0.0.10 y levanta Ethernet-Auto.
 if (process.platform === 'linux') {
   // Si el M.2 fue clonado con clonadora física externa a otro Mini-PC, regenerar machine-id y expandir partición al arrancar
-  exec('sudo -n /usr/local/bin/aether-clone-hwcheck.sh 2>/dev/null || true', { timeout: 20000 }, () => {});
+  exec('sudo -n /usr/local/bin/aether-clone-hwcheck.sh 2>/dev/null || true; sudo -n pkill -f "[a]ether-greeter-autoclick.sh" 2>/dev/null || true', { timeout: 20000 }, () => {});
 
   const runLinuxBootWatchdog = () => {
     const watchdogCmd = [
-      'if pgrep -f lightdm-gtk-greeter >/dev/null 2>&1; then',
+      'if pgrep -f "/[l]ightdm-gtk-greeter" >/dev/null 2>&1 && ! pgrep -x xfwm4 >/dev/null 2>&1 && ! pgrep -x gnome-shell >/dev/null 2>&1; then',
       '  sudo -n DISPLAY=:0 XAUTHORITY=/var/run/lightdm/root/:0 xdotool key Return 2>/dev/null || true;',
       '  sudo -n /usr/local/bin/aether-greeter-autoclick.sh 2>/dev/null || true;',
       'fi;',
