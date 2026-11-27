@@ -5,10 +5,12 @@
  */
 
 export class SignagePlayer {
-  constructor(state, mediaLayer, syncBridge) {
+  constructor(state, mediaLayer, syncBridge, signageKey = 'signage', mediaKey = 'media') {
     this.state = state;
     this.media = mediaLayer;
     this.syncBridge = syncBridge;
+    this.signageKey = signageKey;
+    this.mediaKey = mediaKey;
     this.libraryItems = [];
     this.slideElapsed = 0;
     this.loadingElapsed = 0;
@@ -17,6 +19,14 @@ export class SignagePlayer {
     this.pendingIndex = -1;
     this._lastRandomMode = 1;
     this._refreshing = false;
+  }
+
+  _sg() {
+    return this.state[this.signageKey];
+  }
+
+  _med() {
+    return this.state[this.mediaKey];
   }
 
   _buildValidEntry(it) {
@@ -28,7 +38,7 @@ export class SignagePlayer {
   }
 
   _getActiveItems() {
-    const sg = this.state.signage;
+    const sg = this._sg();
     if (!sg) return [];
     const libByUrl = new Map();
     for (let i = 0; i < this.libraryItems.length; i++) {
@@ -77,7 +87,8 @@ export class SignagePlayer {
         // Dejar orden cronológico de subida por defecto para que las secuencias queden ordenadas
         this.libraryItems = data.items.slice().reverse();
         const libUrls = new Set(this.libraryItems.map((it) => it.url));
-        const sg = this.state.signage;
+        const sg = this._sg();
+        const med = this._med();
         if (sg && Array.isArray(sg.playlist) && sg.playlist.length) {
           sg.playlist = sg.playlist.filter((it) => it && libUrls.has(it.url));
         }
@@ -89,7 +100,7 @@ export class SignagePlayer {
             sg.currentName = '';
             sg.remainingSec = 0;
           } else {
-            const curUrl = this.state.media ? this.state.media.url : '';
+            const curUrl = med ? med.url : '';
             const curMatch = active.findIndex((it) => it.url === curUrl);
             if (curMatch >= 0 && !forceEnsurePlaying) {
               sg.currentIndex = curMatch;
@@ -113,13 +124,13 @@ export class SignagePlayer {
   onConfigLoaded() {
     if (this.media) {
       this.media.onVideoEnded = () => {
-        const sg = this.state.signage;
+        const sg = this._sg();
         if (sg && sg.enabled && !sg.paused) {
           this.next(false);
         }
       };
       this.media.onMediaError = () => {
-        const sg = this.state.signage;
+        const sg = this._sg();
         if (sg && sg.enabled && sg.totalItems > 1) {
           this.next(true);
         }
@@ -129,7 +140,7 @@ export class SignagePlayer {
   }
 
   activate(enable) {
-    const sg = this.state.signage;
+    const sg = this._sg();
     if (!sg) return;
     sg.enabled = Boolean(enable);
     this.fadePhase = 'idle';
@@ -139,9 +150,9 @@ export class SignagePlayer {
     sg.transProgress = 0.0;
     sg.transDir = 0.0;
 
+    const m = this._med();
     if (sg.enabled) {
       sg.paused = false;
-      const m = this.state.media;
       if (m) {
         m.blend = 0;
         m.fx = 0;
@@ -154,13 +165,22 @@ export class SignagePlayer {
       this.refreshLibrary(true);
     } else {
       if (this.media) this.media.singleLoop = true;
-      if (this.state.media) this.state.media.opacity = 1.0;
+      if (m) {
+        m.opacity = 1.0;
+        // En Zona 2: al apagarla, liberar inmediatamente su decodificador de vídeo/imagen
+        if (this.mediaKey !== 'media') {
+          m.enabled = false;
+          m.source = 'none';
+          m.url = '';
+          m.version = (m.version || 0) + 1;
+        }
+      }
     }
   }
 
   _commitItem(idx, items) {
-    const sg = this.state.signage;
-    const m = this.state.media;
+    const sg = this._sg();
+    const m = this._med();
     if (!sg || !m || !items.length) return;
     const safeIdx = ((idx % items.length) + items.length) % items.length;
     const item = items[safeIdx];
@@ -190,7 +210,8 @@ export class SignagePlayer {
   }
 
   goTo(index, immediate = false) {
-    const sg = this.state.signage;
+    const sg = this._sg();
+    const m = this._med();
     if (!sg) return;
     const items = this._getActiveItems();
     sg.totalItems = items.length;
@@ -198,6 +219,12 @@ export class SignagePlayer {
       sg.currentIndex = 0;
       sg.currentName = '';
       sg.remainingSec = 0;
+      if (m && this.mediaKey !== 'media') {
+        m.enabled = false;
+        m.source = 'none';
+        m.url = '';
+        m.version = (m.version || 0) + 1;
+      }
       return;
     }
 
@@ -209,14 +236,14 @@ export class SignagePlayer {
       this.fadePhase = 'idle';
       sg.transProgress = 0.0;
       sg.transDir = 0.0;
-      if (this.state.media) this.state.media.opacity = 1.0;
+      if (m) m.opacity = 1.0;
       this._commitItem(index, items);
       return;
     }
 
     let activeMode = trans;
     if (trans === 6) {
-      const pool = [1, 2, 3, 4, 5].filter((m) => m !== this._lastRandomMode);
+      const pool = [1, 2, 3, 4, 5].filter((mode) => mode !== this._lastRandomMode);
       activeMode = pool[Math.floor(Math.random() * pool.length)] || 1;
       this._lastRandomMode = activeMode;
     } else {
@@ -237,20 +264,20 @@ export class SignagePlayer {
   }
 
   next(immediate = false) {
-    const sg = this.state.signage;
+    const sg = this._sg();
     if (!sg) return;
     this.goTo((sg.currentIndex || 0) + 1, immediate);
   }
 
   prev(immediate = false) {
-    const sg = this.state.signage;
+    const sg = this._sg();
     if (!sg) return;
     this.goTo((sg.currentIndex || 0) - 1, immediate);
   }
 
   update(dt) {
-    const sg = this.state.signage;
-    const m = this.state.media;
+    const sg = this._sg();
+    const m = this._med();
     if (!sg || !sg.enabled || !m) return;
 
     // Mantener imagen limpia de publicidad sin mezcla ni deformaciones DJ
@@ -267,6 +294,12 @@ export class SignagePlayer {
       sg.currentName = '';
       sg.remainingSec = 0;
       m.opacity = 1.0;
+      if (this.mediaKey !== 'media' && m.source !== 'none') {
+        m.enabled = false;
+        m.source = 'none';
+        m.url = '';
+        m.version = (m.version || 0) + 1;
+      }
       return;
     }
 

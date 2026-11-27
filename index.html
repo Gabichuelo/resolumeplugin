@@ -158,13 +158,85 @@
         <div class="help-step-box">
           <div class="help-step-num">📋</div>
           <div style="flex:1">
-            <h3>PLAYLIST DE PUBLICIDAD</h3>
+            <h3>PLAYLIST DE PUBLICIDAD (ZONA 1)</h3>
             <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:6px;margin:6px 0" id="desk-signage-scope-grid">
               <button type="button" class="btn-console-action primary" data-dsall="1">📋 Reproducir TODOS</button>
               <button type="button" class="btn-console-action" data-dsall="0">✅ Solo marcados</button>
               <button type="button" id="desk-btn-signage-refresh" class="btn-console-action">🔄</button>
             </div>
             <div id="desk-signage-playlist" style="max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:4px"></div>
+          </div>
+        </div>
+
+        <div class="help-step-box" style="border-color:rgba(192,132,252,0.5)">
+          <div class="help-step-num">🪧</div>
+          <div style="flex:1">
+            <h3>ZONA 2 INDEPENDIENTE (2º BANNER / VÍDEO EN EL MISMO HDMI)</h3>
+            <p>Ejecuta un segundo vídeo o carrusel distinto a la vez que Zona 1 (p.ej. logos a la izquierda y vídeo a la derecha) en su propio rectángulo <strong>X, Y, Ancho, Alto</strong>.</p>
+            <button type="button" id="desk-btn-signage2-toggle" class="btn-console-action" style="width:100%;margin:8px 0;padding:10px;font-size:13px">
+              ⬜ ZONA 2 INDEPENDIENTE: APAGADA
+            </button>
+            <div id="desk-signage2-now" style="padding:8px 10px;background:#070a10;border:1px solid #2e1f47;border-radius:6px;font-family:monospace;font-size:12px;color:#e879f9;margin-bottom:8px">
+              ⏹ Zona 2 apagada
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+              <button type="button" id="desk-btn-signage2-prev" class="btn-console-action">⏮ ANTERIOR</button>
+              <button type="button" id="desk-btn-signage2-pause" class="btn-console-action">⏸ PAUSAR</button>
+              <button type="button" id="desk-btn-signage2-next" class="btn-console-action">⏭ SIGUIENTE</button>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
+              <button type="button" id="desk-btn-signage2-right" class="btn-console-action primary">➡️ Al lado de Zona 1</button>
+              <button type="button" id="desk-btn-signage2-below" class="btn-console-action">⬇️ Debajo de Zona 1</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px" id="desk-signage2-presets">
+              <button type="button" class="btn-console-action" data-z2w="512" data-z2h="256">512×256</button>
+              <button type="button" class="btn-console-action" data-z2w="768" data-z2h="384">768×384</button>
+              <button type="button" class="btn-console-action primary" data-z2w="1024" data-z2h="512">1024×512</button>
+              <button type="button" class="btn-console-action" data-z2w="960" data-z2h="1080">960×1080</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px">
+              <div><small style="color:#98a4b8">ANCHO Z2 (PX)</small><input type="number" id="desk-signage2-w" class="v2-text-input" min="64" max="7680" value="1024" style="width:100%;text-align:center" /></div>
+              <div><small style="color:#98a4b8">ALTO Z2 (PX)</small><input type="number" id="desk-signage2-h" class="v2-text-input" min="64" max="4320" value="512" style="width:100%;text-align:center" /></div>
+              <div><small style="color:#98a4b8">INICIO X</small><input type="number" id="desk-signage2-x" class="v2-text-input" min="0" max="7680" value="512" style="width:100%;text-align:center" /></div>
+              <div><small style="color:#98a4b8">INICIO Y</small><input type="number" id="desk-signage2-y" class="v2-text-input" min="0" max="4320" value="0" style="width:100%;text-align:center" /></div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px" id="desk-signage2-fit-grid">
+              <button type="button" class="btn-console-action primary" data-ds2fit="0">⛶ Llenar</button>
+              <button type="button" class="btn-console-action" data-ds2fit="1">▣ Encajar</button>
+              <button type="button" class="btn-console-action" data-ds2fit="2">↔️ Estirar X×Y</button>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:6px" id="desk-signage2-sec-grid">
+              <button type="button" class="btn-console-action" data-ds2sec="3">3s</button>
+              <button type="button" class="btn-console-action" data-ds2sec="5">5s</button>
+              <button type="button" class="btn-console-action primary" data-ds2sec="8">8s</button>
+              <button type="button" class="btn-console-action" data-ds2sec="15">15s</button>
+              <button type="button" class="btn-console-action" data-ds2sec="30">30s</button>
+              <input type="number" id="desk-signage2-sec-input" class="v2-text-input" min="2" max="300" step="1" value="8" style="text-align:center;font-weight:700" title="Segundos personalizados por foto (Zona 2)" />
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:6px" id="desk-signage2-trans-grid">
+              <button type="button" class="btn-console-action" data-ds2trans="0">✂️ Corte</button>
+              <button type="button" class="btn-console-action primary" data-ds2trans="1">✨ Fundido</button>
+              <button type="button" class="btn-console-action" data-ds2trans="2">🔍 Zoom</button>
+              <button type="button" class="btn-console-action" data-ds2trans="3">➡️ Deslizar</button>
+              <button type="button" class="btn-console-action" data-ds2trans="4">🪟 Cortina</button>
+              <button type="button" class="btn-console-action" data-ds2trans="5">💥 Iris</button>
+              <button type="button" class="btn-console-action" data-ds2trans="6" style="grid-column:span 2">🎲 Aleatorio</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px" id="desk-signage2-fade-grid">
+              <button type="button" class="btn-console-action" data-ds2fade="0.4">⚡ Rápida 0.4s</button>
+              <button type="button" class="btn-console-action primary" data-ds2fade="0.8">✨ Suave 0.8s</button>
+              <button type="button" class="btn-console-action" data-ds2fade="1.5">🐢 Lenta 1.5s</button>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:6px;margin:6px 0" id="desk-signage2-scope-grid">
+              <button type="button" class="btn-console-action primary" data-ds2all="0">✅ Solo marcados (Z2)</button>
+              <button type="button" class="btn-console-action" data-ds2all="1">📋 Reproducir TODOS</button>
+              <button type="button" id="desk-btn-signage2-refresh" class="btn-console-action">🔄</button>
+            </div>
+            <div id="desk-signage2-playlist" style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:4px"></div>
           </div>
         </div>
       </div>

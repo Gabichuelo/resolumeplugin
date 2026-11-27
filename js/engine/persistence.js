@@ -108,6 +108,19 @@ export class Persistence {
         fit: [0, 1, 2].includes(Number(st.signage.fit)) ? Number(st.signage.fit) : 0,
         transition: Math.max(0, Math.min(6, Math.round(Number(st.signage.transition ?? 1)))),
         fadeSeconds: Math.max(0, Math.min(3, Number(st.signage.fadeSeconds) || 0))
+      } : null,
+      signage2: st.signage2 ? {
+        enabled: Boolean(st.signage2.enabled),
+        x: Math.max(0, Math.min(7680, Math.round(Number(st.signage2.x) || 0))),
+        y: Math.max(0, Math.min(4320, Math.round(Number(st.signage2.y) || 0))),
+        width: Math.max(64, Math.min(7680, Math.round(Number(st.signage2.width) || 1024))),
+        height: Math.max(64, Math.min(4320, Math.round(Number(st.signage2.height) || 512))),
+        useAllMedia: Boolean(st.signage2.useAllMedia),
+        playlist: Array.isArray(st.signage2.playlist) ? st.signage2.playlist.slice(0, 200) : [],
+        slideSeconds: Math.max(2, Math.min(300, Number(st.signage2.slideSeconds) || 8)),
+        fit: [0, 1, 2].includes(Number(st.signage2.fit)) ? Number(st.signage2.fit) : 0,
+        transition: Math.max(0, Math.min(6, Math.round(Number(st.signage2.transition ?? 1)))),
+        fadeSeconds: Math.max(0, Math.min(3, Number(st.signage2.fadeSeconds) || 0))
       } : null
     };
   }
@@ -170,6 +183,32 @@ export class Persistence {
           }));
       }
       st.signage.paused = false;
+    }
+    if (cfg.signage2 && typeof cfg.signage2 === 'object' && st.signage2) {
+      const sg2 = cfg.signage2;
+      st.signage2.enabled = Boolean(sg2.enabled);
+      st.signage2.x = Math.max(0, Math.min(7680, Math.round(Number(sg2.x) || 0)));
+      st.signage2.y = Math.max(0, Math.min(4320, Math.round(Number(sg2.y) || 0)));
+      st.signage2.width = Math.max(64, Math.min(7680, Math.round(Number(sg2.width) || 1024)));
+      st.signage2.height = Math.max(64, Math.min(4320, Math.round(Number(sg2.height) || 512)));
+      st.signage2.useAllMedia = Boolean(sg2.useAllMedia);
+      st.signage2.slideSeconds = Math.max(2, Math.min(300, Number(sg2.slideSeconds) || 8));
+      st.signage2.fit = [0, 1, 2].includes(Number(sg2.fit)) ? Number(sg2.fit) : 0;
+      st.signage2.fadeSeconds = Math.max(0, Math.min(3, Number(sg2.fadeSeconds) || 0));
+      st.signage2.transition = (sg2.transition !== undefined)
+        ? Math.max(0, Math.min(6, Math.round(Number(sg2.transition) || 0)))
+        : (st.signage2.fadeSeconds > 0.02 ? 1 : 0);
+      if (Array.isArray(sg2.playlist)) {
+        st.signage2.playlist = sg2.playlist
+          .filter((it) => it && typeof it.url === 'string' && /^\/media\/[^/\\]+$/.test(it.url))
+          .slice(0, 200)
+          .map((it) => ({
+            url: it.url,
+            kind: ['video', 'gif', 'image'].includes(it.kind) ? it.kind : 'video',
+            name: String(it.name || it.url.split('/').pop() || '').slice(0, 80)
+          }));
+      }
+      st.signage2.paused = false;
     }
     if (typeof cfg.safeStrobe === 'boolean') {
       st.fx.safeStrobe = cfg.safeStrobe;

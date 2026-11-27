@@ -975,6 +975,43 @@ function createInitialState() {
       currentName: '',
       remainingSec: 0
     },
+    media2: {
+      enabled: false,         // Capa de vídeo / foto para Zona 2 de Publicidad
+      source: 'none',         // 'none' | 'file' | 'camera'
+      url: '',
+      kind: 'video',
+      name: '',
+      opacity: 1.0,
+      blend: 0,
+      fx: 0,
+      fit: 0,
+      mirror: false,
+      beatZoom: 0.0,
+      speed: 1.0,
+      cameraId: '',
+      version: 0
+    },
+    signage2: {
+      enabled: false,         // Zona 2 independiente (mismo HDMI, coordenadas X, Y, Ancho, Alto en píxeles)
+      x: 512,
+      y: 0,
+      width: 1024,
+      height: 512,
+      useAllMedia: false,     // false = Zona 2 reproduce solo los archivos marcados en su propia playlist
+      playlist: [],
+      slideSeconds: 8,
+      fit: 0,                 // 0: Llenar (Cover) | 1: Encajar (Contain) | 2: Estirar exacto X×Y
+      transition: 1,          // 0: Corte | 1: Fundido | 2: Zoom | 3: Deslizar | 4: Cortina | 5: Iris | 6: Aleatorio
+      fadeSeconds: 0.7,
+      transModeActive: 1,
+      transProgress: 0.0,
+      transDir: 0.0,
+      paused: false,
+      currentIndex: 0,
+      totalItems: 0,
+      currentName: '',
+      remainingSec: 0
+    },
     midi: {
       supported: false,       // El navegador soporta Web MIDI
       enabled: false,         // El usuario ha activado la escucha de MIDI Clock
@@ -4602,6 +4639,116 @@ void main() {
   fragColor = vec4(clamp(color, 0.0, 1.0), outAlpha);
 }
 `;
+const SIGNAGE_ZONE_SHADER_SRC = `#version 300 es
+precision highp float;
+
+in vec2 vUv;
+out vec4 fragColor;
+
+uniform sampler2D uTexMedia;
+uniform float uMediaMix;
+uniform vec2 uUvScale;
+uniform int uTransMode;
+uniform vec2 uTrans;
+uniform float uMasterBright;
+uniform float uColorTemp;
+uniform float uBlackout;
+uniform int uMapTestGrid;
+uniform vec2 uResolution;
+uniform int uBgMode;
+
+vec4 sampleMediaRaw(vec2 muv) {
+  vec4 p = texture(uTexMedia, vec2(muv.x, 1.0 - muv.y));
+  vec3 straight = (p.a > 0.002) ? clamp(p.rgb / p.a, 0.0, 1.0) : vec3(0.0);
+  return vec4(straight, p.a);
+}
+
+void main() {
+  if (uBlackout > 0.5) {
+    fragColor = vec4(0.0, 0.0, 0.0, (uBgMode == 1) ? 0.0 : 1.0);
+    return;
+  }
+
+  vec2 muv = (vUv - 0.5) * uUvScale + 0.5;
+  float transAlpha = 1.0;
+  float tp = clamp(uTrans.x, 0.0, 1.0);
+  float tdir = uTrans.y;
+  float te = smoothstep(0.0, 1.0, tp);
+
+  if (uTransMode > 0 && tp > 0.001) {
+    if (uTransMode == 1) {
+      transAlpha = 1.0 - te;
+    } else if (uTransMode == 2) {
+      float z = (tdir < 0.0) ? (1.0 + 0.14 * te) : (1.0 - 0.14 * te);
+      muv = (muv - 0.5) / max(z, 0.2) + 0.5;
+      transAlpha = 1.0 - te;
+    } else if (uTransMode == 3) {
+      muv.x += (tdir < 0.0) ? (te * 0.55) : (-te * 0.55);
+      transAlpha = 1.0 - te * 0.85;
+    } else if (uTransMode == 4) {
+      float fe = 0.09;
+      if (tdir < 0.0) {
+        float edge = te * (1.0 + fe);
+        transAlpha = smoothstep(edge - fe, edge, vUv.x);
+      } else {
+        float rev = 1.0 - te;
+        float edge = rev * (1.0 + fe);
+        transAlpha = 1.0 - smoothstep(edge - fe, edge, vUv.x);
+      }
+    } else if (uTransMode == 5) {
+      float distC = length((vUv - 0.5) * vec2(1.0, 0.72));
+      float rad = (1.0 - te) * 0.72;
+      transAlpha = 1.0 - smoothstep(rad - 0.09, rad + 0.02, distC);
+    }
+  }
+
+  vec3 color = vec3(0.0);
+  if (uMediaMix > 0.003 && transAlpha > 0.001 && muv.x >= 0.0 && muv.x <= 1.0 && muv.y >= 0.0 && muv.y <= 1.0) {
+    vec4 raw = sampleMediaRaw(muv);
+    float a = clamp(uMediaMix * raw.a * transAlpha, 0.0, 1.0);
+    color = raw.rgb * a;
+  }
+
+  if (uMapTestGrid == 1) {
+    float aspect = uResolution.x / max(uResolution.y, 1.0);
+    vec2 bDist = min(vUv, 1.0 - vUv);
+    float border = smoothstep(0.015, 0.004, min(bDist.x, bDist.y));
+    float crossLine = max(
+      smoothstep(0.006, 0.0015, abs(vUv.x - 0.5)),
+      smoothstep(0.006, 0.0015, abs(vUv.y - 0.5))
+    );
+    float diag = max(
+      smoothstep(0.005, 0.0015, abs(vUv.x - vUv.y)),
+      smoothstep(0.005, 0.0015, abs(vUv.x - (1.0 - vUv.y)))
+    ) * 0.45;
+    vec2 cRel = (vUv - 0.5) * vec2(aspect, 1.0);
+    float ring = smoothstep(0.010, 0.0025, abs(length(cRel) - 0.25));
+    vec3 gridCol = vec3(1.0, 0.15, 0.75) * (border + ring) + vec3(1.0, 0.78, 0.0) * (crossLine + diag);
+    float gridMask = clamp(border + crossLine * 0.85 + ring * 0.85 + diag, 0.0, 1.0);
+    color = mix(color * 0.55, gridCol, gridMask);
+  }
+
+  float temp = clamp(uColorTemp, -1.0, 1.0);
+  color *= vec3(1.0 + 0.10 * temp, 1.0 + 0.01 * temp, 1.0 - 0.16 * temp);
+  color *= clamp(uMasterBright, 0.0, 1.0);
+
+  float outAlpha = 1.0;
+  if (uBgMode == 1) {
+    float peakChannel = max(color.r, max(color.g, color.b));
+    float luma = dot(color, vec3(0.299, 0.587, 0.114));
+    outAlpha = clamp(smoothstep(0.012, 0.22, max(peakChannel, luma)), 0.0, 1.0);
+    color = (outAlpha > 0.005) ? clamp(color / outAlpha, 0.0, 1.0) : vec3(0.0);
+  } else if (uBgMode == 2) {
+    float peakChannel = max(color.r, max(color.g, color.b));
+    float shapeMask = clamp(smoothstep(0.015, 0.22, peakChannel), 0.0, 1.0);
+    vec3 pureColor = (shapeMask > 0.005) ? clamp(color / shapeMask, 0.0, 1.0) : vec3(0.0);
+    color = mix(vec3(0.0, 1.0, 0.0), pureColor, shapeMask);
+    outAlpha = 1.0;
+  }
+
+  fragColor = vec4(clamp(color, 0.0, 1.0), outAlpha);
+}
+`;
 
 
 // ==================== MODULE: js/engine/textLayer.js ====================
@@ -4766,6 +4913,7 @@ class WebGLRenderer {
     this.generatorPrograms = [];
     this.feedbackProgram = null;
     this.postFxProgram = null;
+    this.signageZoneProgram = null;
 
     this.fboDeckA = null;
     this.fboDeckB = null;
@@ -4783,6 +4931,13 @@ class WebGLRenderer {
     this._mediaFade = 0.0;
     this._mediaW = 1;
     this._mediaH = 1;
+
+    // Zona 2 de cartelería LED independiente
+    this.media2 = null;
+    this.texMedia2 = null;
+    this._media2Fade = 0.0;
+    this._media2W = 1;
+    this._media2H = 1;
 
     // Texto en pantalla
     this.texText = null;
@@ -4852,9 +5007,11 @@ class WebGLRenderer {
       this.texLogo = null;
       this._lastLogoDataUrl = '';
       this.texMedia = null;
+      this.texMedia2 = null;
       this.texText = null;
       this._textKey = '';
       if (this.media) this.media.dirty = true;
+      if (this.media2) this.media2.dirty = true;
       this._buildResources();
     });
 
@@ -4949,6 +5106,16 @@ class WebGLRenderer {
       uniforms: this._cacheUniforms(postProg, postUniformNames)
     };
 
+    const sgZoneUniformNames = [
+      'uTexMedia', 'uMediaMix', 'uUvScale', 'uTransMode', 'uTrans',
+      'uMasterBright', 'uColorTemp', 'uBlackout', 'uMapTestGrid', 'uResolution', 'uBgMode'
+    ];
+    const sgZoneProg = this._createProgram(VERTEX_SHADER_SRC, SIGNAGE_ZONE_SHADER_SRC, 'SignageZone');
+    this.signageZoneProgram = {
+      program: sgZoneProg,
+      uniforms: this._cacheUniforms(sgZoneProg, sgZoneUniformNames)
+    };
+
     // 5. Allocate Reusable FBO Targets & Default DJ Logo Texture
     this.width = Math.max(64, this.canvas.clientWidth || 1280);
     this.height = Math.max(64, this.canvas.clientHeight || 720);
@@ -4964,6 +5131,7 @@ class WebGLRenderer {
     this._lastLogoDataUrl = '';
 
     this.texMedia = this._createBlankTexture();
+    this.texMedia2 = this._createBlankTexture();
     this.texText = this._createBlankTexture();
     this._textKey = '';
   }
@@ -5012,9 +5180,8 @@ class WebGLRenderer {
   }
 
   /** Sube el fotograma nuevo del vídeo / GIF / cámara a la GPU (solo si hay uno nuevo). */
-  _syncMediaTexture() {
-    const media = this.media;
-    if (!media || !this.texMedia) return;
+  _syncMediaTextureObj(media, tex, onDims) {
+    if (!media || !tex) return;
     media.sync();
     const src = media.pollFrame(performance.now());
     if (!src) return;
@@ -5022,7 +5189,7 @@ class WebGLRenderer {
     const isVideo = typeof HTMLVideoElement !== 'undefined' && src instanceof HTMLVideoElement;
     const uploadSrc = isVideo ? src : this._prepareUploadSource(src);
     try {
-      gl.bindTexture(gl.TEXTURE_2D, this.texMedia);
+      gl.bindTexture(gl.TEXTURE_2D, tex);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, !isVideo);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, uploadSrc);
@@ -5030,13 +5197,19 @@ class WebGLRenderer {
       gl.generateMipmap(gl.TEXTURE_2D);
       this._applyHighQualityTextureParams(gl, true);
       gl.bindTexture(gl.TEXTURE_2D, null);
-      this._mediaW = Math.max(1, media.width);
-      this._mediaH = Math.max(1, media.height);
+      if (onDims) onDims(Math.max(1, media.width), Math.max(1, media.height));
     } catch (err) {
       // Vídeo de otro origen sin CORS o fotograma no listo: se ignora este fotograma
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
       gl.bindTexture(gl.TEXTURE_2D, null);
     }
+  }
+
+  _syncMediaTexture() {
+    this._syncMediaTextureObj(this.media, this.texMedia, (w, h) => {
+      this._mediaW = w;
+      this._mediaH = h;
+    });
   }
 
   /** Regenera la textura del texto cuando cambia el contenido o la fuente. */
@@ -5659,6 +5832,82 @@ class WebGLRenderer {
     }
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+    // ZONA 2 INDEPENDIENTE (mismo HDMI, coordenadas X, Y, Ancho, Alto en píxeles)
+    const sg2 = state.signage2;
+    if (this.media2 && (!isSignage || !sg2 || !sg2.enabled)) {
+      this.media2.sync();
+      this._media2Fade = 0.0;
+    }
+    if (isSignage && sg2 && sg2.enabled && this.signageZoneProgram && this.texMedia2) {
+      this._syncMediaTextureObj(this.media2, this.texMedia2, (w, h) => {
+        this._media2W = w;
+        this._media2H = h;
+      });
+      const med2 = state.media2;
+      const media2Ready = Boolean(this.media2 && this.media2.ready);
+      const media2Target = (med2 && med2.enabled && media2Ready) ? 1.0 : 0.0;
+      this._media2Fade += (media2Target - this._media2Fade) * 0.45;
+      if (Math.abs(media2Target - this._media2Fade) < 0.004) this._media2Fade = media2Target;
+
+      const screenW = Math.max(64, this.canvas.clientWidth || 1920);
+      const screenH = Math.max(64, this.canvas.clientHeight || 1080);
+      const scaleX2 = this.width / screenW;
+      const scaleY2 = this.height / screenH;
+      const z2W = Math.max(32, Math.min(8192, Number(sg2.width) || 512));
+      const z2H = Math.max(32, Math.min(8192, Number(sg2.height) || 256));
+      const z2X = Math.max(0, Math.min(8192, Number(sg2.x) || 0));
+      const z2Y = Math.max(0, Math.min(8192, Number(sg2.y) || 0));
+
+      const z2VpW = Math.max(16, Math.round(z2W * scaleX2));
+      const z2VpH = Math.max(16, Math.round(z2H * scaleY2));
+      const z2VpX = Math.round(z2X * scaleX2);
+      const z2VpY = Math.round(this.height - (z2Y * scaleY2) - z2VpH);
+
+      const contentAspect2 = z2W / z2H;
+      const mediaAspect2 = this._media2W / Math.max(1, this._media2H);
+      let sx2 = 1.0;
+      let sy2 = 1.0;
+      const fit2 = Number(sg2.fit) || 0;
+      if (fit2 === 2) {
+        sx2 = 1.0;
+        sy2 = 1.0;
+      } else if (fit2 === 1) {
+        if (mediaAspect2 > contentAspect2) sy2 = mediaAspect2 / contentAspect2;
+        else sx2 = contentAspect2 / mediaAspect2;
+      } else {
+        if (mediaAspect2 > contentAspect2) sx2 = contentAspect2 / mediaAspect2;
+        else sy2 = mediaAspect2 / contentAspect2;
+      }
+
+      const z2U = this.signageZoneProgram.uniforms;
+      const sg2Mode = (sg2.transProgress > 0.001) ? (sg2.transModeActive || 0) : 0;
+      const media2Opacity = med2 ? Math.max(0, Math.min(1, Number(med2.opacity ?? 1))) : 0;
+
+      gl.enable(gl.SCISSOR_TEST);
+      gl.scissor(z2VpX, z2VpY, z2VpW, z2VpH);
+      gl.viewport(z2VpX, z2VpY, z2VpW, z2VpH);
+      gl.useProgram(this.signageZoneProgram.program);
+
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.texMedia2);
+      gl.uniform1i(z2U.uTexMedia, 0);
+      gl.uniform1f(z2U.uMediaMix, this._media2Fade * media2Opacity);
+      gl.uniform2f(z2U.uUvScale, sx2, sy2);
+      gl.uniform1i(z2U.uTransMode, sg2Mode);
+      gl.uniform2f(z2U.uTrans, sg2Mode ? (sg2.transProgress || 0.0) : 0.0, sg2Mode ? (sg2.transDir || 0.0) : 0.0);
+      gl.uniform1f(z2U.uMasterBright, out.brightness ?? 1.0);
+      gl.uniform1f(z2U.uColorTemp, out.colorTemp || 0.0);
+      gl.uniform1f(z2U.uBlackout, fx.blackout ? 1.0 : 0.0);
+      gl.uniform1i(z2U.uMapTestGrid, map.showTestGrid ? 1 : 0);
+      gl.uniform2f(z2U.uResolution, z2VpW, z2VpH);
+      gl.uniform1i(z2U.uBgMode, bgModeInt);
+
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      gl.disable(gl.SCISSOR_TEST);
+      gl.viewport(0, 0, this.width, this.height);
+    }
+
     gl.bindVertexArray(null);
   }
 }
@@ -6926,6 +7175,19 @@ class Persistence {
         fit: [0, 1, 2].includes(Number(st.signage.fit)) ? Number(st.signage.fit) : 0,
         transition: Math.max(0, Math.min(6, Math.round(Number(st.signage.transition ?? 1)))),
         fadeSeconds: Math.max(0, Math.min(3, Number(st.signage.fadeSeconds) || 0))
+      } : null,
+      signage2: st.signage2 ? {
+        enabled: Boolean(st.signage2.enabled),
+        x: Math.max(0, Math.min(7680, Math.round(Number(st.signage2.x) || 0))),
+        y: Math.max(0, Math.min(4320, Math.round(Number(st.signage2.y) || 0))),
+        width: Math.max(64, Math.min(7680, Math.round(Number(st.signage2.width) || 1024))),
+        height: Math.max(64, Math.min(4320, Math.round(Number(st.signage2.height) || 512))),
+        useAllMedia: Boolean(st.signage2.useAllMedia),
+        playlist: Array.isArray(st.signage2.playlist) ? st.signage2.playlist.slice(0, 200) : [],
+        slideSeconds: Math.max(2, Math.min(300, Number(st.signage2.slideSeconds) || 8)),
+        fit: [0, 1, 2].includes(Number(st.signage2.fit)) ? Number(st.signage2.fit) : 0,
+        transition: Math.max(0, Math.min(6, Math.round(Number(st.signage2.transition ?? 1)))),
+        fadeSeconds: Math.max(0, Math.min(3, Number(st.signage2.fadeSeconds) || 0))
       } : null
     };
   }
@@ -6988,6 +7250,32 @@ class Persistence {
           }));
       }
       st.signage.paused = false;
+    }
+    if (cfg.signage2 && typeof cfg.signage2 === 'object' && st.signage2) {
+      const sg2 = cfg.signage2;
+      st.signage2.enabled = Boolean(sg2.enabled);
+      st.signage2.x = Math.max(0, Math.min(7680, Math.round(Number(sg2.x) || 0)));
+      st.signage2.y = Math.max(0, Math.min(4320, Math.round(Number(sg2.y) || 0)));
+      st.signage2.width = Math.max(64, Math.min(7680, Math.round(Number(sg2.width) || 1024)));
+      st.signage2.height = Math.max(64, Math.min(4320, Math.round(Number(sg2.height) || 512)));
+      st.signage2.useAllMedia = Boolean(sg2.useAllMedia);
+      st.signage2.slideSeconds = Math.max(2, Math.min(300, Number(sg2.slideSeconds) || 8));
+      st.signage2.fit = [0, 1, 2].includes(Number(sg2.fit)) ? Number(sg2.fit) : 0;
+      st.signage2.fadeSeconds = Math.max(0, Math.min(3, Number(sg2.fadeSeconds) || 0));
+      st.signage2.transition = (sg2.transition !== undefined)
+        ? Math.max(0, Math.min(6, Math.round(Number(sg2.transition) || 0)))
+        : (st.signage2.fadeSeconds > 0.02 ? 1 : 0);
+      if (Array.isArray(sg2.playlist)) {
+        st.signage2.playlist = sg2.playlist
+          .filter((it) => it && typeof it.url === 'string' && /^\/media\/[^/\\]+$/.test(it.url))
+          .slice(0, 200)
+          .map((it) => ({
+            url: it.url,
+            kind: ['video', 'gif', 'image'].includes(it.kind) ? it.kind : 'video',
+            name: String(it.name || it.url.split('/').pop() || '').slice(0, 80)
+          }));
+      }
+      st.signage2.paused = false;
     }
     if (typeof cfg.safeStrobe === 'boolean') {
       st.fx.safeStrobe = cfg.safeStrobe;
@@ -7322,8 +7610,9 @@ function detectMediaKind(nameOrType = '') {
   return 'video';
 }
 class MediaLayer {
-  constructor(state) {
+  constructor(state, stateKey = 'media') {
     this.state = state;
+    this.stateKey = stateKey;
     this.video = null;
     this.image = null;
     this.stream = null;
@@ -7351,11 +7640,12 @@ class MediaLayer {
   }
 
   get isPlaying() {
-    return this.ready && this.state.media && this.state.media.enabled;
+    const m = this.state[this.stateKey];
+    return this.ready && m && m.enabled;
   }
 
   _sourceKey() {
-    const m = this.state.media;
+    const m = this.state[this.stateKey];
     if (!m || m.source === 'none') return '';
     if (m.source === 'camera') return `camera|${m.cameraId || ''}|${m.version || 0}`;
     return `file|${m.url}|${m.version || 0}`;
@@ -7367,7 +7657,7 @@ class MediaLayer {
     if (key !== this.currentKey) {
       this.currentKey = key;
       this._teardown();
-      const m = this.state.media;
+      const m = this.state[this.stateKey];
       if (key) {
         if (m.source === 'camera') {
           this._startCamera(m.cameraId);
@@ -7382,8 +7672,9 @@ class MediaLayer {
     }
 
     // Velocidad de reproducción en vivo y bucle único/lista
-    if (this.video && this.state.media.source === 'file') {
-      const rate = Math.max(0.25, Math.min(2.0, Number(this.state.media.speed) || 1.0));
+    const m = this.state[this.stateKey];
+    if (this.video && m && m.source === 'file') {
+      const rate = Math.max(0.25, Math.min(2.0, Number(m.speed) || 1.0));
       if (Math.abs(this.video.playbackRate - rate) > 0.001) {
         this.video.playbackRate = rate;
       }
@@ -7403,7 +7694,8 @@ class MediaLayer {
     if (this.video) {
       const v = this.video;
       if (v.readyState < 2 || v.videoWidth === 0) return null;
-      if (v.paused && this.state.media.source === 'file') {
+      const m = this.state[this.stateKey];
+      if (v.paused && m && m.source === 'file') {
         v.play().catch(() => {});
       }
       this.width = v.videoWidth;
@@ -7453,7 +7745,7 @@ class MediaLayer {
     }
     const url = URL.createObjectURL(file);
     this._blobUrl = url;
-    const m = this.state.media;
+    const m = this.state[this.stateKey];
     m.source = 'file';
     m.url = url;
     m.kind = detectMediaKind(file.type || file.name);
@@ -7693,10 +7985,12 @@ class MediaLayer {
  * desde /media/ en las proporciones X×Y y brillo configurados.
  */
 class SignagePlayer {
-  constructor(state, mediaLayer, syncBridge) {
+  constructor(state, mediaLayer, syncBridge, signageKey = 'signage', mediaKey = 'media') {
     this.state = state;
     this.media = mediaLayer;
     this.syncBridge = syncBridge;
+    this.signageKey = signageKey;
+    this.mediaKey = mediaKey;
     this.libraryItems = [];
     this.slideElapsed = 0;
     this.loadingElapsed = 0;
@@ -7705,6 +7999,14 @@ class SignagePlayer {
     this.pendingIndex = -1;
     this._lastRandomMode = 1;
     this._refreshing = false;
+  }
+
+  _sg() {
+    return this.state[this.signageKey];
+  }
+
+  _med() {
+    return this.state[this.mediaKey];
   }
 
   _buildValidEntry(it) {
@@ -7716,7 +8018,7 @@ class SignagePlayer {
   }
 
   _getActiveItems() {
-    const sg = this.state.signage;
+    const sg = this._sg();
     if (!sg) return [];
     const libByUrl = new Map();
     for (let i = 0; i < this.libraryItems.length; i++) {
@@ -7765,7 +8067,8 @@ class SignagePlayer {
         // Dejar orden cronológico de subida por defecto para que las secuencias queden ordenadas
         this.libraryItems = data.items.slice().reverse();
         const libUrls = new Set(this.libraryItems.map((it) => it.url));
-        const sg = this.state.signage;
+        const sg = this._sg();
+        const med = this._med();
         if (sg && Array.isArray(sg.playlist) && sg.playlist.length) {
           sg.playlist = sg.playlist.filter((it) => it && libUrls.has(it.url));
         }
@@ -7777,7 +8080,7 @@ class SignagePlayer {
             sg.currentName = '';
             sg.remainingSec = 0;
           } else {
-            const curUrl = this.state.media ? this.state.media.url : '';
+            const curUrl = med ? med.url : '';
             const curMatch = active.findIndex((it) => it.url === curUrl);
             if (curMatch >= 0 && !forceEnsurePlaying) {
               sg.currentIndex = curMatch;
@@ -7801,13 +8104,13 @@ class SignagePlayer {
   onConfigLoaded() {
     if (this.media) {
       this.media.onVideoEnded = () => {
-        const sg = this.state.signage;
+        const sg = this._sg();
         if (sg && sg.enabled && !sg.paused) {
           this.next(false);
         }
       };
       this.media.onMediaError = () => {
-        const sg = this.state.signage;
+        const sg = this._sg();
         if (sg && sg.enabled && sg.totalItems > 1) {
           this.next(true);
         }
@@ -7817,7 +8120,7 @@ class SignagePlayer {
   }
 
   activate(enable) {
-    const sg = this.state.signage;
+    const sg = this._sg();
     if (!sg) return;
     sg.enabled = Boolean(enable);
     this.fadePhase = 'idle';
@@ -7827,9 +8130,9 @@ class SignagePlayer {
     sg.transProgress = 0.0;
     sg.transDir = 0.0;
 
+    const m = this._med();
     if (sg.enabled) {
       sg.paused = false;
-      const m = this.state.media;
       if (m) {
         m.blend = 0;
         m.fx = 0;
@@ -7842,13 +8145,22 @@ class SignagePlayer {
       this.refreshLibrary(true);
     } else {
       if (this.media) this.media.singleLoop = true;
-      if (this.state.media) this.state.media.opacity = 1.0;
+      if (m) {
+        m.opacity = 1.0;
+        // En Zona 2: al apagarla, liberar inmediatamente su decodificador de vídeo/imagen
+        if (this.mediaKey !== 'media') {
+          m.enabled = false;
+          m.source = 'none';
+          m.url = '';
+          m.version = (m.version || 0) + 1;
+        }
+      }
     }
   }
 
   _commitItem(idx, items) {
-    const sg = this.state.signage;
-    const m = this.state.media;
+    const sg = this._sg();
+    const m = this._med();
     if (!sg || !m || !items.length) return;
     const safeIdx = ((idx % items.length) + items.length) % items.length;
     const item = items[safeIdx];
@@ -7878,7 +8190,8 @@ class SignagePlayer {
   }
 
   goTo(index, immediate = false) {
-    const sg = this.state.signage;
+    const sg = this._sg();
+    const m = this._med();
     if (!sg) return;
     const items = this._getActiveItems();
     sg.totalItems = items.length;
@@ -7886,6 +8199,12 @@ class SignagePlayer {
       sg.currentIndex = 0;
       sg.currentName = '';
       sg.remainingSec = 0;
+      if (m && this.mediaKey !== 'media') {
+        m.enabled = false;
+        m.source = 'none';
+        m.url = '';
+        m.version = (m.version || 0) + 1;
+      }
       return;
     }
 
@@ -7897,14 +8216,14 @@ class SignagePlayer {
       this.fadePhase = 'idle';
       sg.transProgress = 0.0;
       sg.transDir = 0.0;
-      if (this.state.media) this.state.media.opacity = 1.0;
+      if (m) m.opacity = 1.0;
       this._commitItem(index, items);
       return;
     }
 
     let activeMode = trans;
     if (trans === 6) {
-      const pool = [1, 2, 3, 4, 5].filter((m) => m !== this._lastRandomMode);
+      const pool = [1, 2, 3, 4, 5].filter((mode) => mode !== this._lastRandomMode);
       activeMode = pool[Math.floor(Math.random() * pool.length)] || 1;
       this._lastRandomMode = activeMode;
     } else {
@@ -7925,20 +8244,20 @@ class SignagePlayer {
   }
 
   next(immediate = false) {
-    const sg = this.state.signage;
+    const sg = this._sg();
     if (!sg) return;
     this.goTo((sg.currentIndex || 0) + 1, immediate);
   }
 
   prev(immediate = false) {
-    const sg = this.state.signage;
+    const sg = this._sg();
     if (!sg) return;
     this.goTo((sg.currentIndex || 0) - 1, immediate);
   }
 
   update(dt) {
-    const sg = this.state.signage;
-    const m = this.state.media;
+    const sg = this._sg();
+    const m = this._med();
     if (!sg || !sg.enabled || !m) return;
 
     // Mantener imagen limpia de publicidad sin mezcla ni deformaciones DJ
@@ -7955,6 +8274,12 @@ class SignagePlayer {
       sg.currentName = '';
       sg.remainingSec = 0;
       m.opacity = 1.0;
+      if (this.mediaKey !== 'media' && m.source !== 'none') {
+        m.enabled = false;
+        m.source = 'none';
+        m.url = '';
+        m.version = (m.version || 0) + 1;
+      }
       return;
     }
 
@@ -8235,6 +8560,7 @@ class SyncBridge {
     this.remoteConnected = false;
     this.media = null;              // MediaLayer (para cámaras y ficheros locales)
     this.signage = null;            // SignagePlayer (para Modo Kiosco Publicidad)
+    this.signage2 = null;           // SignagePlayer Zona 2 independiente
     this.edgeModeOverride = null;   // Ventana de proyector con ?blend=left|right
     this.logoProcessing = false;
 
@@ -8322,6 +8648,10 @@ class SyncBridge {
 
   attachSignage(signagePlayer) {
     this.signage = signagePlayer;
+  }
+
+  attachSignage2(signagePlayer2) {
+    this.signage2 = signagePlayer2;
   }
 
   /**
@@ -8550,7 +8880,9 @@ class SyncBridge {
         : st.media,
       mediaPlaying: Boolean(this.media && this.media.isPlaying),
       mediaError: this.media ? this.media.lastError : '',
+      media2Url: (st.media2 && st.media2.url && !st.media2.url.startsWith('blob:')) ? st.media2.url : '',
       signage: st.signage,
+      signage2: st.signage2,
       blackout: Boolean(st.fx && st.fx.blackout),
       transition: st.transition,
       edgeBlend: st.fx.edgeBlend,
@@ -8989,21 +9321,28 @@ class SyncBridge {
           }
         }
         break;
-      case 'SET_SIGNAGE_ENABLED':
-        if (this.signage) {
-          this.signage.activate(Boolean(cmd.value));
-        } else if (st.signage) {
-          st.signage.enabled = Boolean(cmd.value);
+      case 'SET_SIGNAGE_ENABLED': {
+        const isZ2 = Number(cmd.zone) === 2;
+        const player = isZ2 ? this.signage2 : this.signage;
+        const sgTarget = isZ2 ? st.signage2 : st.signage;
+        if (player) {
+          player.activate(Boolean(cmd.value));
+        } else if (sgTarget) {
+          sgTarget.enabled = Boolean(cmd.value);
         }
         break;
-      case 'SET_SIGNAGE_PROP':
-        if (st.signage && cmd.prop) {
-          const sg = st.signage;
+      }
+      case 'SET_SIGNAGE_PROP': {
+        const isZ2 = Number(cmd.zone) === 2;
+        const player = isZ2 ? this.signage2 : this.signage;
+        const sg = isZ2 ? st.signage2 : st.signage;
+        const medTarget = isZ2 ? st.media2 : st.media;
+        if (sg && cmd.prop) {
           if (cmd.prop === 'slideSeconds') {
             sg.slideSeconds = Math.round(clampNum(cmd.value, 2, 300, 8));
           } else if (cmd.prop === 'fit') {
             sg.fit = clampNum(cmd.value, 0, 2, 0) | 0;
-            if (sg.enabled && st.media) st.media.fit = sg.fit;
+            if (sg.enabled && medTarget) medTarget.fit = sg.fit;
           } else if (cmd.prop === 'fadeSeconds') {
             sg.fadeSeconds = clampNum(cmd.value, 0, 3, 0.7);
             if (sg.fadeSeconds <= 0.02) sg.transition = 0;
@@ -9015,9 +9354,22 @@ class SyncBridge {
             }
           } else if (cmd.prop === 'paused') {
             sg.paused = Boolean(cmd.value);
+          } else if (isZ2 && cmd.prop === 'x') {
+            sg.x = Math.round(clampNum(cmd.value, 0, 7680, 512));
+          } else if (isZ2 && cmd.prop === 'y') {
+            sg.y = Math.round(clampNum(cmd.value, 0, 4320, 0));
+          } else if (isZ2 && cmd.prop === 'width') {
+            sg.width = Math.round(clampNum(cmd.value, 64, 7680, 1024));
+          } else if (isZ2 && cmd.prop === 'height') {
+            sg.height = Math.round(clampNum(cmd.value, 64, 4320, 512));
+          } else if (isZ2 && cmd.prop === 'rect' && cmd.value && typeof cmd.value === 'object') {
+            if (cmd.value.x !== undefined) sg.x = Math.round(clampNum(cmd.value.x, 0, 7680, sg.x || 0));
+            if (cmd.value.y !== undefined) sg.y = Math.round(clampNum(cmd.value.y, 0, 4320, sg.y || 0));
+            if (cmd.value.width !== undefined) sg.width = Math.round(clampNum(cmd.value.width, 64, 7680, sg.width || 1024));
+            if (cmd.value.height !== undefined) sg.height = Math.round(clampNum(cmd.value.height, 64, 4320, sg.height || 512));
           } else if (cmd.prop === 'useAllMedia') {
             sg.useAllMedia = Boolean(cmd.value);
-            if (this.signage && sg.enabled) this.signage.refreshLibrary(true);
+            if (player && sg.enabled) player.refreshLibrary(true);
           } else if (cmd.prop === 'playlist' && Array.isArray(cmd.value)) {
             sg.playlist = cmd.value
               .filter((it) => it && typeof it.url === 'string' && /^\/media\/[^/\\]+$/.test(it.url))
@@ -9028,25 +9380,41 @@ class SyncBridge {
                 name: String(it.name || it.url.split('/').pop() || '').slice(0, 80)
               }));
             if (cmd.useAllMedia !== undefined) sg.useAllMedia = Boolean(cmd.useAllMedia);
-            if (this.signage && sg.enabled) this.signage.refreshLibrary(true);
+            if (player && sg.enabled) player.refreshLibrary(true);
           }
         }
         break;
-      case 'SIGNAGE_NEXT':
-        if (this.signage) this.signage.next(Boolean(cmd.immediate));
+      }
+      case 'SIGNAGE_NEXT': {
+        const player = Number(cmd.zone) === 2 ? this.signage2 : this.signage;
+        if (player) player.next(Boolean(cmd.immediate));
         break;
-      case 'SIGNAGE_PREV':
-        if (this.signage) this.signage.prev(Boolean(cmd.immediate));
+      }
+      case 'SIGNAGE_PREV': {
+        const player = Number(cmd.zone) === 2 ? this.signage2 : this.signage;
+        if (player) player.prev(Boolean(cmd.immediate));
         break;
-      case 'SIGNAGE_GOTO':
-        if (this.signage) {
-          if (typeof cmd.url === 'string') this.signage.goToUrl(cmd.url);
-          else this.signage.goTo(Number(cmd.index) || 0, true);
+      }
+      case 'SIGNAGE_GOTO': {
+        const player = Number(cmd.zone) === 2 ? this.signage2 : this.signage;
+        if (player) {
+          if (typeof cmd.url === 'string') player.goToUrl(cmd.url);
+          else player.goTo(Number(cmd.index) || 0, true);
         }
         break;
-      case 'SIGNAGE_REFRESH_LIBRARY':
-        if (this.signage) this.signage.refreshLibrary();
+      }
+      case 'SIGNAGE_REFRESH_LIBRARY': {
+        const z = Number(cmd.zone);
+        if (z === 2) {
+          if (this.signage2) this.signage2.refreshLibrary();
+        } else if (z === 1) {
+          if (this.signage) this.signage.refreshLibrary();
+        } else {
+          if (this.signage) this.signage.refreshLibrary();
+          if (this.signage2) this.signage2.refreshLibrary();
+        }
         break;
+      }
       case 'SET_SIGNAGE_BANNER_PRESET':
         if (st.fx && st.fx.mapping) {
           const mp = st.fx.mapping;
@@ -9227,10 +9595,22 @@ class SyncBridge {
     p.colorOffset = st.colorOffset || 0;
     p.text = st.text;
     p.media = st.media;
+    p.media2 = st.media2;
     p.signageEnabled = Boolean(st.signage && st.signage.enabled);
     p.signageTransMode = st.signage ? (st.signage.transModeActive || 0) : 0;
     p.signageTransProg = st.signage ? (st.signage.transProgress || 0.0) : 0.0;
     p.signageTransDir = st.signage ? (st.signage.transDir || 0.0) : 0.0;
+    p.signage2 = st.signage2 ? {
+      enabled: Boolean(st.signage2.enabled),
+      x: st.signage2.x,
+      y: st.signage2.y,
+      width: st.signage2.width,
+      height: st.signage2.height,
+      fit: st.signage2.fit,
+      transModeActive: st.signage2.transModeActive || 0,
+      transProgress: st.signage2.transProgress || 0.0,
+      transDir: st.signage2.transDir || 0.0
+    } : null;
 
     p.fx.kaleidoEnabled = st.fx.kaleidoscope.enabled;
     p.fx.kaleidoWet = st.fx.kaleidoscope.wet;
@@ -9344,11 +9724,17 @@ class SyncBridge {
     if (p.media) {
       st.media = Object.assign(st.media || {}, p.media);
     }
+    if (p.media2) {
+      st.media2 = Object.assign(st.media2 || {}, p.media2);
+    }
     if (st.signage && typeof p.signageEnabled === 'boolean') {
       st.signage.enabled = p.signageEnabled;
       st.signage.transModeActive = p.signageTransMode || 0;
       st.signage.transProgress = p.signageTransProg || 0.0;
       st.signage.transDir = p.signageTransDir || 0.0;
+    }
+    if (p.signage2 && st.signage2) {
+      Object.assign(st.signage2, p.signage2);
     }
 
     st.fx.kaleidoscope.enabled = p.fx.kaleidoEnabled;
@@ -11422,6 +11808,27 @@ class ConsoleController {
       deskSignageScopeBtns: toBtns('#desk-signage-scope-grid [data-dsall]', 'data-dsall', (s) => parseInt(s, 10) === 1 ? 1 : 0),
       deskBtnSignageRefresh: $('desk-btn-signage-refresh'),
       deskSignagePlaylist: $('desk-signage-playlist'),
+      // Modal Kiosco Zona 2 Independiente
+      deskBtnSignage2Toggle: $('desk-btn-signage2-toggle'),
+      deskSignage2Now: $('desk-signage2-now'),
+      deskBtnSignage2Prev: $('desk-btn-signage2-prev'),
+      deskBtnSignage2Pause: $('desk-btn-signage2-pause'),
+      deskBtnSignage2Next: $('desk-btn-signage2-next'),
+      deskBtnSignage2Right: $('desk-btn-signage2-right'),
+      deskBtnSignage2Below: $('desk-btn-signage2-below'),
+      deskSignage2Presets: Array.from(document.querySelectorAll('#desk-signage2-presets [data-z2w]')),
+      deskSignage2W: $('desk-signage2-w'),
+      deskSignage2H: $('desk-signage2-h'),
+      deskSignage2X: $('desk-signage2-x'),
+      deskSignage2Y: $('desk-signage2-y'),
+      deskSignage2FitBtns: toBtns('#desk-signage2-fit-grid [data-ds2fit]', 'data-ds2fit', (s) => parseInt(s, 10) || 0),
+      deskSignage2SecInput: $('desk-signage2-sec-input'),
+      deskSignage2SecBtns: toBtns('#desk-signage2-sec-grid [data-ds2sec]', 'data-ds2sec', (s) => parseInt(s, 10) || 8),
+      deskSignage2TransBtns: toBtns('#desk-signage2-trans-grid [data-ds2trans]', 'data-ds2trans', (s) => parseInt(s, 10) || 0),
+      deskSignage2FadeBtns: toBtns('#desk-signage2-fade-grid [data-ds2fade]', 'data-ds2fade', (s) => parseFloat(s) || 0),
+      deskSignage2ScopeBtns: toBtns('#desk-signage2-scope-grid [data-ds2all]', 'data-ds2all', (s) => parseInt(s, 10) === 1 ? 1 : 0),
+      deskBtnSignage2Refresh: $('desk-btn-signage2-refresh'),
+      deskSignage2Playlist: $('desk-signage2-playlist'),
       // Mutación Automática por Vuelta de Loops (🤖 AUTO por sección)
       autoModBtns: Array.from(document.querySelectorAll('.btn-auto-mod')),
       btnAllAutoToggle: $('btn-all-auto-toggle'),
@@ -11896,24 +12303,24 @@ class ConsoleController {
     });
 
     // ---- Modal Kiosco de Publicidad / Cartelería LED ----
-    const renderDeskSignagePlaylist = () => {
-      const box = d.deskSignagePlaylist;
+    const renderZonePlaylist = (box, sg, zoneNum) => {
       if (!box) return;
       const lib = (this._mediaLibItems || []).slice().reverse();
-      const sg = st.signage || {};
+      const sgState = sg || {};
       const byUrl = new Map(lib.map((it) => [it.url, it]));
       const ordered = [];
       const seen = new Set();
-      (sg.playlist || []).forEach((p) => {
+      (sgState.playlist || []).forEach((p) => {
         if (p && p.url && byUrl.has(p.url) && !seen.has(p.url)) {
           seen.add(p.url);
           ordered.push({ item: byUrl.get(p.url), selected: true });
         }
       });
+      const defaultSelected = zoneNum === 2 ? Boolean(sgState.useAllMedia) : (sgState.useAllMedia !== false);
       lib.forEach((it) => {
         if (it && it.url && !seen.has(it.url)) {
           seen.add(it.url);
-          ordered.push({ item: it, selected: sg.useAllMedia !== false });
+          ordered.push({ item: it, selected: defaultSelected });
         }
       });
       if (!ordered.length) {
@@ -11928,11 +12335,12 @@ class ConsoleController {
         }));
         this._cmd({
           action: 'SET_SIGNAGE_PROP',
+          zone: zoneNum,
           prop: 'playlist',
           value: list,
-          useAllMedia: makeCustom ? false : (sg.useAllMedia !== false)
+          useAllMedia: makeCustom ? false : defaultSelected
         });
-        renderDeskSignagePlaylist();
+        renderDeskSignagePlaylists();
       };
       box.innerHTML = '';
       const icons = { video: '🎬', gif: '🌀', image: '🖼' };
@@ -11943,7 +12351,7 @@ class ConsoleController {
         const chk = document.createElement('input');
         chk.type = 'checkbox';
         chk.checked = Boolean(row.selected);
-        chk.style.cssText = 'width:16px;height:16px;accent-color:#00e676;cursor:pointer';
+        chk.style.cssText = `width:16px;height:16px;accent-color:${zoneNum === 2 ? '#e879f9' : '#00e676'};cursor:pointer`;
         chk.addEventListener('change', () => {
           ordered[idx].selected = chk.checked;
           commitOrder(ordered, true);
@@ -11954,10 +12362,20 @@ class ConsoleController {
         const playBtn = document.createElement('button');
         playBtn.type = 'button';
         playBtn.textContent = '▶';
-        playBtn.title = 'Reproducir ahora';
+        playBtn.title = zoneNum === 2 ? 'Reproducir en Zona 2' : 'Reproducir ahora';
         playBtn.addEventListener('click', () => {
-          if (!st.signage?.enabled) this._cmd({ action: 'SET_SIGNAGE_ENABLED', value: true });
-          this._cmd({ action: 'SIGNAGE_GOTO', url: it.url });
+          if (zoneNum === 2) {
+            if (!st.signage?.enabled) this._cmd({ action: 'SET_SIGNAGE_ENABLED', zone: 1, value: true });
+            if (!ordered[idx].selected && st.signage2?.useAllMedia !== true) {
+              ordered[idx].selected = true;
+              commitOrder(ordered, true);
+            }
+            if (!st.signage2?.enabled) this._cmd({ action: 'SET_SIGNAGE_ENABLED', zone: 2, value: true });
+            this._cmd({ action: 'SIGNAGE_GOTO', zone: 2, url: it.url });
+          } else {
+            if (!st.signage?.enabled) this._cmd({ action: 'SET_SIGNAGE_ENABLED', zone: 1, value: true });
+            this._cmd({ action: 'SIGNAGE_GOTO', zone: 1, url: it.url });
+          }
         });
         const upBtn = document.createElement('button');
         upBtn.type = 'button';
@@ -11985,18 +12403,22 @@ class ConsoleController {
         delBtn.textContent = '🗑';
         delBtn.addEventListener('click', async () => {
           await this._deleteMediaItem(it);
-          renderDeskSignagePlaylist();
+          renderDeskSignagePlaylists();
         });
         el.append(chk, nameEl, playBtn, upBtn, dnBtn, delBtn);
         box.appendChild(el);
       });
     };
-    this._renderDeskSignagePlaylist = renderDeskSignagePlaylist;
+    const renderDeskSignagePlaylists = () => {
+      renderZonePlaylist(d.deskSignagePlaylist, st.signage, 1);
+      renderZonePlaylist(d.deskSignage2Playlist, st.signage2, 2);
+    };
+    this._renderDeskSignagePlaylist = renderDeskSignagePlaylists;
 
     d.btnOpenSignageModal?.addEventListener('click', async () => {
       d.signageModalBackdrop?.classList.remove('hidden');
       await this._refreshMediaLibrary();
-      renderDeskSignagePlaylist();
+      renderDeskSignagePlaylists();
     });
     d.btnCloseSignageModal?.addEventListener('click', () => {
       d.signageModalBackdrop?.classList.add('hidden');
@@ -12037,12 +12459,11 @@ class ConsoleController {
         } catch (_) {}
       }
       await this._refreshMediaLibrary();
-      renderDeskSignagePlaylist();
+      renderDeskSignagePlaylists();
       if (!st.signage?.enabled && okCount > 0) {
         this._cmd({ action: 'SET_SIGNAGE_ENABLED', value: true });
-      } else {
-        this._cmd({ action: 'SIGNAGE_REFRESH_LIBRARY' });
       }
+      this._cmd({ action: 'SIGNAGE_REFRESH_LIBRARY' });
       if (d.deskSignageMsg) {
         d.deskSignageMsg.textContent = okCount ? `✅ ${okCount} archivo(s) subidos al carrusel.` : '❌ No se pudieron subir los archivos.';
       }
@@ -12107,12 +12528,90 @@ class ConsoleController {
         } else {
           this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'useAllMedia', value: all });
         }
-        renderDeskSignagePlaylist();
+        renderDeskSignagePlaylists();
       });
     });
     d.deskBtnSignageRefresh?.addEventListener('click', async () => {
       await this._refreshMediaLibrary();
-      renderDeskSignagePlaylist();
+      renderDeskSignagePlaylists();
+    });
+
+    // ---- Zona 2 Independiente (Modal Desktop) ----
+    d.deskBtnSignage2Toggle?.addEventListener('click', () => {
+      const next = !st.signage2?.enabled;
+      if (next && !st.signage?.enabled) {
+        this._cmd({ action: 'SET_SIGNAGE_ENABLED', zone: 1, value: true });
+      }
+      this._cmd({ action: 'SET_SIGNAGE_ENABLED', zone: 2, value: next });
+    });
+    d.deskBtnSignage2Prev?.addEventListener('click', () => this._cmd({ action: 'SIGNAGE_PREV', zone: 2, immediate: true }));
+    d.deskBtnSignage2Next?.addEventListener('click', () => this._cmd({ action: 'SIGNAGE_NEXT', zone: 2, immediate: true }));
+    d.deskBtnSignage2Pause?.addEventListener('click', () => {
+      this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'paused', value: !st.signage2?.paused });
+    });
+    const placeZone2Relative = (side) => {
+      const mp = st.fx?.mapping || {};
+      const z1W = Math.max(64, Number(mp.ledWidthPx) || 1024);
+      const z1H = Math.max(64, Number(mp.ledHeightPx) || 512);
+      const z1X = Math.max(0, Number(mp.ledOffsetXPx) || 0);
+      const z1Y = Math.max(0, Number(mp.ledOffsetYPx) || 0);
+      if (!mp.ledScalerEnabled) {
+        this._cmd({ action: 'SET_MAP_PROP', prop: 'ledScalerEnabled', value: true });
+      }
+      const rect = side === 'below' ? { x: z1X, y: z1Y + z1H } : { x: z1X + z1W, y: z1Y };
+      this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'rect', value: rect });
+    };
+    d.deskBtnSignage2Right?.addEventListener('click', () => placeZone2Relative('right'));
+    d.deskBtnSignage2Below?.addEventListener('click', () => placeZone2Relative('below'));
+    d.deskSignage2Presets?.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const w = parseInt(btn.getAttribute('data-z2w'), 10) || 1024;
+        const h = parseInt(btn.getAttribute('data-z2h'), 10) || 512;
+        this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'rect', value: { width: w, height: h } });
+      });
+    });
+    const bindZ2Num = (el, prop, minV, maxV) => {
+      if (!el) return;
+      const apply = () => {
+        const v = parseInt(el.value, 10);
+        if (Number.isFinite(v)) {
+          this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop, value: Math.max(minV, Math.min(maxV, v)) });
+        }
+      };
+      el.addEventListener('input', apply);
+      el.addEventListener('change', apply);
+    };
+    bindZ2Num(d.deskSignage2W, 'width', 64, 7680);
+    bindZ2Num(d.deskSignage2H, 'height', 64, 4320);
+    bindZ2Num(d.deskSignage2X, 'x', 0, 7680);
+    bindZ2Num(d.deskSignage2Y, 'y', 0, 4320);
+    d.deskSignage2FitBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'fit', value: b.id }));
+    });
+    d.deskSignage2SecBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'slideSeconds', value: b.id }));
+    });
+    const applyDeskZ2SlideSec = () => {
+      const v = parseInt(d.deskSignage2SecInput?.value, 10);
+      if (Number.isFinite(v)) this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'slideSeconds', value: v });
+    };
+    d.deskSignage2SecInput?.addEventListener('input', applyDeskZ2SlideSec);
+    d.deskSignage2SecInput?.addEventListener('change', applyDeskZ2SlideSec);
+    d.deskSignage2TransBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'transition', value: b.id }));
+    });
+    d.deskSignage2FadeBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'fadeSeconds', value: b.id }));
+    });
+    d.deskSignage2ScopeBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => {
+        this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'useAllMedia', value: b.id === 1 });
+        renderDeskSignagePlaylists();
+      });
+    });
+    d.deskBtnSignage2Refresh?.addEventListener('click', async () => {
+      await this._refreshMediaLibrary();
+      renderDeskSignagePlaylists();
     });
   }
 
@@ -12783,6 +13282,51 @@ class ConsoleController {
     const outBright = n(st.fx?.output?.brightness, 1.0);
     this._syncSlider(d.deskSignageBright, d.deskSignageBrightVal, outBright, pct(outBright));
 
+    // ---- Modal Kiosco Zona 2 Independiente ----
+    const sg2 = st.signage2 || EMPTY;
+    const sg2On = Boolean(sg2.enabled);
+    this._syncToggle(
+      d.deskBtnSignage2Toggle,
+      'deskSignage2On',
+      sg2On,
+      '🟢 ZONA 2 INDEPENDIENTE: ACTIVA',
+      '⬜ ZONA 2 INDEPENDIENTE: APAGADA',
+      'primary'
+    );
+    if (d.deskSignage2Now) {
+      let now2Txt = '⏹ Zona 2 apagada';
+      if (sg2On) {
+        if (!sg2.totalItems) now2Txt = '⚠️ Zona 2 activa sin archivos — marca al menos 1 archivo abajo';
+        else {
+          const rem2 = sg2.remainingSec > 0 ? ` · ${sg2.remainingSec}s` : (sg2.totalItems === 1 ? ' · LOOP 24/7' : '');
+          now2Txt = `${sg2.paused ? '⏸' : '▶'} ${(sg2.currentIndex || 0) + 1}/${sg2.totalItems} · ${sg2.currentName || 'Archivo'}${rem2}`;
+        }
+      }
+      this._setText(d.deskSignage2Now, now2Txt);
+    }
+    this._syncToggle(d.deskBtnSignage2Pause, 'deskSignage2Paused', Boolean(sg2.paused), '▶ SEGUIR', '⏸ PAUSAR', 'primary');
+    const z2W = n(sg2.width, 1024), z2H = n(sg2.height, 512), z2X = n(sg2.x, 512), z2Y = n(sg2.y, 0);
+    if (d.deskSignage2W && document.activeElement !== d.deskSignage2W && Number(d.deskSignage2W.value) !== z2W) d.deskSignage2W.value = z2W;
+    if (d.deskSignage2H && document.activeElement !== d.deskSignage2H && Number(d.deskSignage2H.value) !== z2H) d.deskSignage2H.value = z2H;
+    if (d.deskSignage2X && document.activeElement !== d.deskSignage2X && Number(d.deskSignage2X.value) !== z2X) d.deskSignage2X.value = z2X;
+    if (d.deskSignage2Y && document.activeElement !== d.deskSignage2Y && Number(d.deskSignage2Y.value) !== z2Y) d.deskSignage2Y.value = z2Y;
+    d.deskSignage2Presets?.forEach((btn) => {
+      const bw = parseInt(btn.getAttribute('data-z2w'), 10);
+      const bh = parseInt(btn.getAttribute('data-z2h'), 10);
+      btn.classList.toggle('primary', bw === z2W && bh === z2H);
+    });
+    if (d.deskSignage2SecInput && document.activeElement !== d.deskSignage2SecInput && Number(d.deskSignage2SecInput.value) !== (sg2.slideSeconds || 8)) {
+      d.deskSignage2SecInput.value = sg2.slideSeconds || 8;
+    }
+    d.deskSignage2SecBtns?.forEach((b) => b.el.classList.toggle('primary', b.id === (sg2.slideSeconds || 8)));
+    const cur2Trans = sg2.transition !== undefined ? Number(sg2.transition) : 1;
+    const cur2Fade = Number(sg2.fadeSeconds) || 0.7;
+    const nearest2Fade = [0.4, 0.8, 1.5].reduce((a, b) => (Math.abs(b - cur2Fade) < Math.abs(a - cur2Fade) ? b : a), 0.8);
+    d.deskSignage2TransBtns?.forEach((b) => b.el.classList.toggle('primary', b.id === cur2Trans));
+    d.deskSignage2FadeBtns?.forEach((b) => b.el.classList.toggle('primary', cur2Trans > 0 && Math.abs(b.id - nearest2Fade) < 0.05));
+    d.deskSignage2FitBtns?.forEach((b) => b.el.classList.toggle('primary', b.id === (sg2.fit || 0)));
+    d.deskSignage2ScopeBtns?.forEach((b) => b.el.classList.toggle('primary', (b.id === 1) === Boolean(sg2.useAllMedia)));
+
     // Editor: solo se redibuja si cambia algo y está visible
     const cv = d.cornerCanvas;
     if (cv && cv.offsetParent !== null) {
@@ -12845,6 +13389,11 @@ class AetherVJApplication {
     this.syncBridge.attachMedia(this.media);
     this.signagePlayer = new SignagePlayer(this.state, this.media, this.syncBridge);
     this.syncBridge.attachSignage(this.signagePlayer);
+    // Zona 2 de cartelería LED independiente
+    this.media2 = new MediaLayer(this.state, 'media2');
+    this.renderer.media2 = this.media2;
+    this.signagePlayer2 = new SignagePlayer(this.state, this.media2, this.syncBridge, 'signage2', 'media2');
+    this.syncBridge.attachSignage2(this.signagePlayer2);
     this.media.refreshCameras();
     this.persistence = new Persistence(this.state, this.syncBridge);
     this.ui = new ConsoleController(
@@ -12855,6 +13404,7 @@ class AetherVJApplication {
     );
     this.ui.midiClock = this.midiClock;
     this.ui.signagePlayer = this.signagePlayer;
+    this.ui.signagePlayer2 = this.signagePlayer2;
     this.syncBridge.attachControllers(this.autopilot, () => this.ui._buildGeneratorBanks());
 
     if (this.state.uiHidden) {
@@ -12881,6 +13431,7 @@ class AetherVJApplication {
         this.state.resolutionScale = AUTO_QUALITY_STEPS[0];
       }
       this.signagePlayer.onConfigLoaded();
+      this.signagePlayer2.onConfigLoaded();
     });
 
     // Kiosk with ?mic=1: listen to the real room / mixer audio automatically (falls back to the simulator)
@@ -12904,7 +13455,7 @@ class AetherVJApplication {
     const st = this.state;
     if (!st.autoQuality) return;
     // En modo Publicidad/Kiosco el gasto GPU es mínimo: mantener siempre 100% de resolución nativa para logos nítidos
-    if (st.signage && st.signage.enabled) {
+    if ((st.signage && st.signage.enabled) || (st.signage2 && st.signage2.enabled)) {
       if (st.resolutionScale !== 1.0) st.resolutionScale = 1.0;
       this.autoQualityStepIdx = 0;
       this.lowFpsSeconds = 0;
@@ -13022,6 +13573,9 @@ class AetherVJApplication {
     // 2.5 Update Advertising Kiosk / Signage Player (loops or timed carousel)
     if (this.signagePlayer) {
       this.signagePlayer.update(dt);
+    }
+    if (this.signagePlayer2) {
+      this.signagePlayer2.update(dt);
     }
 
     // 3. Execute Multi-Pass GPU Shader Pipeline (skip GPU draw if window is minimized to save power while keeping Projector & Remote live)

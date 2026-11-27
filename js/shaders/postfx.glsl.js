@@ -1011,3 +1011,114 @@ void main() {
   fragColor = vec4(clamp(color, 0.0, 1.0), outAlpha);
 }
 `;
+
+export const SIGNAGE_ZONE_SHADER_SRC = `#version 300 es
+precision highp float;
+
+in vec2 vUv;
+out vec4 fragColor;
+
+uniform sampler2D uTexMedia;
+uniform float uMediaMix;
+uniform vec2 uUvScale;
+uniform int uTransMode;
+uniform vec2 uTrans;
+uniform float uMasterBright;
+uniform float uColorTemp;
+uniform float uBlackout;
+uniform int uMapTestGrid;
+uniform vec2 uResolution;
+uniform int uBgMode;
+
+vec4 sampleMediaRaw(vec2 muv) {
+  vec4 p = texture(uTexMedia, vec2(muv.x, 1.0 - muv.y));
+  vec3 straight = (p.a > 0.002) ? clamp(p.rgb / p.a, 0.0, 1.0) : vec3(0.0);
+  return vec4(straight, p.a);
+}
+
+void main() {
+  if (uBlackout > 0.5) {
+    fragColor = vec4(0.0, 0.0, 0.0, (uBgMode == 1) ? 0.0 : 1.0);
+    return;
+  }
+
+  vec2 muv = (vUv - 0.5) * uUvScale + 0.5;
+  float transAlpha = 1.0;
+  float tp = clamp(uTrans.x, 0.0, 1.0);
+  float tdir = uTrans.y;
+  float te = smoothstep(0.0, 1.0, tp);
+
+  if (uTransMode > 0 && tp > 0.001) {
+    if (uTransMode == 1) {
+      transAlpha = 1.0 - te;
+    } else if (uTransMode == 2) {
+      float z = (tdir < 0.0) ? (1.0 + 0.14 * te) : (1.0 - 0.14 * te);
+      muv = (muv - 0.5) / max(z, 0.2) + 0.5;
+      transAlpha = 1.0 - te;
+    } else if (uTransMode == 3) {
+      muv.x += (tdir < 0.0) ? (te * 0.55) : (-te * 0.55);
+      transAlpha = 1.0 - te * 0.85;
+    } else if (uTransMode == 4) {
+      float fe = 0.09;
+      if (tdir < 0.0) {
+        float edge = te * (1.0 + fe);
+        transAlpha = smoothstep(edge - fe, edge, vUv.x);
+      } else {
+        float rev = 1.0 - te;
+        float edge = rev * (1.0 + fe);
+        transAlpha = 1.0 - smoothstep(edge - fe, edge, vUv.x);
+      }
+    } else if (uTransMode == 5) {
+      float distC = length((vUv - 0.5) * vec2(1.0, 0.72));
+      float rad = (1.0 - te) * 0.72;
+      transAlpha = 1.0 - smoothstep(rad - 0.09, rad + 0.02, distC);
+    }
+  }
+
+  vec3 color = vec3(0.0);
+  if (uMediaMix > 0.003 && transAlpha > 0.001 && muv.x >= 0.0 && muv.x <= 1.0 && muv.y >= 0.0 && muv.y <= 1.0) {
+    vec4 raw = sampleMediaRaw(muv);
+    float a = clamp(uMediaMix * raw.a * transAlpha, 0.0, 1.0);
+    color = raw.rgb * a;
+  }
+
+  if (uMapTestGrid == 1) {
+    float aspect = uResolution.x / max(uResolution.y, 1.0);
+    vec2 bDist = min(vUv, 1.0 - vUv);
+    float border = smoothstep(0.015, 0.004, min(bDist.x, bDist.y));
+    float crossLine = max(
+      smoothstep(0.006, 0.0015, abs(vUv.x - 0.5)),
+      smoothstep(0.006, 0.0015, abs(vUv.y - 0.5))
+    );
+    float diag = max(
+      smoothstep(0.005, 0.0015, abs(vUv.x - vUv.y)),
+      smoothstep(0.005, 0.0015, abs(vUv.x - (1.0 - vUv.y)))
+    ) * 0.45;
+    vec2 cRel = (vUv - 0.5) * vec2(aspect, 1.0);
+    float ring = smoothstep(0.010, 0.0025, abs(length(cRel) - 0.25));
+    vec3 gridCol = vec3(1.0, 0.15, 0.75) * (border + ring) + vec3(1.0, 0.78, 0.0) * (crossLine + diag);
+    float gridMask = clamp(border + crossLine * 0.85 + ring * 0.85 + diag, 0.0, 1.0);
+    color = mix(color * 0.55, gridCol, gridMask);
+  }
+
+  float temp = clamp(uColorTemp, -1.0, 1.0);
+  color *= vec3(1.0 + 0.10 * temp, 1.0 + 0.01 * temp, 1.0 - 0.16 * temp);
+  color *= clamp(uMasterBright, 0.0, 1.0);
+
+  float outAlpha = 1.0;
+  if (uBgMode == 1) {
+    float peakChannel = max(color.r, max(color.g, color.b));
+    float luma = dot(color, vec3(0.299, 0.587, 0.114));
+    outAlpha = clamp(smoothstep(0.012, 0.22, max(peakChannel, luma)), 0.0, 1.0);
+    color = (outAlpha > 0.005) ? clamp(color / outAlpha, 0.0, 1.0) : vec3(0.0);
+  } else if (uBgMode == 2) {
+    float peakChannel = max(color.r, max(color.g, color.b));
+    float shapeMask = clamp(smoothstep(0.015, 0.22, peakChannel), 0.0, 1.0);
+    vec3 pureColor = (shapeMask > 0.005) ? clamp(color / shapeMask, 0.0, 1.0) : vec3(0.0);
+    color = mix(vec3(0.0, 1.0, 0.0), pureColor, shapeMask);
+    outAlpha = 1.0;
+  }
+
+  fragColor = vec4(clamp(color, 0.0, 1.0), outAlpha);
+}
+`;

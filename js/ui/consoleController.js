@@ -2074,6 +2074,27 @@ export class ConsoleController {
       deskSignageScopeBtns: toBtns('#desk-signage-scope-grid [data-dsall]', 'data-dsall', (s) => parseInt(s, 10) === 1 ? 1 : 0),
       deskBtnSignageRefresh: $('desk-btn-signage-refresh'),
       deskSignagePlaylist: $('desk-signage-playlist'),
+      // Modal Kiosco Zona 2 Independiente
+      deskBtnSignage2Toggle: $('desk-btn-signage2-toggle'),
+      deskSignage2Now: $('desk-signage2-now'),
+      deskBtnSignage2Prev: $('desk-btn-signage2-prev'),
+      deskBtnSignage2Pause: $('desk-btn-signage2-pause'),
+      deskBtnSignage2Next: $('desk-btn-signage2-next'),
+      deskBtnSignage2Right: $('desk-btn-signage2-right'),
+      deskBtnSignage2Below: $('desk-btn-signage2-below'),
+      deskSignage2Presets: Array.from(document.querySelectorAll('#desk-signage2-presets [data-z2w]')),
+      deskSignage2W: $('desk-signage2-w'),
+      deskSignage2H: $('desk-signage2-h'),
+      deskSignage2X: $('desk-signage2-x'),
+      deskSignage2Y: $('desk-signage2-y'),
+      deskSignage2FitBtns: toBtns('#desk-signage2-fit-grid [data-ds2fit]', 'data-ds2fit', (s) => parseInt(s, 10) || 0),
+      deskSignage2SecInput: $('desk-signage2-sec-input'),
+      deskSignage2SecBtns: toBtns('#desk-signage2-sec-grid [data-ds2sec]', 'data-ds2sec', (s) => parseInt(s, 10) || 8),
+      deskSignage2TransBtns: toBtns('#desk-signage2-trans-grid [data-ds2trans]', 'data-ds2trans', (s) => parseInt(s, 10) || 0),
+      deskSignage2FadeBtns: toBtns('#desk-signage2-fade-grid [data-ds2fade]', 'data-ds2fade', (s) => parseFloat(s) || 0),
+      deskSignage2ScopeBtns: toBtns('#desk-signage2-scope-grid [data-ds2all]', 'data-ds2all', (s) => parseInt(s, 10) === 1 ? 1 : 0),
+      deskBtnSignage2Refresh: $('desk-btn-signage2-refresh'),
+      deskSignage2Playlist: $('desk-signage2-playlist'),
       // Mutación Automática por Vuelta de Loops (🤖 AUTO por sección)
       autoModBtns: Array.from(document.querySelectorAll('.btn-auto-mod')),
       btnAllAutoToggle: $('btn-all-auto-toggle'),
@@ -2548,24 +2569,24 @@ export class ConsoleController {
     });
 
     // ---- Modal Kiosco de Publicidad / Cartelería LED ----
-    const renderDeskSignagePlaylist = () => {
-      const box = d.deskSignagePlaylist;
+    const renderZonePlaylist = (box, sg, zoneNum) => {
       if (!box) return;
       const lib = (this._mediaLibItems || []).slice().reverse();
-      const sg = st.signage || {};
+      const sgState = sg || {};
       const byUrl = new Map(lib.map((it) => [it.url, it]));
       const ordered = [];
       const seen = new Set();
-      (sg.playlist || []).forEach((p) => {
+      (sgState.playlist || []).forEach((p) => {
         if (p && p.url && byUrl.has(p.url) && !seen.has(p.url)) {
           seen.add(p.url);
           ordered.push({ item: byUrl.get(p.url), selected: true });
         }
       });
+      const defaultSelected = zoneNum === 2 ? Boolean(sgState.useAllMedia) : (sgState.useAllMedia !== false);
       lib.forEach((it) => {
         if (it && it.url && !seen.has(it.url)) {
           seen.add(it.url);
-          ordered.push({ item: it, selected: sg.useAllMedia !== false });
+          ordered.push({ item: it, selected: defaultSelected });
         }
       });
       if (!ordered.length) {
@@ -2580,11 +2601,12 @@ export class ConsoleController {
         }));
         this._cmd({
           action: 'SET_SIGNAGE_PROP',
+          zone: zoneNum,
           prop: 'playlist',
           value: list,
-          useAllMedia: makeCustom ? false : (sg.useAllMedia !== false)
+          useAllMedia: makeCustom ? false : defaultSelected
         });
-        renderDeskSignagePlaylist();
+        renderDeskSignagePlaylists();
       };
       box.innerHTML = '';
       const icons = { video: '🎬', gif: '🌀', image: '🖼' };
@@ -2595,7 +2617,7 @@ export class ConsoleController {
         const chk = document.createElement('input');
         chk.type = 'checkbox';
         chk.checked = Boolean(row.selected);
-        chk.style.cssText = 'width:16px;height:16px;accent-color:#00e676;cursor:pointer';
+        chk.style.cssText = `width:16px;height:16px;accent-color:${zoneNum === 2 ? '#e879f9' : '#00e676'};cursor:pointer`;
         chk.addEventListener('change', () => {
           ordered[idx].selected = chk.checked;
           commitOrder(ordered, true);
@@ -2606,10 +2628,20 @@ export class ConsoleController {
         const playBtn = document.createElement('button');
         playBtn.type = 'button';
         playBtn.textContent = '▶';
-        playBtn.title = 'Reproducir ahora';
+        playBtn.title = zoneNum === 2 ? 'Reproducir en Zona 2' : 'Reproducir ahora';
         playBtn.addEventListener('click', () => {
-          if (!st.signage?.enabled) this._cmd({ action: 'SET_SIGNAGE_ENABLED', value: true });
-          this._cmd({ action: 'SIGNAGE_GOTO', url: it.url });
+          if (zoneNum === 2) {
+            if (!st.signage?.enabled) this._cmd({ action: 'SET_SIGNAGE_ENABLED', zone: 1, value: true });
+            if (!ordered[idx].selected && st.signage2?.useAllMedia !== true) {
+              ordered[idx].selected = true;
+              commitOrder(ordered, true);
+            }
+            if (!st.signage2?.enabled) this._cmd({ action: 'SET_SIGNAGE_ENABLED', zone: 2, value: true });
+            this._cmd({ action: 'SIGNAGE_GOTO', zone: 2, url: it.url });
+          } else {
+            if (!st.signage?.enabled) this._cmd({ action: 'SET_SIGNAGE_ENABLED', zone: 1, value: true });
+            this._cmd({ action: 'SIGNAGE_GOTO', zone: 1, url: it.url });
+          }
         });
         const upBtn = document.createElement('button');
         upBtn.type = 'button';
@@ -2637,18 +2669,22 @@ export class ConsoleController {
         delBtn.textContent = '🗑';
         delBtn.addEventListener('click', async () => {
           await this._deleteMediaItem(it);
-          renderDeskSignagePlaylist();
+          renderDeskSignagePlaylists();
         });
         el.append(chk, nameEl, playBtn, upBtn, dnBtn, delBtn);
         box.appendChild(el);
       });
     };
-    this._renderDeskSignagePlaylist = renderDeskSignagePlaylist;
+    const renderDeskSignagePlaylists = () => {
+      renderZonePlaylist(d.deskSignagePlaylist, st.signage, 1);
+      renderZonePlaylist(d.deskSignage2Playlist, st.signage2, 2);
+    };
+    this._renderDeskSignagePlaylist = renderDeskSignagePlaylists;
 
     d.btnOpenSignageModal?.addEventListener('click', async () => {
       d.signageModalBackdrop?.classList.remove('hidden');
       await this._refreshMediaLibrary();
-      renderDeskSignagePlaylist();
+      renderDeskSignagePlaylists();
     });
     d.btnCloseSignageModal?.addEventListener('click', () => {
       d.signageModalBackdrop?.classList.add('hidden');
@@ -2689,12 +2725,11 @@ export class ConsoleController {
         } catch (_) {}
       }
       await this._refreshMediaLibrary();
-      renderDeskSignagePlaylist();
+      renderDeskSignagePlaylists();
       if (!st.signage?.enabled && okCount > 0) {
         this._cmd({ action: 'SET_SIGNAGE_ENABLED', value: true });
-      } else {
-        this._cmd({ action: 'SIGNAGE_REFRESH_LIBRARY' });
       }
+      this._cmd({ action: 'SIGNAGE_REFRESH_LIBRARY' });
       if (d.deskSignageMsg) {
         d.deskSignageMsg.textContent = okCount ? `✅ ${okCount} archivo(s) subidos al carrusel.` : '❌ No se pudieron subir los archivos.';
       }
@@ -2759,12 +2794,90 @@ export class ConsoleController {
         } else {
           this._cmd({ action: 'SET_SIGNAGE_PROP', prop: 'useAllMedia', value: all });
         }
-        renderDeskSignagePlaylist();
+        renderDeskSignagePlaylists();
       });
     });
     d.deskBtnSignageRefresh?.addEventListener('click', async () => {
       await this._refreshMediaLibrary();
-      renderDeskSignagePlaylist();
+      renderDeskSignagePlaylists();
+    });
+
+    // ---- Zona 2 Independiente (Modal Desktop) ----
+    d.deskBtnSignage2Toggle?.addEventListener('click', () => {
+      const next = !st.signage2?.enabled;
+      if (next && !st.signage?.enabled) {
+        this._cmd({ action: 'SET_SIGNAGE_ENABLED', zone: 1, value: true });
+      }
+      this._cmd({ action: 'SET_SIGNAGE_ENABLED', zone: 2, value: next });
+    });
+    d.deskBtnSignage2Prev?.addEventListener('click', () => this._cmd({ action: 'SIGNAGE_PREV', zone: 2, immediate: true }));
+    d.deskBtnSignage2Next?.addEventListener('click', () => this._cmd({ action: 'SIGNAGE_NEXT', zone: 2, immediate: true }));
+    d.deskBtnSignage2Pause?.addEventListener('click', () => {
+      this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'paused', value: !st.signage2?.paused });
+    });
+    const placeZone2Relative = (side) => {
+      const mp = st.fx?.mapping || {};
+      const z1W = Math.max(64, Number(mp.ledWidthPx) || 1024);
+      const z1H = Math.max(64, Number(mp.ledHeightPx) || 512);
+      const z1X = Math.max(0, Number(mp.ledOffsetXPx) || 0);
+      const z1Y = Math.max(0, Number(mp.ledOffsetYPx) || 0);
+      if (!mp.ledScalerEnabled) {
+        this._cmd({ action: 'SET_MAP_PROP', prop: 'ledScalerEnabled', value: true });
+      }
+      const rect = side === 'below' ? { x: z1X, y: z1Y + z1H } : { x: z1X + z1W, y: z1Y };
+      this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'rect', value: rect });
+    };
+    d.deskBtnSignage2Right?.addEventListener('click', () => placeZone2Relative('right'));
+    d.deskBtnSignage2Below?.addEventListener('click', () => placeZone2Relative('below'));
+    d.deskSignage2Presets?.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const w = parseInt(btn.getAttribute('data-z2w'), 10) || 1024;
+        const h = parseInt(btn.getAttribute('data-z2h'), 10) || 512;
+        this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'rect', value: { width: w, height: h } });
+      });
+    });
+    const bindZ2Num = (el, prop, minV, maxV) => {
+      if (!el) return;
+      const apply = () => {
+        const v = parseInt(el.value, 10);
+        if (Number.isFinite(v)) {
+          this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop, value: Math.max(minV, Math.min(maxV, v)) });
+        }
+      };
+      el.addEventListener('input', apply);
+      el.addEventListener('change', apply);
+    };
+    bindZ2Num(d.deskSignage2W, 'width', 64, 7680);
+    bindZ2Num(d.deskSignage2H, 'height', 64, 4320);
+    bindZ2Num(d.deskSignage2X, 'x', 0, 7680);
+    bindZ2Num(d.deskSignage2Y, 'y', 0, 4320);
+    d.deskSignage2FitBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'fit', value: b.id }));
+    });
+    d.deskSignage2SecBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'slideSeconds', value: b.id }));
+    });
+    const applyDeskZ2SlideSec = () => {
+      const v = parseInt(d.deskSignage2SecInput?.value, 10);
+      if (Number.isFinite(v)) this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'slideSeconds', value: v });
+    };
+    d.deskSignage2SecInput?.addEventListener('input', applyDeskZ2SlideSec);
+    d.deskSignage2SecInput?.addEventListener('change', applyDeskZ2SlideSec);
+    d.deskSignage2TransBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'transition', value: b.id }));
+    });
+    d.deskSignage2FadeBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'fadeSeconds', value: b.id }));
+    });
+    d.deskSignage2ScopeBtns?.forEach((b) => {
+      b.el.addEventListener('click', () => {
+        this._cmd({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'useAllMedia', value: b.id === 1 });
+        renderDeskSignagePlaylists();
+      });
+    });
+    d.deskBtnSignage2Refresh?.addEventListener('click', async () => {
+      await this._refreshMediaLibrary();
+      renderDeskSignagePlaylists();
     });
   }
 
@@ -3434,6 +3547,51 @@ export class ConsoleController {
     if (d.deskSignageLedOy && document.activeElement !== d.deskSignageLedOy && Number(d.deskSignageLedOy.value) !== ledOY) d.deskSignageLedOy.value = ledOY;
     const outBright = n(st.fx?.output?.brightness, 1.0);
     this._syncSlider(d.deskSignageBright, d.deskSignageBrightVal, outBright, pct(outBright));
+
+    // ---- Modal Kiosco Zona 2 Independiente ----
+    const sg2 = st.signage2 || EMPTY;
+    const sg2On = Boolean(sg2.enabled);
+    this._syncToggle(
+      d.deskBtnSignage2Toggle,
+      'deskSignage2On',
+      sg2On,
+      '🟢 ZONA 2 INDEPENDIENTE: ACTIVA',
+      '⬜ ZONA 2 INDEPENDIENTE: APAGADA',
+      'primary'
+    );
+    if (d.deskSignage2Now) {
+      let now2Txt = '⏹ Zona 2 apagada';
+      if (sg2On) {
+        if (!sg2.totalItems) now2Txt = '⚠️ Zona 2 activa sin archivos — marca al menos 1 archivo abajo';
+        else {
+          const rem2 = sg2.remainingSec > 0 ? ` · ${sg2.remainingSec}s` : (sg2.totalItems === 1 ? ' · LOOP 24/7' : '');
+          now2Txt = `${sg2.paused ? '⏸' : '▶'} ${(sg2.currentIndex || 0) + 1}/${sg2.totalItems} · ${sg2.currentName || 'Archivo'}${rem2}`;
+        }
+      }
+      this._setText(d.deskSignage2Now, now2Txt);
+    }
+    this._syncToggle(d.deskBtnSignage2Pause, 'deskSignage2Paused', Boolean(sg2.paused), '▶ SEGUIR', '⏸ PAUSAR', 'primary');
+    const z2W = n(sg2.width, 1024), z2H = n(sg2.height, 512), z2X = n(sg2.x, 512), z2Y = n(sg2.y, 0);
+    if (d.deskSignage2W && document.activeElement !== d.deskSignage2W && Number(d.deskSignage2W.value) !== z2W) d.deskSignage2W.value = z2W;
+    if (d.deskSignage2H && document.activeElement !== d.deskSignage2H && Number(d.deskSignage2H.value) !== z2H) d.deskSignage2H.value = z2H;
+    if (d.deskSignage2X && document.activeElement !== d.deskSignage2X && Number(d.deskSignage2X.value) !== z2X) d.deskSignage2X.value = z2X;
+    if (d.deskSignage2Y && document.activeElement !== d.deskSignage2Y && Number(d.deskSignage2Y.value) !== z2Y) d.deskSignage2Y.value = z2Y;
+    d.deskSignage2Presets?.forEach((btn) => {
+      const bw = parseInt(btn.getAttribute('data-z2w'), 10);
+      const bh = parseInt(btn.getAttribute('data-z2h'), 10);
+      btn.classList.toggle('primary', bw === z2W && bh === z2H);
+    });
+    if (d.deskSignage2SecInput && document.activeElement !== d.deskSignage2SecInput && Number(d.deskSignage2SecInput.value) !== (sg2.slideSeconds || 8)) {
+      d.deskSignage2SecInput.value = sg2.slideSeconds || 8;
+    }
+    d.deskSignage2SecBtns?.forEach((b) => b.el.classList.toggle('primary', b.id === (sg2.slideSeconds || 8)));
+    const cur2Trans = sg2.transition !== undefined ? Number(sg2.transition) : 1;
+    const cur2Fade = Number(sg2.fadeSeconds) || 0.7;
+    const nearest2Fade = [0.4, 0.8, 1.5].reduce((a, b) => (Math.abs(b - cur2Fade) < Math.abs(a - cur2Fade) ? b : a), 0.8);
+    d.deskSignage2TransBtns?.forEach((b) => b.el.classList.toggle('primary', b.id === cur2Trans));
+    d.deskSignage2FadeBtns?.forEach((b) => b.el.classList.toggle('primary', cur2Trans > 0 && Math.abs(b.id - nearest2Fade) < 0.05));
+    d.deskSignage2FitBtns?.forEach((b) => b.el.classList.toggle('primary', b.id === (sg2.fit || 0)));
+    d.deskSignage2ScopeBtns?.forEach((b) => b.el.classList.toggle('primary', (b.id === 1) === Boolean(sg2.useAllMedia)));
 
     // Editor: solo se redibuja si cambia algo y está visible
     const cv = d.cornerCanvas;

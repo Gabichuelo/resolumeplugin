@@ -34,6 +34,7 @@ export class SyncBridge {
     this.remoteConnected = false;
     this.media = null;              // MediaLayer (para cámaras y ficheros locales)
     this.signage = null;            // SignagePlayer (para Modo Kiosco Publicidad)
+    this.signage2 = null;           // SignagePlayer Zona 2 independiente
     this.edgeModeOverride = null;   // Ventana de proyector con ?blend=left|right
     this.logoProcessing = false;
 
@@ -121,6 +122,10 @@ export class SyncBridge {
 
   attachSignage(signagePlayer) {
     this.signage = signagePlayer;
+  }
+
+  attachSignage2(signagePlayer2) {
+    this.signage2 = signagePlayer2;
   }
 
   /**
@@ -349,7 +354,9 @@ export class SyncBridge {
         : st.media,
       mediaPlaying: Boolean(this.media && this.media.isPlaying),
       mediaError: this.media ? this.media.lastError : '',
+      media2Url: (st.media2 && st.media2.url && !st.media2.url.startsWith('blob:')) ? st.media2.url : '',
       signage: st.signage,
+      signage2: st.signage2,
       blackout: Boolean(st.fx && st.fx.blackout),
       transition: st.transition,
       edgeBlend: st.fx.edgeBlend,
@@ -788,21 +795,28 @@ export class SyncBridge {
           }
         }
         break;
-      case 'SET_SIGNAGE_ENABLED':
-        if (this.signage) {
-          this.signage.activate(Boolean(cmd.value));
-        } else if (st.signage) {
-          st.signage.enabled = Boolean(cmd.value);
+      case 'SET_SIGNAGE_ENABLED': {
+        const isZ2 = Number(cmd.zone) === 2;
+        const player = isZ2 ? this.signage2 : this.signage;
+        const sgTarget = isZ2 ? st.signage2 : st.signage;
+        if (player) {
+          player.activate(Boolean(cmd.value));
+        } else if (sgTarget) {
+          sgTarget.enabled = Boolean(cmd.value);
         }
         break;
-      case 'SET_SIGNAGE_PROP':
-        if (st.signage && cmd.prop) {
-          const sg = st.signage;
+      }
+      case 'SET_SIGNAGE_PROP': {
+        const isZ2 = Number(cmd.zone) === 2;
+        const player = isZ2 ? this.signage2 : this.signage;
+        const sg = isZ2 ? st.signage2 : st.signage;
+        const medTarget = isZ2 ? st.media2 : st.media;
+        if (sg && cmd.prop) {
           if (cmd.prop === 'slideSeconds') {
             sg.slideSeconds = Math.round(clampNum(cmd.value, 2, 300, 8));
           } else if (cmd.prop === 'fit') {
             sg.fit = clampNum(cmd.value, 0, 2, 0) | 0;
-            if (sg.enabled && st.media) st.media.fit = sg.fit;
+            if (sg.enabled && medTarget) medTarget.fit = sg.fit;
           } else if (cmd.prop === 'fadeSeconds') {
             sg.fadeSeconds = clampNum(cmd.value, 0, 3, 0.7);
             if (sg.fadeSeconds <= 0.02) sg.transition = 0;
@@ -814,9 +828,22 @@ export class SyncBridge {
             }
           } else if (cmd.prop === 'paused') {
             sg.paused = Boolean(cmd.value);
+          } else if (isZ2 && cmd.prop === 'x') {
+            sg.x = Math.round(clampNum(cmd.value, 0, 7680, 512));
+          } else if (isZ2 && cmd.prop === 'y') {
+            sg.y = Math.round(clampNum(cmd.value, 0, 4320, 0));
+          } else if (isZ2 && cmd.prop === 'width') {
+            sg.width = Math.round(clampNum(cmd.value, 64, 7680, 1024));
+          } else if (isZ2 && cmd.prop === 'height') {
+            sg.height = Math.round(clampNum(cmd.value, 64, 4320, 512));
+          } else if (isZ2 && cmd.prop === 'rect' && cmd.value && typeof cmd.value === 'object') {
+            if (cmd.value.x !== undefined) sg.x = Math.round(clampNum(cmd.value.x, 0, 7680, sg.x || 0));
+            if (cmd.value.y !== undefined) sg.y = Math.round(clampNum(cmd.value.y, 0, 4320, sg.y || 0));
+            if (cmd.value.width !== undefined) sg.width = Math.round(clampNum(cmd.value.width, 64, 7680, sg.width || 1024));
+            if (cmd.value.height !== undefined) sg.height = Math.round(clampNum(cmd.value.height, 64, 4320, sg.height || 512));
           } else if (cmd.prop === 'useAllMedia') {
             sg.useAllMedia = Boolean(cmd.value);
-            if (this.signage && sg.enabled) this.signage.refreshLibrary(true);
+            if (player && sg.enabled) player.refreshLibrary(true);
           } else if (cmd.prop === 'playlist' && Array.isArray(cmd.value)) {
             sg.playlist = cmd.value
               .filter((it) => it && typeof it.url === 'string' && /^\/media\/[^/\\]+$/.test(it.url))
@@ -827,25 +854,41 @@ export class SyncBridge {
                 name: String(it.name || it.url.split('/').pop() || '').slice(0, 80)
               }));
             if (cmd.useAllMedia !== undefined) sg.useAllMedia = Boolean(cmd.useAllMedia);
-            if (this.signage && sg.enabled) this.signage.refreshLibrary(true);
+            if (player && sg.enabled) player.refreshLibrary(true);
           }
         }
         break;
-      case 'SIGNAGE_NEXT':
-        if (this.signage) this.signage.next(Boolean(cmd.immediate));
+      }
+      case 'SIGNAGE_NEXT': {
+        const player = Number(cmd.zone) === 2 ? this.signage2 : this.signage;
+        if (player) player.next(Boolean(cmd.immediate));
         break;
-      case 'SIGNAGE_PREV':
-        if (this.signage) this.signage.prev(Boolean(cmd.immediate));
+      }
+      case 'SIGNAGE_PREV': {
+        const player = Number(cmd.zone) === 2 ? this.signage2 : this.signage;
+        if (player) player.prev(Boolean(cmd.immediate));
         break;
-      case 'SIGNAGE_GOTO':
-        if (this.signage) {
-          if (typeof cmd.url === 'string') this.signage.goToUrl(cmd.url);
-          else this.signage.goTo(Number(cmd.index) || 0, true);
+      }
+      case 'SIGNAGE_GOTO': {
+        const player = Number(cmd.zone) === 2 ? this.signage2 : this.signage;
+        if (player) {
+          if (typeof cmd.url === 'string') player.goToUrl(cmd.url);
+          else player.goTo(Number(cmd.index) || 0, true);
         }
         break;
-      case 'SIGNAGE_REFRESH_LIBRARY':
-        if (this.signage) this.signage.refreshLibrary();
+      }
+      case 'SIGNAGE_REFRESH_LIBRARY': {
+        const z = Number(cmd.zone);
+        if (z === 2) {
+          if (this.signage2) this.signage2.refreshLibrary();
+        } else if (z === 1) {
+          if (this.signage) this.signage.refreshLibrary();
+        } else {
+          if (this.signage) this.signage.refreshLibrary();
+          if (this.signage2) this.signage2.refreshLibrary();
+        }
         break;
+      }
       case 'SET_SIGNAGE_BANNER_PRESET':
         if (st.fx && st.fx.mapping) {
           const mp = st.fx.mapping;
@@ -1026,10 +1069,22 @@ export class SyncBridge {
     p.colorOffset = st.colorOffset || 0;
     p.text = st.text;
     p.media = st.media;
+    p.media2 = st.media2;
     p.signageEnabled = Boolean(st.signage && st.signage.enabled);
     p.signageTransMode = st.signage ? (st.signage.transModeActive || 0) : 0;
     p.signageTransProg = st.signage ? (st.signage.transProgress || 0.0) : 0.0;
     p.signageTransDir = st.signage ? (st.signage.transDir || 0.0) : 0.0;
+    p.signage2 = st.signage2 ? {
+      enabled: Boolean(st.signage2.enabled),
+      x: st.signage2.x,
+      y: st.signage2.y,
+      width: st.signage2.width,
+      height: st.signage2.height,
+      fit: st.signage2.fit,
+      transModeActive: st.signage2.transModeActive || 0,
+      transProgress: st.signage2.transProgress || 0.0,
+      transDir: st.signage2.transDir || 0.0
+    } : null;
 
     p.fx.kaleidoEnabled = st.fx.kaleidoscope.enabled;
     p.fx.kaleidoWet = st.fx.kaleidoscope.wet;
@@ -1143,11 +1198,17 @@ export class SyncBridge {
     if (p.media) {
       st.media = Object.assign(st.media || {}, p.media);
     }
+    if (p.media2) {
+      st.media2 = Object.assign(st.media2 || {}, p.media2);
+    }
     if (st.signage && typeof p.signageEnabled === 'boolean') {
       st.signage.enabled = p.signageEnabled;
       st.signage.transModeActive = p.signageTransMode || 0;
       st.signage.transProgress = p.signageTransProg || 0.0;
       st.signage.transDir = p.signageTransDir || 0.0;
+    }
+    if (p.signage2 && st.signage2) {
+      Object.assign(st.signage2, p.signage2);
     }
 
     st.fx.kaleidoscope.enabled = p.fx.kaleidoEnabled;

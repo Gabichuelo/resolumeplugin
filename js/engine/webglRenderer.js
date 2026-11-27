@@ -9,7 +9,7 @@
 
 import { VERTEX_SHADER_SRC } from '../shaders/common.glsl.js';
 import { GENERATOR_SHADERS } from '../shaders/generators.glsl.js';
-import { FEEDBACK_COMPOSITE_SHADER_SRC, POSTFX_RACK_SHADER_SRC } from '../shaders/postfx.glsl.js';
+import { FEEDBACK_COMPOSITE_SHADER_SRC, POSTFX_RACK_SHADER_SRC, SIGNAGE_ZONE_SHADER_SRC } from '../shaders/postfx.glsl.js';
 import { PALETTES, interpolatePalette } from '../palettes.js';
 import { renderTextCanvas } from './textLayer.js';
 import { writeCornerPinMatrix } from './outputMapping.js';
@@ -40,6 +40,7 @@ export class WebGLRenderer {
     this.generatorPrograms = [];
     this.feedbackProgram = null;
     this.postFxProgram = null;
+    this.signageZoneProgram = null;
 
     this.fboDeckA = null;
     this.fboDeckB = null;
@@ -57,6 +58,13 @@ export class WebGLRenderer {
     this._mediaFade = 0.0;
     this._mediaW = 1;
     this._mediaH = 1;
+
+    // Zona 2 de cartelería LED independiente
+    this.media2 = null;
+    this.texMedia2 = null;
+    this._media2Fade = 0.0;
+    this._media2W = 1;
+    this._media2H = 1;
 
     // Texto en pantalla
     this.texText = null;
@@ -126,9 +134,11 @@ export class WebGLRenderer {
       this.texLogo = null;
       this._lastLogoDataUrl = '';
       this.texMedia = null;
+      this.texMedia2 = null;
       this.texText = null;
       this._textKey = '';
       if (this.media) this.media.dirty = true;
+      if (this.media2) this.media2.dirty = true;
       this._buildResources();
     });
 
@@ -223,6 +233,16 @@ export class WebGLRenderer {
       uniforms: this._cacheUniforms(postProg, postUniformNames)
     };
 
+    const sgZoneUniformNames = [
+      'uTexMedia', 'uMediaMix', 'uUvScale', 'uTransMode', 'uTrans',
+      'uMasterBright', 'uColorTemp', 'uBlackout', 'uMapTestGrid', 'uResolution', 'uBgMode'
+    ];
+    const sgZoneProg = this._createProgram(VERTEX_SHADER_SRC, SIGNAGE_ZONE_SHADER_SRC, 'SignageZone');
+    this.signageZoneProgram = {
+      program: sgZoneProg,
+      uniforms: this._cacheUniforms(sgZoneProg, sgZoneUniformNames)
+    };
+
     // 5. Allocate Reusable FBO Targets & Default DJ Logo Texture
     this.width = Math.max(64, this.canvas.clientWidth || 1280);
     this.height = Math.max(64, this.canvas.clientHeight || 720);
@@ -238,6 +258,7 @@ export class WebGLRenderer {
     this._lastLogoDataUrl = '';
 
     this.texMedia = this._createBlankTexture();
+    this.texMedia2 = this._createBlankTexture();
     this.texText = this._createBlankTexture();
     this._textKey = '';
   }
@@ -286,9 +307,8 @@ export class WebGLRenderer {
   }
 
   /** Sube el fotograma nuevo del vídeo / GIF / cámara a la GPU (solo si hay uno nuevo). */
-  _syncMediaTexture() {
-    const media = this.media;
-    if (!media || !this.texMedia) return;
+  _syncMediaTextureObj(media, tex, onDims) {
+    if (!media || !tex) return;
     media.sync();
     const src = media.pollFrame(performance.now());
     if (!src) return;
@@ -296,7 +316,7 @@ export class WebGLRenderer {
     const isVideo = typeof HTMLVideoElement !== 'undefined' && src instanceof HTMLVideoElement;
     const uploadSrc = isVideo ? src : this._prepareUploadSource(src);
     try {
-      gl.bindTexture(gl.TEXTURE_2D, this.texMedia);
+      gl.bindTexture(gl.TEXTURE_2D, tex);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, !isVideo);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, uploadSrc);
@@ -304,13 +324,19 @@ export class WebGLRenderer {
       gl.generateMipmap(gl.TEXTURE_2D);
       this._applyHighQualityTextureParams(gl, true);
       gl.bindTexture(gl.TEXTURE_2D, null);
-      this._mediaW = Math.max(1, media.width);
-      this._mediaH = Math.max(1, media.height);
+      if (onDims) onDims(Math.max(1, media.width), Math.max(1, media.height));
     } catch (err) {
       // Vídeo de otro origen sin CORS o fotograma no listo: se ignora este fotograma
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
       gl.bindTexture(gl.TEXTURE_2D, null);
     }
+  }
+
+  _syncMediaTexture() {
+    this._syncMediaTextureObj(this.media, this.texMedia, (w, h) => {
+      this._mediaW = w;
+      this._mediaH = h;
+    });
   }
 
   /** Regenera la textura del texto cuando cambia el contenido o la fuente. */
@@ -933,6 +959,82 @@ export class WebGLRenderer {
     }
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+    // ZONA 2 INDEPENDIENTE (mismo HDMI, coordenadas X, Y, Ancho, Alto en píxeles)
+    const sg2 = state.signage2;
+    if (this.media2 && (!isSignage || !sg2 || !sg2.enabled)) {
+      this.media2.sync();
+      this._media2Fade = 0.0;
+    }
+    if (isSignage && sg2 && sg2.enabled && this.signageZoneProgram && this.texMedia2) {
+      this._syncMediaTextureObj(this.media2, this.texMedia2, (w, h) => {
+        this._media2W = w;
+        this._media2H = h;
+      });
+      const med2 = state.media2;
+      const media2Ready = Boolean(this.media2 && this.media2.ready);
+      const media2Target = (med2 && med2.enabled && media2Ready) ? 1.0 : 0.0;
+      this._media2Fade += (media2Target - this._media2Fade) * 0.45;
+      if (Math.abs(media2Target - this._media2Fade) < 0.004) this._media2Fade = media2Target;
+
+      const screenW = Math.max(64, this.canvas.clientWidth || 1920);
+      const screenH = Math.max(64, this.canvas.clientHeight || 1080);
+      const scaleX2 = this.width / screenW;
+      const scaleY2 = this.height / screenH;
+      const z2W = Math.max(32, Math.min(8192, Number(sg2.width) || 512));
+      const z2H = Math.max(32, Math.min(8192, Number(sg2.height) || 256));
+      const z2X = Math.max(0, Math.min(8192, Number(sg2.x) || 0));
+      const z2Y = Math.max(0, Math.min(8192, Number(sg2.y) || 0));
+
+      const z2VpW = Math.max(16, Math.round(z2W * scaleX2));
+      const z2VpH = Math.max(16, Math.round(z2H * scaleY2));
+      const z2VpX = Math.round(z2X * scaleX2);
+      const z2VpY = Math.round(this.height - (z2Y * scaleY2) - z2VpH);
+
+      const contentAspect2 = z2W / z2H;
+      const mediaAspect2 = this._media2W / Math.max(1, this._media2H);
+      let sx2 = 1.0;
+      let sy2 = 1.0;
+      const fit2 = Number(sg2.fit) || 0;
+      if (fit2 === 2) {
+        sx2 = 1.0;
+        sy2 = 1.0;
+      } else if (fit2 === 1) {
+        if (mediaAspect2 > contentAspect2) sy2 = mediaAspect2 / contentAspect2;
+        else sx2 = contentAspect2 / mediaAspect2;
+      } else {
+        if (mediaAspect2 > contentAspect2) sx2 = contentAspect2 / mediaAspect2;
+        else sy2 = mediaAspect2 / contentAspect2;
+      }
+
+      const z2U = this.signageZoneProgram.uniforms;
+      const sg2Mode = (sg2.transProgress > 0.001) ? (sg2.transModeActive || 0) : 0;
+      const media2Opacity = med2 ? Math.max(0, Math.min(1, Number(med2.opacity ?? 1))) : 0;
+
+      gl.enable(gl.SCISSOR_TEST);
+      gl.scissor(z2VpX, z2VpY, z2VpW, z2VpH);
+      gl.viewport(z2VpX, z2VpY, z2VpW, z2VpH);
+      gl.useProgram(this.signageZoneProgram.program);
+
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.texMedia2);
+      gl.uniform1i(z2U.uTexMedia, 0);
+      gl.uniform1f(z2U.uMediaMix, this._media2Fade * media2Opacity);
+      gl.uniform2f(z2U.uUvScale, sx2, sy2);
+      gl.uniform1i(z2U.uTransMode, sg2Mode);
+      gl.uniform2f(z2U.uTrans, sg2Mode ? (sg2.transProgress || 0.0) : 0.0, sg2Mode ? (sg2.transDir || 0.0) : 0.0);
+      gl.uniform1f(z2U.uMasterBright, out.brightness ?? 1.0);
+      gl.uniform1f(z2U.uColorTemp, out.colorTemp || 0.0);
+      gl.uniform1f(z2U.uBlackout, fx.blackout ? 1.0 : 0.0);
+      gl.uniform1i(z2U.uMapTestGrid, map.showTestGrid ? 1 : 0);
+      gl.uniform2f(z2U.uResolution, z2VpW, z2VpH);
+      gl.uniform1i(z2U.uBgMode, bgModeInt);
+
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      gl.disable(gl.SCISSOR_TEST);
+      gl.viewport(0, 0, this.width, this.height);
+    }
+
     gl.bindVertexArray(null);
   }
 }

@@ -14,8 +14,9 @@ export function detectMediaKind(nameOrType = '') {
 }
 
 export class MediaLayer {
-  constructor(state) {
+  constructor(state, stateKey = 'media') {
     this.state = state;
+    this.stateKey = stateKey;
     this.video = null;
     this.image = null;
     this.stream = null;
@@ -43,11 +44,12 @@ export class MediaLayer {
   }
 
   get isPlaying() {
-    return this.ready && this.state.media && this.state.media.enabled;
+    const m = this.state[this.stateKey];
+    return this.ready && m && m.enabled;
   }
 
   _sourceKey() {
-    const m = this.state.media;
+    const m = this.state[this.stateKey];
     if (!m || m.source === 'none') return '';
     if (m.source === 'camera') return `camera|${m.cameraId || ''}|${m.version || 0}`;
     return `file|${m.url}|${m.version || 0}`;
@@ -59,7 +61,7 @@ export class MediaLayer {
     if (key !== this.currentKey) {
       this.currentKey = key;
       this._teardown();
-      const m = this.state.media;
+      const m = this.state[this.stateKey];
       if (key) {
         if (m.source === 'camera') {
           this._startCamera(m.cameraId);
@@ -74,8 +76,9 @@ export class MediaLayer {
     }
 
     // Velocidad de reproducción en vivo y bucle único/lista
-    if (this.video && this.state.media.source === 'file') {
-      const rate = Math.max(0.25, Math.min(2.0, Number(this.state.media.speed) || 1.0));
+    const m = this.state[this.stateKey];
+    if (this.video && m && m.source === 'file') {
+      const rate = Math.max(0.25, Math.min(2.0, Number(m.speed) || 1.0));
       if (Math.abs(this.video.playbackRate - rate) > 0.001) {
         this.video.playbackRate = rate;
       }
@@ -95,7 +98,8 @@ export class MediaLayer {
     if (this.video) {
       const v = this.video;
       if (v.readyState < 2 || v.videoWidth === 0) return null;
-      if (v.paused && this.state.media.source === 'file') {
+      const m = this.state[this.stateKey];
+      if (v.paused && m && m.source === 'file') {
         v.play().catch(() => {});
       }
       this.width = v.videoWidth;
@@ -145,7 +149,7 @@ export class MediaLayer {
     }
     const url = URL.createObjectURL(file);
     this._blobUrl = url;
-    const m = this.state.media;
+    const m = this.state[this.stateKey];
     m.source = 'file';
     m.url = url;
     m.kind = detectMediaKind(file.type || file.name);

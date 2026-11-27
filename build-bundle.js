@@ -72,6 +72,8 @@ window.addEventListener('DOMContentLoaded', () => {
   const media = new MediaLayer(state);
   renderer.media = media;
   bridge.attachMedia(media);
+  const media2 = new MediaLayer(state, 'media2');
+  renderer.media2 = media2;
   // projector.html?blend=left|right: esta ventana es el proyector izquierdo/derecho del edge blending
   const blendParam = new URLSearchParams(window.location.search).get('blend');
   if (blendParam === 'left') bridge.edgeModeOverride = 2;

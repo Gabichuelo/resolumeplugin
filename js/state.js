@@ -852,6 +852,43 @@ export function createInitialState() {
       currentName: '',
       remainingSec: 0
     },
+    media2: {
+      enabled: false,         // Capa de vídeo / foto para Zona 2 de Publicidad
+      source: 'none',         // 'none' | 'file' | 'camera'
+      url: '',
+      kind: 'video',
+      name: '',
+      opacity: 1.0,
+      blend: 0,
+      fx: 0,
+      fit: 0,
+      mirror: false,
+      beatZoom: 0.0,
+      speed: 1.0,
+      cameraId: '',
+      version: 0
+    },
+    signage2: {
+      enabled: false,         // Zona 2 independiente (mismo HDMI, coordenadas X, Y, Ancho, Alto en píxeles)
+      x: 512,
+      y: 0,
+      width: 1024,
+      height: 512,
+      useAllMedia: false,     // false = Zona 2 reproduce solo los archivos marcados en su propia playlist
+      playlist: [],
+      slideSeconds: 8,
+      fit: 0,                 // 0: Llenar (Cover) | 1: Encajar (Contain) | 2: Estirar exacto X×Y
+      transition: 1,          // 0: Corte | 1: Fundido | 2: Zoom | 3: Deslizar | 4: Cortina | 5: Iris | 6: Aleatorio
+      fadeSeconds: 0.7,
+      transModeActive: 1,
+      transProgress: 0.0,
+      transDir: 0.0,
+      paused: false,
+      currentIndex: 0,
+      totalItems: 0,
+      currentName: '',
+      remainingSec: 0
+    },
     midi: {
       supported: false,       // El navegador soporta Web MIDI
       enabled: false,         // El usuario ha activado la escucha de MIDI Clock

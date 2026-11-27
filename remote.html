@@ -1188,7 +1188,7 @@
 
     <div class="card">
       <div class="card-title">
-        <span>📋 PLAYLIST (FOTOS Y VÍDEOS EN COLA)</span>
+        <span>📋 PLAYLIST (ZONA 1)</span>
         <button type="button" id="btn-s-refresh-list" class="btn-logout">🔄 VER</button>
       </div>
       <div class="grid-2" id="s-scope-grid" style="margin-bottom:8px">
@@ -1197,6 +1197,98 @@
       </div>
       <div id="s-playlist-wrap" class="media-list">
         <div class="help-text">Sube fotos o vídeos arriba para ver la lista de reproducción.</div>
+      </div>
+    </div>
+
+    <div class="card" style="border-color: rgba(232, 121, 249, 0.55)">
+      <div class="card-title">
+        <span>🪧 ZONA 2 INDEPENDIENTE (2º BANNER / VÍDEO)</span>
+        <span id="s2-status-tag" style="color:var(--amber)">APAGADA</span>
+      </div>
+      <button type="button" id="btn-s2-toggle" class="btn-pad btn-big btn-full" style="margin-bottom:8px;font-size:12px">
+        ⬜ ZONA 2 INDEPENDIENTE: APAGADA
+      </button>
+      <div id="s2-now-playing" class="now-playing" style="margin-bottom:8px">
+        ⏹ Zona 2 apagada
+      </div>
+      <div class="grid-3" style="margin-bottom:10px">
+        <button type="button" id="btn-s2-prev" class="btn-pad">⏮ Anterior</button>
+        <button type="button" id="btn-s2-pause" class="btn-pad">⏸ Pausar</button>
+        <button type="button" id="btn-s2-next" class="btn-pad">⏭ Siguiente</button>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:8px">
+        <button type="button" id="btn-s2-place-right" class="btn-pad active">➡️ Al lado de Zona 1</button>
+        <button type="button" id="btn-s2-place-below" class="btn-pad">⬇️ Debajo de Zona 1</button>
+      </div>
+
+      <div class="grid-2" id="s2-size-presets" style="margin-bottom:8px">
+        <button type="button" class="btn-pad" data-z2w="512" data-z2h="256">🪧 512×256</button>
+        <button type="button" class="btn-pad" data-z2w="768" data-z2h="384">🪧 768×384</button>
+        <button type="button" class="btn-pad active" data-z2w="1024" data-z2h="512">🪧 1024×512</button>
+        <button type="button" class="btn-pad" data-z2w="960" data-z2h="1080">📱 960×1080</button>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:8px">
+        <div class="slider-row" style="margin:0">
+          <span>ANCHO Z2</span>
+          <input type="number" id="s2-w" class="text-input" min="64" max="7680" step="1" value="1024" style="margin:0;text-align:center" />
+        </div>
+        <div class="slider-row" style="margin:0">
+          <span>ALTO Z2</span>
+          <input type="number" id="s2-h" class="text-input" min="64" max="4320" step="1" value="512" style="margin:0;text-align:center" />
+        </div>
+        <div class="slider-row" style="margin:0">
+          <span>INICIO X</span>
+          <input type="number" id="s2-x" class="text-input" min="0" max="7680" step="1" value="512" style="margin:0;text-align:center" />
+        </div>
+        <div class="slider-row" style="margin:0">
+          <span>INICIO Y</span>
+          <input type="number" id="s2-y" class="text-input" min="0" max="4320" step="1" value="0" style="margin:0;text-align:center" />
+        </div>
+      </div>
+
+      <div class="grid-3" id="s2-fit-grid" style="margin-bottom:8px">
+        <button type="button" class="btn-pad active" data-s2fit="0">⛶ Llenar</button>
+        <button type="button" class="btn-pad" data-s2fit="1">▣ Encajar</button>
+        <button type="button" class="btn-pad" data-s2fit="2">↔️ Estirar X×Y</button>
+      </div>
+
+      <div class="grid-4" id="s2-slide-presets" style="margin-bottom:6px">
+        <button type="button" class="btn-pad" data-s2sec="3">3s</button>
+        <button type="button" class="btn-pad" data-s2sec="5">5s</button>
+        <button type="button" class="btn-pad active" data-s2sec="8">8s</button>
+        <button type="button" class="btn-pad" data-s2sec="15">15s</button>
+        <button type="button" class="btn-pad" data-s2sec="30">30s</button>
+        <button type="button" class="btn-pad" data-s2sec="60">60s</button>
+        <input type="number" id="s2-slide-sec" class="text-input" min="2" max="300" step="1" value="8" style="grid-column:span 2;margin:0;text-align:center;font-weight:800" title="Segundos personalizados (Zona 2)" />
+      </div>
+
+      <div class="grid-3" id="s2-trans-grid" style="margin-bottom:6px">
+        <button type="button" class="btn-pad" data-s2trans="0">✂️ Corte</button>
+        <button type="button" class="btn-pad active" data-s2trans="1">✨ Fundido</button>
+        <button type="button" class="btn-pad" data-s2trans="2">🔍 Zoom</button>
+        <button type="button" class="btn-pad" data-s2trans="3">➡️ Deslizar</button>
+        <button type="button" class="btn-pad" data-s2trans="4">🪟 Cortina</button>
+        <button type="button" class="btn-pad" data-s2trans="5">💥 Iris</button>
+        <button type="button" class="btn-pad" data-s2trans="6" style="grid-column:span 3">🎲 Aleatorio (Zona 2)</button>
+      </div>
+      <div class="grid-3" id="s2-fade-grid" style="margin-bottom:10px">
+        <button type="button" class="btn-pad" data-s2fade="0.4">⚡ 0.4s</button>
+        <button type="button" class="btn-pad active" data-s2fade="0.8">✨ 0.8s</button>
+        <button type="button" class="btn-pad" data-s2fade="1.5">🐢 1.5s</button>
+      </div>
+
+      <div class="card-title" style="margin-bottom:6px">
+        <span>📋 PLAYLIST DE ZONA 2</span>
+        <button type="button" id="btn-s2-refresh-list" class="btn-logout">🔄 VER</button>
+      </div>
+      <div class="grid-2" id="s2-scope-grid" style="margin-bottom:8px">
+        <button type="button" class="btn-pad active" data-s2all="0">✅ Solo marcados (Z2)</button>
+        <button type="button" class="btn-pad" data-s2all="1">📋 Todos</button>
+      </div>
+      <div id="s2-playlist-wrap" class="media-list">
+        <div class="help-text">Marca qué vídeos o fotos quieres reproducir en Zona 2.</div>
       </div>
     </div>
   </section>
@@ -3507,6 +3599,7 @@
               mediaItemsCache = Array.isArray(res.data.items) ? res.data.items : [];
               renderMediaList(mediaItemsCache);
               if (typeof renderSignagePlaylist === 'function') renderSignagePlaylist();
+              if (typeof renderSignage2Playlist === 'function') renderSignage2Playlist();
             } else {
               mediaListEl.innerHTML = '<div class="help-text">No se pudo cargar la biblioteca' + (res.data && res.data.error ? ': ' + escapeText(res.data.error) : '.') + '</div>';
             }
@@ -4059,6 +4152,37 @@
       const btnSBlackout = document.getElementById('btn-s-blackout');
       const sPlaylistWrap = document.getElementById('s-playlist-wrap');
 
+      // Zona 2 independiente
+      let signage2Local = {
+        enabled: false,
+        x: 512,
+        y: 0,
+        width: 1024,
+        height: 512,
+        useAllMedia: false,
+        playlist: [],
+        slideSeconds: 8,
+        fit: 0,
+        transition: 1,
+        fadeSeconds: 0.7,
+        paused: false,
+        currentIndex: 0,
+        totalItems: 0,
+        currentName: '',
+        remainingSec: 0
+      };
+      let media2CurrentUrl = '';
+      const btnSignage2Toggle = document.getElementById('btn-s2-toggle');
+      const s2StatusTag = document.getElementById('s2-status-tag');
+      const s2NowPlaying = document.getElementById('s2-now-playing');
+      const btnSignage2Pause = document.getElementById('btn-s2-pause');
+      const inpS2W = document.getElementById('s2-w');
+      const inpS2H = document.getElementById('s2-h');
+      const inpS2X = document.getElementById('s2-x');
+      const inpS2Y = document.getElementById('s2-y');
+      const inpS2SlideSec = document.getElementById('s2-slide-sec');
+      const s2PlaylistWrap = document.getElementById('s2-playlist-wrap');
+
       let sMsgTimer = null;
       function showSignageMsg(text, ms = 4000) {
         if (!signageMsg) return;
@@ -4135,12 +4259,12 @@
         });
       }
 
-      function getOrderedSignageCatalog() {
+      function getOrderedZoneCatalog(sgState, defaultAll) {
         const lib = (mediaItemsCache || []).slice().reverse();
         const byUrl = new Map(lib.map((it) => [it.url, it]));
         const ordered = [];
         const seen = new Set();
-        (signageLocal.playlist || []).forEach((p) => {
+        (sgState.playlist || []).forEach((p) => {
           if (p && p.url && byUrl.has(p.url) && !seen.has(p.url)) {
             seen.add(p.url);
             ordered.push({ item: byUrl.get(p.url), selected: true });
@@ -4149,38 +4273,40 @@
         lib.forEach((it) => {
           if (it && it.url && !seen.has(it.url)) {
             seen.add(it.url);
-            ordered.push({ item: it, selected: signageLocal.useAllMedia !== false });
+            ordered.push({ item: it, selected: defaultAll });
           }
         });
         return ordered;
       }
 
-      function commitSignagePlaylistOrder(ordered, makeCustom) {
-        const selectedItems = ordered.filter((r) => r.selected).map((r) => ({
-          url: r.item.url,
-          kind: r.item.kind || guessMediaKind(r.item.name || r.item.file),
-          name: r.item.name || r.item.file || ''
-        }));
-        signageLocal.playlist = selectedItems;
-        if (makeCustom) signageLocal.useAllMedia = false;
-        renderSignageUI();
-        renderSignagePlaylist();
-        sendCommand({
-          action: 'SET_SIGNAGE_PROP',
-          prop: 'playlist',
-          value: selectedItems,
-          useAllMedia: signageLocal.useAllMedia
-        });
-      }
-
-      function renderSignagePlaylist() {
-        if (!sPlaylistWrap) return;
-        const ordered = getOrderedSignageCatalog();
+      function renderZonePlaylistWrap(wrapEl, sgState, zoneNum, curUrl, renderZoneFn) {
+        if (!wrapEl) return;
+        const defaultAll = zoneNum === 2 ? Boolean(sgState.useAllMedia) : (sgState.useAllMedia !== false);
+        const ordered = getOrderedZoneCatalog(sgState, defaultAll);
         if (!ordered.length) {
-          sPlaylistWrap.innerHTML = '<div class="help-text">Sube fotos o vídeos arriba para crear tu bucle o carrusel.</div>';
+          wrapEl.innerHTML = '<div class="help-text">Sube fotos o vídeos arriba para crear tu bucle o carrusel.</div>';
           return;
         }
-        sPlaylistWrap.innerHTML = '';
+        const commitOrder = (nextOrdered, makeCustom) => {
+          const selectedItems = nextOrdered.filter((r) => r.selected).map((r) => ({
+            url: r.item.url,
+            kind: r.item.kind || guessMediaKind(r.item.name || r.item.file),
+            name: r.item.name || r.item.file || ''
+          }));
+          sgState.playlist = selectedItems;
+          if (makeCustom) sgState.useAllMedia = false;
+          renderZoneFn();
+          renderZonePlaylistWrap(wrapEl, sgState, zoneNum, curUrl, renderZoneFn);
+          sendCommand({
+            action: 'SET_SIGNAGE_PROP',
+            zone: zoneNum,
+            prop: 'playlist',
+            value: selectedItems,
+            useAllMedia: sgState.useAllMedia
+          });
+        };
+
+        wrapEl.innerHTML = '';
         ordered.forEach((row, idx) => {
           const it = row.item;
           const wrap = document.createElement('div');
@@ -4190,24 +4316,42 @@
           const chk = document.createElement('input');
           chk.type = 'checkbox';
           chk.checked = Boolean(row.selected);
-          chk.style.cssText = 'width:18px;height:18px;accent-color:var(--green);flex:0 0 auto;cursor:pointer';
+          chk.style.cssText = 'width:18px;height:18px;accent-color:' + (zoneNum === 2 ? '#e879f9' : 'var(--green)') + ';flex:0 0 auto;cursor:pointer';
           chk.addEventListener('change', () => {
             ordered[idx].selected = chk.checked;
-            commitSignagePlaylistOrder(ordered, true);
+            commitOrder(ordered, true);
           });
           wrap.appendChild(chk);
 
           const playBtn = document.createElement('button');
           playBtn.type = 'button';
-          playBtn.className = 'btn-pad media-play' + (signageLocal.enabled && it.url === mediaCurrentUrl ? ' playing' : '');
+          playBtn.className = 'btn-pad media-play' + (sgState.enabled && it.url === curUrl ? ' playing' : '');
           playBtn.innerHTML = '<span>' + kindIcon(it.kind) + '</span><span class="mname">' + escapeText(it.name || it.file || '') +
             '</span><span class="msize">' + formatBytes(it.size) + '</span>';
           playBtn.addEventListener('click', () => {
-            if (!signageLocal.enabled) {
-              signageLocal.enabled = true;
-              sendCommand({ action: 'SET_SIGNAGE_ENABLED', value: true });
+            if (zoneNum === 2) {
+              if (!signageLocal.enabled) {
+                signageLocal.enabled = true;
+                sendCommand({ action: 'SET_SIGNAGE_ENABLED', zone: 1, value: true });
+              }
+              if (!ordered[idx].selected && !sgState.useAllMedia) {
+                ordered[idx].selected = true;
+                commitOrder(ordered, true);
+              }
+              if (!sgState.enabled) {
+                sgState.enabled = true;
+                renderZoneFn();
+                sendCommand({ action: 'SET_SIGNAGE_ENABLED', zone: 2, value: true });
+              }
+              sendCommand({ action: 'SIGNAGE_GOTO', zone: 2, url: it.url });
+            } else {
+              if (!signageLocal.enabled) {
+                signageLocal.enabled = true;
+                renderZoneFn();
+                sendCommand({ action: 'SET_SIGNAGE_ENABLED', zone: 1, value: true });
+              }
+              sendCommand({ action: 'SIGNAGE_GOTO', zone: 1, url: it.url });
             }
-            sendCommand({ action: 'SIGNAGE_GOTO', url: it.url });
           });
           wrap.appendChild(playBtn);
 
@@ -4221,7 +4365,7 @@
             if (idx <= 0) return;
             const copy = ordered.slice();
             const tmp = copy[idx - 1]; copy[idx - 1] = copy[idx]; copy[idx] = tmp;
-            commitSignagePlaylistOrder(copy, true);
+            commitOrder(copy, true);
           });
           wrap.appendChild(upBtn);
 
@@ -4235,7 +4379,7 @@
             if (idx >= ordered.length - 1) return;
             const copy = ordered.slice();
             const tmp = copy[idx + 1]; copy[idx + 1] = copy[idx]; copy[idx] = tmp;
-            commitSignagePlaylistOrder(copy, true);
+            commitOrder(copy, true);
           });
           wrap.appendChild(dnBtn);
 
@@ -4246,14 +4390,76 @@
           delBtn.addEventListener('click', () => deleteMediaItem(it));
           wrap.appendChild(delBtn);
 
-          sPlaylistWrap.appendChild(wrap);
+          wrapEl.appendChild(wrap);
         });
+      }
+
+      function renderSignagePlaylist() {
+        renderZonePlaylistWrap(sPlaylistWrap, signageLocal, 1, mediaCurrentUrl, renderSignageUI);
+      }
+
+      function renderSignage2UI() {
+        const sg2 = signage2Local || {};
+        if (btnSignage2Toggle) {
+          btnSignage2Toggle.classList.toggle('green-live', Boolean(sg2.enabled));
+          btnSignage2Toggle.textContent = sg2.enabled
+            ? '🟢 ZONA 2 INDEPENDIENTE: ACTIVA'
+            : '⬜ ZONA 2 INDEPENDIENTE: APAGADA';
+        }
+        if (s2StatusTag) {
+          s2StatusTag.textContent = sg2.enabled ? (sg2.paused ? 'PAUSADA' : '▶ ACTIVA') : 'APAGADA';
+          s2StatusTag.style.color = sg2.enabled ? 'var(--green)' : 'var(--amber)';
+        }
+        if (s2NowPlaying) {
+          if (!sg2.enabled) {
+            s2NowPlaying.textContent = '⏹ Zona 2 apagada';
+            s2NowPlaying.classList.remove('live');
+          } else if (!sg2.totalItems) {
+            s2NowPlaying.textContent = '⚠️ Sin archivos en Zona 2 — marca alguno abajo';
+            s2NowPlaying.classList.remove('live');
+          } else {
+            const rem2 = sg2.remainingSec > 0 ? (' · ' + sg2.remainingSec + 's') : (sg2.totalItems === 1 ? ' · LOOP 24/7' : '');
+            s2NowPlaying.textContent = (sg2.paused ? '⏸ ' : '▶ ') + ((sg2.currentIndex || 0) + 1) + '/' + sg2.totalItems + ' · ' + (sg2.currentName || 'Archivo') + rem2;
+            s2NowPlaying.classList.toggle('live', !sg2.paused);
+          }
+        }
+        if (btnSignage2Pause) {
+          btnSignage2Pause.classList.toggle('amber-active', Boolean(sg2.paused));
+          btnSignage2Pause.textContent = sg2.paused ? '▶ Seguir' : '⏸ Pausar';
+        }
+        const w2 = Number(sg2.width) || 1024;
+        const h2 = Number(sg2.height) || 512;
+        const x2 = Number(sg2.x) || 0;
+        const y2 = Number(sg2.y) || 0;
+        if (inpS2W && document.activeElement !== inpS2W) inpS2W.value = w2;
+        if (inpS2H && document.activeElement !== inpS2H) inpS2H.value = h2;
+        if (inpS2X && document.activeElement !== inpS2X) inpS2X.value = x2;
+        if (inpS2Y && document.activeElement !== inpS2Y) inpS2Y.value = y2;
+        document.querySelectorAll('#s2-size-presets .btn-pad').forEach((b) => {
+          const bw = parseInt(b.getAttribute('data-z2w'), 10);
+          const bh = parseInt(b.getAttribute('data-z2h'), 10);
+          b.classList.toggle('active', bw === w2 && bh === h2);
+        });
+        if (inpS2SlideSec && document.activeElement !== inpS2SlideSec) inpS2SlideSec.value = sg2.slideSeconds || 8;
+        reflectChoiceGrid('s2-slide-presets', 'data-s2sec', sg2.slideSeconds || 8);
+        const cur2Trans = sg2.transition !== undefined ? Number(sg2.transition) : 1;
+        const cur2Fade = Number(sg2.fadeSeconds) || 0.7;
+        const near2Fade = [0.4, 0.8, 1.5].reduce((a, b) => (Math.abs(b - cur2Fade) < Math.abs(a - cur2Fade) ? b : a), 0.8);
+        reflectChoiceGrid('s2-trans-grid', 'data-s2trans', String(cur2Trans));
+        reflectChoiceGrid('s2-fade-grid', 'data-s2fade', cur2Trans > 0 ? String(near2Fade) : '');
+        reflectChoiceGrid('s2-fit-grid', 'data-s2fit', sg2.fit || 0);
+        reflectChoiceGrid('s2-scope-grid', 'data-s2all', sg2.useAllMedia ? '1' : '0');
+      }
+
+      function renderSignage2Playlist() {
+        renderZonePlaylistWrap(s2PlaylistWrap, signage2Local, 2, media2CurrentUrl, renderSignage2UI);
       }
 
       function onSignageTabOpened() {
         refreshMediaList();
         renderSignageUI();
         renderSignageBannerUI();
+        renderSignage2UI();
       }
 
       btnSignageToggle?.addEventListener('click', () => {
@@ -4300,9 +4506,8 @@
               signageLocal.enabled = true;
               renderSignageUI();
               sendCommand({ action: 'SET_SIGNAGE_ENABLED', value: true });
-            } else {
-              sendCommand({ action: 'SIGNAGE_REFRESH_LIBRARY' });
             }
+            sendCommand({ action: 'SIGNAGE_REFRESH_LIBRARY' });
             return;
           }
           const f = files[idx++];
@@ -4485,6 +4690,120 @@
       renderSignageUI();
       renderSignageBannerUI();
 
+      // Eventos Zona 2 independiente
+      btnSignage2Toggle?.addEventListener('click', () => {
+        signage2Local.enabled = !signage2Local.enabled;
+        markTouched(btnSignage2Toggle);
+        if (signage2Local.enabled && !signageLocal.enabled) {
+          signageLocal.enabled = true;
+          renderSignageUI();
+          sendCommand({ action: 'SET_SIGNAGE_ENABLED', zone: 1, value: true });
+        }
+        renderSignage2UI();
+        sendCommand({ action: 'SET_SIGNAGE_ENABLED', zone: 2, value: signage2Local.enabled });
+      });
+      document.getElementById('btn-s2-prev')?.addEventListener('click', () => sendCommand({ action: 'SIGNAGE_PREV', zone: 2, immediate: true }));
+      document.getElementById('btn-s2-next')?.addEventListener('click', () => sendCommand({ action: 'SIGNAGE_NEXT', zone: 2, immediate: true }));
+      btnSignage2Pause?.addEventListener('click', () => {
+        signage2Local.paused = !signage2Local.paused;
+        renderSignage2UI();
+        sendCommand({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'paused', value: signage2Local.paused });
+      });
+      function placeRemoteZone2(side) {
+        const z1X = Math.max(0, parseInt(inpSLedOx?.value, 10) || 0);
+        const z1Y = Math.max(0, parseInt(inpSLedOy?.value, 10) || 0);
+        const z1W = Math.max(64, ledWLocal || 1024);
+        const z1H = Math.max(64, ledHLocal || 512);
+        if (!ledScalerOn) {
+          ledScalerOn = true;
+          renderSignageBannerUI();
+          renderLedScalerUI();
+          sendCommand({ action: 'SET_MAP_PROP', prop: 'ledScalerEnabled', value: true });
+        }
+        const nx = side === 'below' ? z1X : (z1X + z1W);
+        const ny = side === 'below' ? (z1Y + z1H) : z1Y;
+        signage2Local.x = nx;
+        signage2Local.y = ny;
+        renderSignage2UI();
+        sendCommand({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'rect', value: { x: nx, y: ny } });
+      }
+      document.getElementById('btn-s2-place-right')?.addEventListener('click', () => placeRemoteZone2('right'));
+      document.getElementById('btn-s2-place-below')?.addEventListener('click', () => placeRemoteZone2('below'));
+      document.querySelectorAll('#s2-size-presets .btn-pad').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const w = parseInt(btn.getAttribute('data-z2w'), 10) || 1024;
+          const h = parseInt(btn.getAttribute('data-z2h'), 10) || 512;
+          signage2Local.width = w;
+          signage2Local.height = h;
+          renderSignage2UI();
+          sendCommand({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'rect', value: { width: w, height: h } });
+        });
+      });
+      const bindZ2Num = (el, prop, minV, maxV) => {
+        if (!el) return;
+        const apply = () => {
+          const raw = parseInt(el.value, 10);
+          if (Number.isFinite(raw)) {
+            const c = Math.max(minV, Math.min(maxV, raw));
+            signage2Local[prop] = c;
+            renderSignage2UI();
+            sendCommand({ action: 'SET_SIGNAGE_PROP', zone: 2, prop, value: c });
+          }
+        };
+        el.addEventListener('input', apply);
+        el.addEventListener('change', apply);
+      };
+      bindZ2Num(inpS2W, 'width', 64, 7680);
+      bindZ2Num(inpS2H, 'height', 64, 4320);
+      bindZ2Num(inpS2X, 'x', 0, 7680);
+      bindZ2Num(inpS2Y, 'y', 0, 4320);
+      bindChoiceGrid('s2-fit-grid', 'data-s2fit', (v) => {
+        const fit = parseInt(v, 10) || 0;
+        signage2Local.fit = fit;
+        renderSignage2UI();
+        sendCommand({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'fit', value: fit });
+      });
+      bindChoiceGrid('s2-slide-presets', 'data-s2sec', (v) => {
+        const sec = Math.max(2, Math.min(300, parseInt(v, 10) || 8));
+        signage2Local.slideSeconds = sec;
+        renderSignage2UI();
+        sendCommand({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'slideSeconds', value: sec });
+      });
+      const handleCustomZ2SlideSec = () => {
+        const raw = parseInt(inpS2SlideSec?.value, 10);
+        if (Number.isFinite(raw)) {
+          const sec = Math.max(2, Math.min(300, raw));
+          signage2Local.slideSeconds = sec;
+          renderSignage2UI();
+          sendCommand({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'slideSeconds', value: sec });
+        }
+      };
+      inpS2SlideSec?.addEventListener('input', handleCustomZ2SlideSec);
+      inpS2SlideSec?.addEventListener('change', handleCustomZ2SlideSec);
+      bindChoiceGrid('s2-trans-grid', 'data-s2trans', (v) => {
+        const mode = Math.max(0, Math.min(6, parseInt(v, 10) || 0));
+        signage2Local.transition = mode;
+        if (mode > 0 && (Number(signage2Local.fadeSeconds) || 0) < 0.05) signage2Local.fadeSeconds = 0.7;
+        renderSignage2UI();
+        sendCommand({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'transition', value: mode });
+      });
+      bindChoiceGrid('s2-fade-grid', 'data-s2fade', (v) => {
+        const fade = parseFloat(v) || 0.8;
+        signage2Local.fadeSeconds = fade;
+        if ((signage2Local.transition || 0) === 0) signage2Local.transition = 1;
+        renderSignage2UI();
+        sendCommand({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'fadeSeconds', value: fade });
+      });
+      bindChoiceGrid('s2-scope-grid', 'data-s2all', (v) => {
+        const all = v === '1';
+        signage2Local.useAllMedia = all;
+        renderSignage2UI();
+        renderSignage2Playlist();
+        sendCommand({ action: 'SET_SIGNAGE_PROP', zone: 2, prop: 'useAllMedia', value: all });
+      });
+      document.getElementById('btn-s2-refresh-list')?.addEventListener('click', refreshMediaList);
+      renderSignage2UI();
+
       function applyV2Status(st) {
         if (st.text) applyTextStatus(st.text);
         if (st.media || typeof st.mediaPlaying === 'boolean') applyMediaStatus(st.media, st.mediaPlaying);
@@ -4500,6 +4819,20 @@
             pl: signageLocal.playlist, cur: st.media && st.media.url
           });
           if (prevSig !== nextSig) renderSignagePlaylist();
+        }
+        if (st.signage2 && typeof st.signage2 === 'object') {
+          const prevSig2 = JSON.stringify({
+            e: signage2Local.enabled, u: signage2Local.useAllMedia,
+            pl: signage2Local.playlist, cur: media2CurrentUrl
+          });
+          Object.assign(signage2Local, st.signage2);
+          if (typeof st.media2Url === 'string') media2CurrentUrl = st.media2Url;
+          renderSignage2UI();
+          const nextSig2 = JSON.stringify({
+            e: signage2Local.enabled, u: signage2Local.useAllMedia,
+            pl: signage2Local.playlist, cur: media2CurrentUrl
+          });
+          if (prevSig2 !== nextSig2) renderSignage2Playlist();
         }
         if (st.output && typeof st.output.brightness === 'number') {
           setRangeIfIdle('m-out-bright', st.output.brightness);

@@ -37,6 +37,11 @@ class AetherVJApplication {
     this.syncBridge.attachMedia(this.media);
     this.signagePlayer = new SignagePlayer(this.state, this.media, this.syncBridge);
     this.syncBridge.attachSignage(this.signagePlayer);
+    // Zona 2 de cartelería LED independiente
+    this.media2 = new MediaLayer(this.state, 'media2');
+    this.renderer.media2 = this.media2;
+    this.signagePlayer2 = new SignagePlayer(this.state, this.media2, this.syncBridge, 'signage2', 'media2');
+    this.syncBridge.attachSignage2(this.signagePlayer2);
     this.media.refreshCameras();
     this.persistence = new Persistence(this.state, this.syncBridge);
     this.ui = new ConsoleController(
@@ -47,6 +52,7 @@ class AetherVJApplication {
     );
     this.ui.midiClock = this.midiClock;
     this.ui.signagePlayer = this.signagePlayer;
+    this.ui.signagePlayer2 = this.signagePlayer2;
     this.syncBridge.attachControllers(this.autopilot, () => this.ui._buildGeneratorBanks());
 
     if (this.state.uiHidden) {
@@ -73,6 +79,7 @@ class AetherVJApplication {
         this.state.resolutionScale = AUTO_QUALITY_STEPS[0];
       }
       this.signagePlayer.onConfigLoaded();
+      this.signagePlayer2.onConfigLoaded();
     });
 
     // Kiosk with ?mic=1: listen to the real room / mixer audio automatically (falls back to the simulator)
@@ -96,7 +103,7 @@ class AetherVJApplication {
     const st = this.state;
     if (!st.autoQuality) return;
     // En modo Publicidad/Kiosco el gasto GPU es mínimo: mantener siempre 100% de resolución nativa para logos nítidos
-    if (st.signage && st.signage.enabled) {
+    if ((st.signage && st.signage.enabled) || (st.signage2 && st.signage2.enabled)) {
       if (st.resolutionScale !== 1.0) st.resolutionScale = 1.0;
       this.autoQualityStepIdx = 0;
       this.lowFpsSeconds = 0;
@@ -214,6 +221,9 @@ class AetherVJApplication {
     // 2.5 Update Advertising Kiosk / Signage Player (loops or timed carousel)
     if (this.signagePlayer) {
       this.signagePlayer.update(dt);
+    }
+    if (this.signagePlayer2) {
+      this.signagePlayer2.update(dt);
     }
 
     // 3. Execute Multi-Pass GPU Shader Pipeline (skip GPU draw if window is minimized to save power while keeping Projector & Remote live)
