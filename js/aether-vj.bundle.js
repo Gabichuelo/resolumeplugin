@@ -12154,14 +12154,19 @@ class ConsoleController {
           deskSharedNotes.value = `⏳ Ejecutando: ${btn.textContent.trim()}...\nEspera unos segundos...`;
         }
         try {
+          const reqBody = {
+            pin: '1234',
+            preset,
+            sudoPass: deskSudoPass ? deskSudoPass.value : ''
+          };
+          if (preset === 'hotspot-on' || preset === 'install-wifi-aic8800') {
+            const ssidVal = document.getElementById('desk-hotspot-ssid')?.value?.trim() || '';
+            if (ssidVal) reqBody.ssid = ssidVal;
+          }
           const res = await fetch('/api/system-terminal', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              pin: '1234',
-              preset,
-              sudoPass: deskSudoPass ? deskSudoPass.value : ''
-            })
+            body: JSON.stringify(reqBody)
           });
           const data = await res.json();
           if (deskSharedNotes) {
