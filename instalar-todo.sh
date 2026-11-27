@@ -81,6 +81,12 @@ sudo -u "$REAL_USER" SKIP_QUITAR_CLAVES=1 bash "$AETHER_DIR/setup-linux-pi-kiosk
 wait_for_internet
 bash "$AETHER_DIR/instalar-luces-sl04.sh"
 
+# 4.5. Instalar driver USB Wi-Fi AIC8800DC + Python OpenCV (para auto-limpiar logos y Hotspot)
+if [ -f "$AETHER_DIR/instalar-wifi-aic8800.sh" ]; then
+  wait_for_internet
+  bash "$AETHER_DIR/instalar-wifi-aic8800.sh" || echo "⚠️ Aviso: driver Wi-Fi AIC8800 pendiente de revisión/MOK."
+fi
+
 # 5. Quitar todas las contraseñas y preparar UEFI/Red para clonación (al final, cuando ya se descargó todo)
 bash "$AETHER_DIR/quitar-claves.sh"
 

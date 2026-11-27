@@ -1747,6 +1747,16 @@
         <button type="button" class="btn-pad active" data-term-preset="hotspot-status" style="padding:13px 8px;font-size:11px">
           📶 10. Probar Antena USB / Estado Wi-Fi
         </button>
+        <button type="button" class="btn-pad amber-active" data-term-preset="install-wifi-aic8800" style="padding:13px 8px;font-size:11px">
+          🔧 11. Instalar Driver USB Wi-Fi (AIC8800)
+        </button>
+        <button type="button" class="btn-pad" data-term-preset="hotspot-off" style="padding:13px 8px;font-size:11px">
+          📴 12. Apagar Wi-Fi Propio (Hotspot)
+        </button>
+      </div>
+
+      <div style="margin:6px 0 10px">
+        <input type="text" id="term-hotspot-ssid" class="text-input" placeholder="Nombre Wi-Fi opcional (ej: AETHER-1, por defecto: AETHER-VJ)" maxlength="32" autocomplete="off" autocapitalize="none" spellcheck="false" style="margin:0" />
       </div>
 
       <div class="card-title" style="margin-top:8px;margin-bottom:4px">
@@ -3018,7 +3028,12 @@
           if (preset === 'clone-m2') {
             if (!window.confirm('⚠️ ¿Clonar este Mini-PC Maestro sobre el disco M.2 / USB secundario conectado?\n\nTODOS los datos del disco nuevo se borrarán y quedará clonado listo para otro Mini-PC (tarda ~1-2 min).')) return;
           }
-          runRemoteTerminal({ preset }, btn.textContent.trim());
+          const reqPayload = { preset };
+          if (preset === 'hotspot-on' || preset === 'install-wifi-aic8800') {
+            const ssidVal = document.getElementById('term-hotspot-ssid')?.value?.trim() || '';
+            if (ssidVal) reqPayload.ssid = ssidVal;
+          }
+          runRemoteTerminal(reqPayload, btn.textContent.trim());
         });
       });
 

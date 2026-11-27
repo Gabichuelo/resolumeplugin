@@ -66,9 +66,28 @@ detect_iface() {
     IFACE="$(nmcli -t -f DEVICE,TYPE device 2>/dev/null | awk -F: '$2=="wifi"{print $1; exit}' || true)"
   fi
   if [ -z "$IFACE" ]; then
+    # Si la antena AIC8800 está en modo pendrive (a69c:5721) o módulo sin cargar (a69c:88dc), intentar activarla
+    if lsusb 2>/dev/null | grep -qi 'a69c:5721'; then
+      for dev in /dev/aicudisk* /dev/disk/by-id/usb-AIC_flash*; do
+        [ -e "$dev" ] || continue
+        $SUDO eject "$dev" 2>/dev/null || true
+      done
+      sleep 3
+    fi
+    if lsusb 2>/dev/null | grep -qi 'a69c:88dc'; then
+      $SUDO modprobe aic_load_fw 2>/dev/null || true
+      $SUDO modprobe aic8800_fdrv 2>/dev/null || true
+      sleep 2
+    fi
+    IFACE="$(nmcli -t -f DEVICE,TYPE device 2>/dev/null | awk -F: '$2=="wifi"{print $1; exit}' || true)"
+  fi
+  if [ -z "$IFACE" ]; then
     echo "=== DIAGNOSTICO ADAPTADORES USB WI-FI ===" >&2
     nmcli device status 2>/dev/null >&2 || true
-    lsusb 2>/dev/null | grep -iE 'wifi|wlan|realtek|ralink|mediatek|atheros|tp-link|802\.11|wireless|net|intel|broadcom' >&2 || lsusb 2>/dev/null >&2 || true
+    lsusb 2>/dev/null | grep -iE 'wifi|wlan|realtek|ralink|mediatek|atheros|tp-link|802\.11|wireless|net|intel|broadcom|aic|a69c' >&2 || lsusb 2>/dev/null >&2 || true
+    if lsusb 2>/dev/null | grep -qi 'a69c:'; then
+      echo "💡 Detectado adaptador AICSemi AIC8800. Ejecuta primero: sudo bash instalar-wifi-aic8800.sh (o botón '11. Instalar Driver USB Wi-Fi')." >&2
+    fi
     fatal "No se encontró ninguna tarjeta Wi-Fi activa en Linux. Si acabas de enchufar una antena USB nueva, puede que necesite driver (mira el chip en lsusb arriba)."
   fi
 }

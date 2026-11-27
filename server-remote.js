@@ -952,7 +952,15 @@ const requestHandler = async (req, res) => {
       } else if (preset === 'clone-m2') {
         rawCmd = 'sudo -S bash clonar-m2.sh --clone';
       } else if (preset === 'hotspot-on') {
-        rawCmd = 'sudo -S bash setup-hotspot-linux.sh --no-restart';
+        const safeSsid = String(body.ssid || '').trim().replace(/[^A-Za-z0-9._-]/g, '').slice(0, 32);
+        rawCmd = safeSsid
+          ? `sudo -S bash setup-hotspot-linux.sh --no-restart "${safeSsid}"`
+          : 'sudo -S bash setup-hotspot-linux.sh --no-restart';
+      } else if (preset === 'install-wifi-aic8800') {
+        const safeSsid = String(body.ssid || '').trim().replace(/[^A-Za-z0-9._-]/g, '').slice(0, 32);
+        rawCmd = safeSsid
+          ? `sudo -S bash instalar-wifi-aic8800.sh "${safeSsid}"`
+          : 'sudo -S bash instalar-wifi-aic8800.sh';
       } else if (preset === 'hotspot-off') {
         rawCmd = 'sudo -S bash setup-hotspot-linux.sh --off';
       } else if (preset === 'hotspot-status') {
@@ -975,7 +983,9 @@ const requestHandler = async (req, res) => {
         return;
       }
 
-      const cmdTimeoutMs = (preset === 'clone-m2' || preset === 'usb-backup') ? 1200000 : 120000;
+      const cmdTimeoutMs = (preset === 'clone-m2' || preset === 'usb-backup')
+        ? 1200000
+        : (preset === 'install-wifi-aic8800' ? 300000 : 120000);
       const child = exec(rawCmd, { cwd: __dirname, timeout: cmdTimeoutMs, maxBuffer: 4 * 1024 * 1024 }, (err, stdout, stderr) => {
         const combined = ((stdout || '') + (stderr ? '\n' + stderr : '')).trim();
         const outText = combined || (err ? err.message : '(Comando ejecutado sin texto de salida)');
